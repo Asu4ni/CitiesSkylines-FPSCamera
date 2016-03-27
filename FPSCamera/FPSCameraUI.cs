@@ -204,7 +204,7 @@ namespace FPSCamera
             }
 
             MakeSlider(panel, "FieldOfView", "Field of view", y,
-                FPSCamera.instance.config.fieldOfView, 30.0f, 120.0f,
+                FPSCamera.instance.config.fieldOfView, 5.0f, 120.0f,
                 value =>
                 {
                     FPSCamera.instance.SetFieldOfView(value);
@@ -287,6 +287,24 @@ namespace FPSCamera
                 });
 
             y += 28.0f + 16.0f;
+
+            MakeSlider(panel, "VehicleXOffset", "Vehicle camera X offset", y, FPSCamera.instance.config.vehicleCameraOffsetX, -6f, 6.0f,
+                value =>
+                {
+                    FPSCamera.instance.config.vehicleCameraOffsetX = value;
+                    FPSCamera.instance.SaveConfig();
+                });
+
+            y += 28.0f;
+
+            MakeSlider(panel, "VehicleYOffset", "Vehicle camera Y offset", y, FPSCamera.instance.config.vehicleCameraOffsetY, -1f, 6.0f,
+                value =>
+                {
+                   FPSCamera.instance.config.vehicleCameraOffsetY = value;
+                   FPSCamera.instance.SaveConfig();
+                });
+
+            y += 28.0f;
 
             if (!FPSCamera.editorMode)
             {
@@ -459,7 +477,7 @@ namespace FPSCamera
 
         void OnDestroy()
         {
-            Destroy(panel.gameObject);   
+            Destroy(panel.gameObject);
         }
 
         private void OnGUI()
@@ -492,7 +510,7 @@ namespace FPSCamera
                     FPSCamera.instance.SaveConfig();
                 }
             }
-            
+
         }
     }
 

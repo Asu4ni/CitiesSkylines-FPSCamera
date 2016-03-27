@@ -46,7 +46,7 @@ namespace FPSCamera
             FPSCamera.instance.SetMode(false);
             followInstance = instance;
             following = true;
-            camera.nearClipPlane = 0.1f;
+            camera.nearClipPlane = 0.75f;
             cameraController.enabled = false;
             camera.fieldOfView = FPSCamera.instance.config.fieldOfView;
             FPSCamera.onCameraModeChanged(true);
@@ -101,7 +101,7 @@ namespace FPSCamera
                 Vector3 forward = orientation * Vector3.forward;
                 Vector3 up = orientation * Vector3.up;
 
-                var pos = position + GetCameraOffsetForVehicleType(v, forward, up);
+                var pos = position + GetCameraOffsetForVehicleType(v, forward, up) + forward * FPSCamera.instance.config.vehicleCameraOffsetX + up * FPSCamera.instance.config.vehicleCameraOffsetY;
                 camera.transform.position = pos + userOffset;
                 Vector3 lookAt = pos + (orientation * Vector3.forward) * 1.0f;
 

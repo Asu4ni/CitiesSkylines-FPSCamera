@@ -24,7 +24,7 @@ namespace FPSCamera
             FPSCamera.instance.SetMode(false);
             followInstance = instance;
             following = true;
-            camera.nearClipPlane = 0.1f;
+            camera.nearClipPlane = 0.75f;
             cameraController.enabled = false;
             camera.fieldOfView = FPSCamera.instance.config.fieldOfView;
             FPSCamera.onCameraModeChanged(true);

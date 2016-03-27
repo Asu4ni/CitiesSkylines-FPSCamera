@@ -19,6 +19,7 @@ namespace FPSCamera
         public bool invertYAxis = false;
         public bool limitSpeedGround = false;
         public float fieldOfView = 45.0f;
+        public float vFieldOfView = 45.0f;
         public bool preventClipGround = true;
         public bool animateTransitions = true;
         public float animationSpeed = 1.0f;
@@ -26,6 +27,8 @@ namespace FPSCamera
         public float walkthroughModeTimer = 25.0f;
         public bool walkthroughModeManual = false;
         public bool allowUserOffsetInVehicleCitizenMode = false;
+        public float vehicleCameraOffsetX = 0f;
+        public float vehicleCameraOffsetY = 0f;
 
         public void OnPreSerialize()
         {

@@ -196,6 +196,15 @@ namespace FPSCamera
         {
             instance.fpsModeEnabled = fpsMode;
 
+            if( fpsMode )
+            {
+                instance.controller.m_maxDistance = 50f;
+            }
+            else
+            {
+                instance.controller.m_maxDistance = 4000f;
+            }
+
             if (instance.fpsModeEnabled)
             {
                 camera.fieldOfView = config.fieldOfView;
