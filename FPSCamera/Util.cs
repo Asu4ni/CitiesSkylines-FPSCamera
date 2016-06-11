@@ -9,6 +9,18 @@ namespace FPSCamera
 
     public static class Util
     {
+        public static MethodInfo FindMethod<T>(T o, string methodName)
+        {
+            var methods = typeof(T).GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            foreach (var m in methods)
+            {
+                if (m.Name == methodName){
+                    return m;
+                }
+            }
+            return null;
+        }
+
         public static FieldInfo FindField<T>(T o, string fieldName)
         {
             var fields = typeof(T).GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);

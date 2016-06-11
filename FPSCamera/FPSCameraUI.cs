@@ -107,16 +107,7 @@ namespace FPSCamera
             panel.relativePosition = new Vector3(cameraModeButton.relativePosition.x - panel.size.x, cameraModeButton.relativePosition.y + 60.0f);
             panel.name = "FPSCameraConfigPanel";
 
-            var titleLabel = panel.AddUIComponent<UILabel>();
-            titleLabel.name = "Title";
-            titleLabel.text = "First-person camera configuration";
-            titleLabel.autoSize = false;
-            titleLabel.size = new Vector2(panel.size.x, 24.0f);
-            titleLabel.AlignTo(panel, UIAlignAnchor.TopLeft);
-            titleLabel.relativePosition = new Vector3(titleLabel.relativePosition.x, titleLabel.relativePosition.y + 2.0f);
-            titleLabel.textAlignment = UIHorizontalAlignment.Center;
-
-            float y = 48.0f;
+            float y = 4.0f;
 
             var hotkeyToggleLabel = panel.AddUIComponent<UILabel>();
             hotkeyToggleLabel.name = "ToggleFirstpersonLabel";
@@ -213,7 +204,7 @@ namespace FPSCamera
             y += 28.0f;
 
             MakeSlider(panel, "MovementSpeed", "Movement speed", y,
-                FPSCamera.instance.config.cameraMoveSpeed, 0.25f, 128.0f,
+                FPSCamera.instance.config.cameraMoveSpeed, 0, 128.0f,
                 value =>
                 {
                     FPSCamera.instance.config.cameraMoveSpeed = value;
@@ -300,7 +291,16 @@ namespace FPSCamera
             MakeSlider(panel, "VehicleYOffset", "Vehicle camera Y offset", y, FPSCamera.instance.config.vehicleCameraOffsetY, -1f, 6.0f,
                 value =>
                 {
-                   FPSCamera.instance.config.vehicleCameraOffsetY = value;
+                    FPSCamera.instance.config.vehicleCameraOffsetY = value;
+                    FPSCamera.instance.SaveConfig();
+                });
+
+            y += 28.0f;
+
+            MakeCheckbox(panel, "DofEnabled", "DOF enabled", y, FPSCamera.instance.config.enableDOF,
+                value =>
+                {
+                   FPSCamera.instance.config.enableDOF = value;
                    FPSCamera.instance.SaveConfig();
                 });
 

@@ -29,6 +29,7 @@ namespace FPSCamera
         public bool allowUserOffsetInVehicleCitizenMode = false;
         public float vehicleCameraOffsetX = 0f;
         public float vehicleCameraOffsetY = 0f;
+        public bool enableDOF = false;
 
         public void OnPreSerialize()
         {

@@ -2,6 +2,7 @@ using ColossalFramework;
 using ColossalFramework.Math;
 using ICities;
 using UnityEngine;
+using UnityStandardAssets.ImageEffects;
 
 namespace FPSCamera
 {
@@ -46,10 +47,11 @@ namespace FPSCamera
         public static readonly string configPath = "FPSCameraConfig.xml";
         public Configuration config;
 
-        private bool fpsModeEnabled = false;
+        public bool fpsModeEnabled = false;
         private CameraController controller;
-        private Camera camera;
+        public Camera camera;
         float rotationY = 0f;
+        public DepthOfField effect;
 
         private Vector3 mainCameraPosition;
         private Quaternion mainCameraOrientation;
@@ -79,6 +81,7 @@ namespace FPSCamera
             controller = FindObjectOfType<CameraController>();
             camera = controller.GetComponent<Camera>();
             originalFieldOfView = camera.fieldOfView;
+            effect = controller.GetComponent<DepthOfField>();
 
             config = Configuration.Deserialize(configPath);
             if (config == null)
@@ -195,25 +198,23 @@ namespace FPSCamera
         public void SetMode(bool fpsMode)
         {
             instance.fpsModeEnabled = fpsMode;
-
-            if( fpsMode )
-            {
-                instance.controller.m_maxDistance = 50f;
-            }
-            else
-            {
-                instance.controller.m_maxDistance = 4000f;
-            }
+            FPSCameraUI.instance.Hide();
 
             if (instance.fpsModeEnabled)
             {
                 camera.fieldOfView = config.fieldOfView;
+                instance.controller.m_maxDistance = 50f;
+                instance.controller.m_currentSize = 5;
+                instance.controller.m_currentHeight =2f;
                 instance.controller.enabled = false;
+                effect.enabled = config.enableDOF;
                 Cursor.visible = false;
                 instance.rotationY = -instance.transform.localEulerAngles.x;
             }
             else
             {
+                instance.controller.m_maxDistance = 4000f;
+
                 if (!config.animateTransitions)
                 {
                     instance.controller.enabled = true;
@@ -221,6 +222,7 @@ namespace FPSCamera
 
                 camera.fieldOfView = originalFieldOfView;
                 Cursor.visible = true;
+
             }
 
             if (hideUIComponent != null && config.integrateHideUI)
@@ -674,6 +676,26 @@ namespace FPSCamera
 
                 camera.fieldOfView = config.fieldOfView;
                 camera.nearClipPlane = 1.0f;
+
+                effect.enabled = config.enableDOF;
+                if (config.enableDOF)
+                {
+                    ushort buildingIndex;
+                    ushort vehicleIndex;
+                    ushort parkedVehicleIndex;
+
+                    Vector3 hitPos;
+                    Segment3 scanSegment = new Segment3(camera.transform.position, camera.transform.position + camera.transform.forward * 1000);
+                    if (BuildingManager.instance.RayCast(scanSegment, ItemClass.Service.None, ItemClass.SubService.None, ItemClass.Layer.Default, Building.Flags.None, out hitPos,out buildingIndex))
+                    {
+                        effect.focalLength = Mathf.Abs(Vector3.Magnitude(hitPos - camera.transform.position));
+                    }
+                    if (VehicleManager.instance.RayCast(scanSegment, Vehicle.Flags.None, VehicleParked.Flags.None, out hitPos, out vehicleIndex, out parkedVehicleIndex))
+                    {
+                        effect.focalLength = Mathf.Abs(Vector3.Magnitude(hitPos - camera.transform.position));
+                    }
+                }
+              
             }
             else
             {

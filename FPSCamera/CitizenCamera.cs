@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityStandardAssets.ImageEffects;
 
 namespace FPSCamera
 {
@@ -10,7 +11,8 @@ namespace FPSCamera
         public bool inVehicle = false;
 
         private CameraController cameraController;
-        private Camera camera;
+        public Camera camera;
+        public DepthOfField effect;
 
         private CitizenManager cManager;
 
@@ -26,7 +28,15 @@ namespace FPSCamera
             following = true;
             camera.nearClipPlane = 0.75f;
             cameraController.enabled = false;
+            cameraController.m_maxDistance = 50f;
+            cameraController.m_currentSize = 5;
             camera.fieldOfView = FPSCamera.instance.config.fieldOfView;
+            effect.enabled = FPSCamera.instance.config.enableDOF;
+            //Set to 1/4 minimum vanilla value( ground level )
+            effect.focalLength = 10;
+            //A bit bigger, to reduce blur some more
+            effect.focalSize = 0.8f;
+
             FPSCamera.onCameraModeChanged(true);
         }
 
@@ -35,6 +45,7 @@ namespace FPSCamera
             following = false;
             cameraController.enabled = true;
             camera.nearClipPlane = 1.0f;
+            cameraController.m_maxDistance = 4000f;
             FPSCamera.onCameraModeChanged(false);
             userOffset = Vector3.zero;
             camera.fieldOfView = FPSCamera.instance.originalFieldOfView;
@@ -50,6 +61,8 @@ namespace FPSCamera
             cameraController = GetComponent<CameraController>();
             camera = GetComponent<Camera>();
             cManager = CitizenManager.instance;
+            effect = cameraController.GetComponent<DepthOfField>();
+
         }
 
         void Update()
@@ -90,6 +103,12 @@ namespace FPSCamera
                 camera.transform.LookAt(lookAt, Vector3.up);
                 camera.transform.rotation = Quaternion.Slerp(currentOrientation, camera.transform.rotation,
                     Time.deltaTime*2.0f);
+
+                float height = camera.transform.position.y - TerrainManager.instance.SampleDetailHeight(camera.transform.position);
+                cameraController.m_currentPosition = camera.transform.position;
+
+                effect.enabled = FPSCamera.instance.config.enableDOF;
+
             }
         }
 
