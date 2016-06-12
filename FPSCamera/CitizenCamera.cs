@@ -20,13 +20,14 @@ namespace FPSCamera
         private float cameraOffsetUp = 1.5f;
 
         public Vector3 userOffset = Vector3.zero;
+        public VehicleCamera vehicleCamera;
 
         public void SetFollowInstance(uint instance)
         {
             FPSCamera.instance.SetMode(false);
             followInstance = instance;
             following = true;
-            camera.nearClipPlane = 0.75f;
+            camera.nearClipPlane = 1f;
             cameraController.enabled = false;
             cameraController.m_maxDistance = 50f;
             cameraController.m_currentSize = 5;
@@ -50,10 +51,6 @@ namespace FPSCamera
             userOffset = Vector3.zero;
             camera.fieldOfView = FPSCamera.instance.originalFieldOfView;
 
-            if (FPSCamera.instance.hideUIComponent != null && FPSCamera.instance.config.integrateHideUI)
-            {
-                FPSCamera.instance.hideUIComponent.SendMessage("Show");
-            }
         }
 
         void Awake()
@@ -71,8 +68,20 @@ namespace FPSCamera
             {
                 var citizen = cManager.m_citizens.m_buffer[followInstance];
                 var i = citizen.m_instance;
-
                 var flags = cManager.m_instances.m_buffer[i].m_flags;
+
+                if ( inVehicle )
+                {
+                    if (citizen.m_vehicle == 0)
+                    {
+                        inVehicle = false;
+                        vehicleCamera.StopFollowing();
+                        SetFollowInstance(followInstance);
+                    }
+                    return;
+                }
+                
+
                 if ((flags & (CitizenInstance.Flags.Created | CitizenInstance.Flags.Deleted)) != CitizenInstance.Flags.Created)
                 {
                     StopFollowing();
@@ -80,7 +89,17 @@ namespace FPSCamera
                 }
 
                 if ((flags & CitizenInstance.Flags.EnteringVehicle) != 0)
-                {
+                {                    
+                    if ( citizen.m_vehicle != 0 )
+                    { 
+                        if((VehicleManager.instance.m_vehicles.m_buffer[citizen.m_vehicle].Info.GetService() == ItemClass.Service.PublicTransport))
+                        {
+                            vehicleCamera.SetFollowInstance(citizen.m_vehicle);
+                            inVehicle = true;
+                            return;
+                        }
+
+                    }
                     StopFollowing();
                     return;
                 }

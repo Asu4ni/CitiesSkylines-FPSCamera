@@ -29,6 +29,7 @@ namespace FPSCamera
                 instance.gameObject.AddComponent<GamePanelExtender>();
                 instance.vehicleCamera = instance.gameObject.AddComponent<VehicleCamera>();
                 instance.citizenCamera = instance.gameObject.AddComponent<CitizenCamera>();
+                instance.citizenCamera.vehicleCamera = instance.vehicleCamera;
                 editorMode = false;
             }
             else
@@ -237,10 +238,7 @@ namespace FPSCamera
                 }
             }
 
-            if (onCameraModeChanged != null)
-            {
-                onCameraModeChanged(fpsMode);
-            }
+            onCameraModeChanged?.Invoke(fpsMode);
         }
 
         public static KeyCode GetToggleUIKey()
@@ -695,12 +693,15 @@ namespace FPSCamera
                         effect.focalLength = Mathf.Abs(Vector3.Magnitude(hitPos - camera.transform.position));
                     }
                 }
-              
+                float height = FPSCamera.instance.camera.transform.position.y - TerrainManager.instance.SampleDetailHeight(FPSCamera.instance.camera.transform.position);
+                float otherHeight = TerrainManager.instance.SampleRawHeightSmoothWithWater(FPSCamera.instance.camera.transform.position, true, 2f);
+                RenderManager.instance.CameraHeight = height;
+
             }
             else
             {
-                mainCameraPosition = gameObject.transform.position;
-                mainCameraOrientation = gameObject.transform.rotation;
+                mainCameraPosition = camera.transform.position;
+                mainCameraOrientation = camera.transform.rotation;
             }
 
             if (config.preventClipGround)

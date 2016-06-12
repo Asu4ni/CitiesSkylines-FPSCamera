@@ -49,7 +49,7 @@ namespace FPSCamera
             FPSCamera.instance.SetMode(false);
             followInstance = instance;
             following = true;
-            camera.nearClipPlane = 0.75f;
+            camera.nearClipPlane = 1f;
             cameraController.enabled = false;
             cameraController.m_maxDistance = 50f;
 
@@ -71,10 +71,6 @@ namespace FPSCamera
             cameraController.m_maxDistance = 4000f;
 
             FPSCamera.onCameraModeChanged(false);
-            if (FPSCamera.instance.hideUIComponent != null && FPSCamera.instance.config.integrateHideUI)
-            {
-                FPSCamera.instance.hideUIComponent.SendMessage("Show");
-            }
        
             camera.fieldOfView = FPSCamera.instance.originalFieldOfView;
         }
