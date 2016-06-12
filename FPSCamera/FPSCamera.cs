@@ -688,7 +688,7 @@ namespace FPSCamera
                     {
                         effect.focalLength = Mathf.Abs(Vector3.Magnitude(hitPos - camera.transform.position));
                     }
-                    if (VehicleManager.instance.RayCast(scanSegment, Vehicle.Flags.None, VehicleParked.Flags.None, out hitPos, out vehicleIndex, out parkedVehicleIndex))
+                    if (VehicleManager.instance.RayCast(scanSegment, Vehicle.Flags.Deleted, VehicleParked.Flags.None, out hitPos, out vehicleIndex, out parkedVehicleIndex))
                     {
                         effect.focalLength = Mathf.Abs(Vector3.Magnitude(hitPos - camera.transform.position));
                     }
