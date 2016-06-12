@@ -504,6 +504,7 @@ namespace FPSCamera
 
                 SetMode(!fpsModeEnabled);
             }
+            ui.Hide();
         }
 
         void OnToggleCameraHotkeyPressed()
@@ -555,6 +556,7 @@ namespace FPSCamera
 
                 SetMode(!fpsModeEnabled);
             }
+            ui.Hide();
         }
 
         void Update()

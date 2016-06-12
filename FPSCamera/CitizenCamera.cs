@@ -50,7 +50,11 @@ namespace FPSCamera
             FPSCamera.onCameraModeChanged(false);
             userOffset = Vector3.zero;
             camera.fieldOfView = FPSCamera.instance.originalFieldOfView;
-
+            if (FPSCamera.instance.hideUIComponent != null && FPSCamera.instance.config.integrateHideUI)
+            {
+                FPSCamera.instance.hideUIComponent.SendMessage("Show");
+            }
+            FPSCamera.instance.ui.Hide();
         }
 
         void Awake()
