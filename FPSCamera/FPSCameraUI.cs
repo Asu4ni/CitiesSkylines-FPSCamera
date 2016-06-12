@@ -182,17 +182,14 @@ namespace FPSCamera
 
             y += 28.0f + 16.0f;
 
-            if (FPSCamera.instance.hideUIComponent != null)
-            {
-                MakeCheckbox(panel, "HideUI", "HideUI integration", y, FPSCamera.instance.config.integrateHideUI,
-                    value =>
-                    {
-                        FPSCamera.instance.config.integrateHideUI = value;
-                        FPSCamera.instance.SaveConfig();
-                    });
+            MakeCheckbox(panel, "HideUI", "Hide UI", y, FPSCamera.instance.config.integrateHideUI,
+                 value =>
+                 {
+                     FPSCamera.instance.config.integrateHideUI = value;
+                     FPSCamera.instance.SaveConfig();
+                 });
 
-                y += 28.0f + 8.0f;
-            }
+            y += 28.0f + 8.0f;
 
             MakeSlider(panel, "FieldOfView", "Field of view", y,
                 FPSCamera.instance.config.fieldOfView, 5.0f, 120.0f,

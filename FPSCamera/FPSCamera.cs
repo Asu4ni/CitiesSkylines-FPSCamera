@@ -64,7 +64,6 @@ namespace FPSCamera
         private SavedInputKey cameraZoomCloser;
         private SavedInputKey cameraZoomAway;
 
-        public Component hideUIComponent = null;
         public bool checkedForHideUI = false;
 
         public VehicleCamera vehicleCamera;
@@ -105,19 +104,6 @@ namespace FPSCamera
             mainCameraPosition = gameObject.transform.position;
             mainCameraOrientation = gameObject.transform.rotation;
             rotationY = -instance.transform.localEulerAngles.x;
-
-            var gameObjects = FindObjectsOfType<GameObject>();
-            foreach (var go in gameObjects)
-            {
-                var tmp = go.GetComponent("HideUI");
-                if (tmp != null)
-                {
-                    hideUIComponent = tmp;
-                    break;
-                }
-            }
-
-            checkedForHideUI = true;
 
             ui = FPSCameraUI.Instance;
         }
@@ -176,9 +162,9 @@ namespace FPSCamera
             cityWalkthroughMode = true;
             cityWalkthroughNextChangeTimer = config.walkthroughModeTimer;
 
-            if (hideUIComponent != null && config.integrateHideUI)
+            if ( config.integrateHideUI)
             {
-                hideUIComponent.SendMessage("Hide");
+                UIHider.Hide();
             }
 
             WalkthroughModeSwitchTarget();
@@ -201,6 +187,18 @@ namespace FPSCamera
             instance.fpsModeEnabled = fpsMode;
             FPSCameraUI.instance.Hide();
 
+            if (config.integrateHideUI)
+            {
+                if (instance.fpsModeEnabled)
+                {
+                    UIHider.Hide();
+                }
+                else
+                {
+                    UIHider.Show();
+                }
+            }
+
             if (instance.fpsModeEnabled)
             {
                 camera.fieldOfView = config.fieldOfView;
@@ -214,7 +212,7 @@ namespace FPSCamera
             }
             else
             {
-                instance.controller.m_maxDistance = 4000f;
+                instance.controller.m_maxDistance = 10000f;
 
                 if (!config.animateTransitions)
                 {
@@ -225,19 +223,7 @@ namespace FPSCamera
                 Cursor.visible = true;
 
             }
-
-            if (hideUIComponent != null && config.integrateHideUI)
-            {
-                if (instance.fpsModeEnabled)
-                {
-                    hideUIComponent.SendMessage("Hide");
-                }
-                else
-                {
-                    hideUIComponent.SendMessage("Show");
-                }
-            }
-
+            
             onCameraModeChanged?.Invoke(fpsMode);
         }
 
@@ -448,7 +434,13 @@ namespace FPSCamera
         {
             if (cityWalkthroughMode)
             {
+
                 cityWalkthroughMode = false;
+                if( config.integrateHideUI)
+                {
+                    UIHider.Hide();
+                }
+
                 if (vehicleCamera != null && vehicleCamera.following)
                 {
                     vehicleCamera.StopFollowing();
@@ -458,29 +450,23 @@ namespace FPSCamera
                 {
                     citizenCamera.StopFollowing();
                 }
-
-                if (hideUIComponent != null && config.integrateHideUI)
-                {
-                    hideUIComponent.SendMessage("Show");
-                }
+                
             }
             else if (vehicleCamera != null && vehicleCamera.following)
             {
-                vehicleCamera.StopFollowing();
-
-                if (hideUIComponent != null && config.integrateHideUI)
+                if (config.integrateHideUI)
                 {
-                    hideUIComponent.SendMessage("Show");
+                    UIHider.Hide();
                 }
+                vehicleCamera.StopFollowing();
             }
             else if (citizenCamera != null && citizenCamera.following)
             {
-                citizenCamera.StopFollowing();
-
-                if (hideUIComponent != null && config.integrateHideUI)
+                if (config.integrateHideUI)
                 {
-                    hideUIComponent.SendMessage("Show");
+                    UIHider.Hide();
                 }
+                citizenCamera.StopFollowing();
             }
             else if (fpsModeEnabled)
             {
@@ -511,6 +497,11 @@ namespace FPSCamera
         {
             if (cityWalkthroughMode)
             {
+                if (config.integrateHideUI)
+                {
+                    UIHider.Show();
+                }
+
                 cityWalkthroughMode = false;
                 if (vehicleCamera.following)
                 {
@@ -521,10 +512,7 @@ namespace FPSCamera
                     citizenCamera.StopFollowing();
                 }
 
-                if (hideUIComponent != null && config.integrateHideUI)
-                {
-                    hideUIComponent.SendMessage("Show");
-                }
+
             }
             else if (vehicleCamera != null && vehicleCamera.following)
             {

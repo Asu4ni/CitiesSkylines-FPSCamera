@@ -25,6 +25,14 @@ namespace FPSCamera
         public void SetFollowInstance(uint instance)
         {
             FPSCamera.instance.SetMode(false);
+
+            if (FPSCamera.instance.config.integrateHideUI)
+            {
+                UIHider.Hide();
+            }
+            FPSCamera.instance.ui.Hide();
+
+            inVehicle = false;
             followInstance = instance;
             following = true;
             camera.nearClipPlane = 1f;
@@ -39,10 +47,17 @@ namespace FPSCamera
             effect.focalSize = 0.8f;
 
             FPSCamera.onCameraModeChanged(true);
+            
         }
 
         public void StopFollowing()
         {
+            if (FPSCamera.instance.config.integrateHideUI)
+            {
+                UIHider.Show();
+            }
+            FPSCamera.instance.ui.Hide();
+
             following = false;
             cameraController.enabled = true;
             camera.nearClipPlane = 1.0f;
@@ -50,11 +65,7 @@ namespace FPSCamera
             FPSCamera.onCameraModeChanged(false);
             userOffset = Vector3.zero;
             camera.fieldOfView = FPSCamera.instance.originalFieldOfView;
-            if (FPSCamera.instance.hideUIComponent != null && FPSCamera.instance.config.integrateHideUI)
-            {
-                FPSCamera.instance.hideUIComponent.SendMessage("Show");
-            }
-            FPSCamera.instance.ui.Hide();
+            
         }
 
         void Awake()
