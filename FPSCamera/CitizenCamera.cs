@@ -1,10 +1,11 @@
+using System;
 using UnityEngine;
 using UnityStandardAssets.ImageEffects;
 
 namespace FPSCamera
 {
 
-    public class CitizenCamera : MonoBehaviour
+    public class CitizenCamera : MonoBehaviour, InstanceCamera
     {
         private uint followInstance;
         public bool following = false;
@@ -16,56 +17,29 @@ namespace FPSCamera
 
         private CitizenManager cManager;
 
-        private float cameraOffsetForward = 0.2f;
-        private float cameraOffsetUp = 1.5f;
-
         public Vector3 userOffset = Vector3.zero;
         public VehicleCamera vehicleCamera;
 
         public void SetFollowInstance(uint instance)
         {
             FPSCamera.instance.SetMode(false);
-
-            if (FPSCamera.instance.config.integrateHideUI)
-            {
-                UIHider.Hide();
-            }
-            FPSCamera.instance.ui.Hide();
-
-            inVehicle = false;
             followInstance = instance;
             following = true;
-            camera.nearClipPlane = 1f;
-            cameraController.enabled = false;
-            cameraController.m_maxDistance = 50f;
-            cameraController.m_currentSize = 5;
-            camera.fieldOfView = FPSCamera.instance.config.fieldOfView;
-            effect.enabled = FPSCamera.instance.config.enableDOF;
-            //Set to 1/4 minimum vanilla value( ground level )
-            effect.focalLength = 10;
-            //A bit bigger, to reduce blur some more
-            effect.focalSize = 0.8f;
-
+            CameraUtils.setCamera(cameraController, camera);
             FPSCamera.onCameraModeChanged(true);
-            
         }
 
         public void StopFollowing()
         {
-            if (FPSCamera.instance.config.integrateHideUI)
-            {
-                UIHider.Show();
-            }
-            FPSCamera.instance.ui.Hide();
-
             following = false;
-            cameraController.enabled = true;
-            camera.nearClipPlane = 1.0f;
-            cameraController.m_maxDistance = 4000f;
-            FPSCamera.onCameraModeChanged(false);
+            CameraUtils.stopCamera(cameraController, camera);
             userOffset = Vector3.zero;
             camera.fieldOfView = FPSCamera.instance.originalFieldOfView;
-            
+            FPSCamera.onCameraModeChanged(false);
+            if(!inVehicle)
+            {
+                vehicleCamera.StopFollowing();
+            }
         }
 
         void Awake()
@@ -73,8 +47,6 @@ namespace FPSCamera
             cameraController = GetComponent<CameraController>();
             camera = GetComponent<Camera>();
             cManager = CitizenManager.instance;
-            effect = cameraController.GetComponent<DepthOfField>();
-
         }
 
         void Update()
@@ -96,9 +68,9 @@ namespace FPSCamera
                     return;
                 }
                 
-
                 if ((flags & (CitizenInstance.Flags.Created | CitizenInstance.Flags.Deleted)) != CitizenInstance.Flags.Created)
                 {
+                    inVehicle = false;
                     StopFollowing();
                     return;
                 }
@@ -106,11 +78,16 @@ namespace FPSCamera
                 if ((flags & CitizenInstance.Flags.EnteringVehicle) != 0)
                 {                    
                     if ( citizen.m_vehicle != 0 )
-                    { 
-                        if((VehicleManager.instance.m_vehicles.m_buffer[citizen.m_vehicle].Info.GetService() == ItemClass.Service.PublicTransport))
+                    {
+                        ushort vehicleId = citizen.m_vehicle;
+                        if((VehicleManager.instance.m_vehicles.m_buffer[vehicleId].Info.GetService() == ItemClass.Service.PublicTransport))
                         {
-                            vehicleCamera.SetFollowInstance(citizen.m_vehicle);
+                            while(VehicleManager.instance.m_vehicles.m_buffer[vehicleId].m_leadingVehicle != 0)
+                            {
+                                vehicleId = VehicleManager.instance.m_vehicles.m_buffer[vehicleId].m_leadingVehicle;
+                            }
                             inVehicle = true;
+                            vehicleCamera.SetFollowInstance(vehicleId);
                             return;
                         }
 
@@ -127,12 +104,8 @@ namespace FPSCamera
                 Vector3 forward = orientation * Vector3.forward;
                 Vector3 up = orientation * Vector3.up;
 
-                var pos = position +
-                          forward*cameraOffsetForward +
-                          up*cameraOffsetUp;
-                camera.transform.position = pos +
-                                            userOffset;
-                Vector3 lookAt = pos + (orientation * Vector3.forward) * 1.0f;
+                camera.transform.position = GetOffset(position, forward, up, userOffset);
+                Vector3 lookAt = camera.transform.position + (orientation * Vector3.forward) * 1.0f;
                 var currentOrientation = camera.transform.rotation;
                 camera.transform.LookAt(lookAt, Vector3.up);
                 camera.transform.rotation = Quaternion.Slerp(currentOrientation, camera.transform.rotation,
@@ -141,11 +114,22 @@ namespace FPSCamera
                 float height = camera.transform.position.y - TerrainManager.instance.SampleDetailHeight(camera.transform.position);
                 cameraController.m_currentPosition = camera.transform.position;
 
-                effect.enabled = FPSCamera.instance.config.enableDOF;
+                if(effect)
+                {
+                    effect.enabled = FPSCamera.instance.config.enableDOF;
+                }
 
             }
         }
 
+        public Vector3 GetOffset( Vector3 position, Vector3 forward, Vector3 up, Vector3 userOffset)
+        {
+            Vector3 retVal = position +
+                          forward * CameraUtils.CAMERAOFFSETFORWARD +
+                          up * CameraUtils.CAMERAOFFSETUP;
+            return retVal + userOffset;
+        }
+        
     }
 
 }

@@ -37,6 +37,12 @@ namespace FPSCamera
             Destroy(citizenCameraButton);
         }
 
+        void resetCamera()
+        {
+            FPSCamera.instance.vehicleCamera.StopFollowing();
+            FPSCamera.instance.citizenCamera.StopFollowing();
+        }
+
         void Update()
         {
             if (!initialized)
@@ -55,6 +61,7 @@ namespace FPSCamera
                             UIHider.Hide();
                         }
                         InstanceID instance = Util.ReadPrivate<CitizenVehicleWorldInfoPanel, InstanceID>(citizenVehicleInfoPanel, "m_InstanceID");
+                        resetCamera();
                         FPSCamera.instance.vehicleCamera.SetFollowInstance(instance.Vehicle);
 
                        
@@ -76,6 +83,7 @@ namespace FPSCamera
                             UIHider.Hide();
                         }
                         InstanceID instance = Util.ReadPrivate<CityServiceVehicleWorldInfoPanel, InstanceID>(cityServiceVehicleInfoPanel, "m_InstanceID");
+                        resetCamera();
                         FPSCamera.instance.vehicleCamera.SetFollowInstance(instance.Vehicle);
 
                     }
@@ -96,6 +104,7 @@ namespace FPSCamera
                             UIHider.Hide();
                         }
                         InstanceID instance = Util.ReadPrivate<PublicTransportVehicleWorldInfoPanel, InstanceID>(publicTransportVehicleInfoPanel, "m_InstanceID");
+                        resetCamera();
                         FPSCamera.instance.vehicleCamera.SetFollowInstance(instance.Vehicle);
 
                      
@@ -118,6 +127,7 @@ namespace FPSCamera
                             UIHider.Hide();
                         }
                         InstanceID instance = Util.ReadPrivate<CitizenWorldInfoPanel, InstanceID>(citizenInfoPanel, "m_InstanceID");
+                        resetCamera();
                         FPSCamera.instance.citizenCamera.SetFollowInstance(instance.Citizen);
                         
                     }

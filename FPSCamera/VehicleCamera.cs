@@ -1,3 +1,4 @@
+using System;
 using ColossalFramework;
 using UnityEngine;
 using UnityStandardAssets.ImageEffects;
@@ -5,7 +6,7 @@ using UnityStandardAssets.ImageEffects;
 namespace FPSCamera
 {
 
-    public class VehicleCamera : MonoBehaviour
+    public class VehicleCamera : MonoBehaviour, InstanceCamera
     {
         private ushort followInstance;
         public bool following = false;
@@ -15,89 +16,13 @@ namespace FPSCamera
         public DepthOfField effect;
 
         private VehicleManager vManager;
-
-        private float cameraOffsetForward = 2.75f;
-        private float cameraOffsetUp = 1.5f;
-
-        private Vehicle currentVehicle;
-
         public Vector3 userOffset = Vector3.zero;
-        private Vector3 GetCameraOffsetForVehicleType(Vehicle v, Vector3 forward, Vector3 up)
-        {
-            currentVehicle = v;
-
-            var offset = forward * v.Info.m_attachOffsetFront +
-                         forward * cameraOffsetForward +
-                         up * cameraOffsetUp;
-
-            if (v.m_leadingVehicle != 0)
-            {
-                offset += up*3.0f;
-                offset -= forward*2.0f;
-            }
-            else if(v.Info.name == "Train Engine")
-            {
-                offset += forward * 2.0f;
-            }
-
-
-            return offset;
-        }
-
-        public void SetFollowInstance(ushort instance)
-        {
-            FPSCamera.instance.SetMode(false);
-
-            if (FPSCamera.instance.config.integrateHideUI)
-            {
-                UIHider.Hide();
-            }
-            FPSCamera.instance.ui.Hide();
-
-
-            followInstance = instance;
-            following = true;
-            camera.nearClipPlane = 1f;
-            cameraController.enabled = false;
-            cameraController.m_maxDistance = 50f;
-
-            //Set to 1/4 minimum vanilla value( ground level )
-            effect.focalLength = 10;
-            //A bit bigger, to reduce blur some more
-            effect.focalSize = 0.8f;
-
-            camera.fieldOfView = FPSCamera.instance.config.fieldOfView;
-            FPSCamera.onCameraModeChanged(true);
-
-            userOffset = Vector3.zero;
-        }
-
-        public void StopFollowing()
-        {
-            if (FPSCamera.instance.config.integrateHideUI)
-            {
-                UIHider.Show();
-            }
-            FPSCamera.instance.ui.Hide();
-
-            following = false;
-            cameraController.enabled = true;
-            camera.nearClipPlane = 1.0f;
-            cameraController.m_maxDistance = 4000f;
-
-            FPSCamera.onCameraModeChanged(false);
-       
-            camera.fieldOfView = FPSCamera.instance.originalFieldOfView;
-
-
-        }
 
         void Awake()
         {
             cameraController = GetComponent<CameraController>();
             camera = GetComponent<Camera>();
             vManager = VehicleManager.instance;
-            effect = cameraController.GetComponent<DepthOfField>();
         }
 
         void Update()
@@ -122,12 +47,24 @@ namespace FPSCamera
                 Vector3 position = Vector3.zero;
                 Quaternion orientation = Quaternion.identity;
                 v.GetSmoothPosition((ushort)i, out position, out orientation);
-
                 Vector3 forward = orientation * Vector3.forward;
                 Vector3 up = orientation * Vector3.up;
 
-                var pos = position + GetCameraOffsetForVehicleType(v, forward, up) + forward * FPSCamera.instance.config.vehicleCameraOffsetX + up * FPSCamera.instance.config.vehicleCameraOffsetY;
-                camera.transform.position = pos + userOffset;
+                Vector3 userOffset = forward * v.Info.m_attachOffsetFront;
+                if (v.m_leadingVehicle != 0)
+                {
+                    userOffset += up * 3.0f;
+                    userOffset -= forward * 2.0f;
+                }
+                else if (v.Info.name == "Train Engine")
+                {
+                    userOffset += forward * 2.0f;
+                }
+
+                var pos = GetOffset(position, forward, up, userOffset) + 
+                          forward * FPSCamera.instance.config.vehicleCameraOffsetX +
+                          up * FPSCamera.instance.config.vehicleCameraOffsetY;
+                camera.transform.position = pos;
                 Vector3 lookAt = pos + (orientation * Vector3.forward) * 1.0f;
 
                 var currentOrientation = camera.transform.rotation;
@@ -137,9 +74,39 @@ namespace FPSCamera
 
                 float height = camera.transform.position.y - TerrainManager.instance.SampleDetailHeight(camera.transform.position);
                 cameraController.m_currentPosition = camera.transform.position;
-
                 effect.enabled = FPSCamera.instance.config.enableDOF;
             }
+        }
+
+        public void SetFollowInstance(uint instance)
+        {
+            FPSCamera.instance.SetMode(false);
+            
+            followInstance = (ushort)instance;
+            following = true;
+
+            CameraUtils.setCamera(cameraController, camera);
+
+            FPSCamera.onCameraModeChanged(true);
+            userOffset = Vector3.zero;
+        }
+
+        public void StopFollowing()
+        {
+            followInstance = 0;
+            following = false;
+
+            CameraUtils.stopCamera(cameraController, camera);
+            FPSCamera.onCameraModeChanged(false);
+        }
+
+        public Vector3 GetOffset(Vector3 position, Vector3 forward, Vector3 up, Vector3 userOffset)
+        {
+            Vector3 retVal = position + userOffset +
+                            forward * CameraUtils.CAMERAOFFSETFORWARD +
+                            up * CameraUtils.CAMERAOFFSETUP;
+
+            return retVal;
         }
 
     }

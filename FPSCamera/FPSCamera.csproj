@@ -54,11 +54,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CameraManipulatorRenderingManager.cs" />
+    <Compile Include="CameraUtils.cs" />
     <Compile Include="CitizenCamera.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="FPSCamera.cs" />
     <Compile Include="FPSCameraUI.cs" />
     <Compile Include="GamePanelExtender.cs" />
+    <Compile Include="InstanceCamera.cs" />
     <Compile Include="Log.cs" />
     <Compile Include="Mod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

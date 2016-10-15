@@ -53,6 +53,7 @@ namespace FPSCamera
         public Camera camera;
         float rotationY = 0f;
         public DepthOfField effect;
+        public TiltShiftEffect legacyEffect;
 
         private Vector3 mainCameraPosition;
         private Quaternion mainCameraOrientation;
@@ -74,6 +75,8 @@ namespace FPSCamera
 
         public float originalFieldOfView = 0.0f;
 
+        public bool isIsometric;
+
         public FPSCameraUI ui;
 
         void Start()
@@ -82,6 +85,7 @@ namespace FPSCamera
             camera = controller.GetComponent<Camera>();
             originalFieldOfView = camera.fieldOfView;
             effect = controller.GetComponent<DepthOfField>();
+            legacyEffect = controller.GetComponent<TiltShiftEffect>();
 
             config = Configuration.Deserialize(configPath);
             if (config == null)
@@ -206,7 +210,16 @@ namespace FPSCamera
                 instance.controller.m_currentSize = 5;
                 instance.controller.m_currentHeight =2f;
                 instance.controller.enabled = false;
-                effect.enabled = config.enableDOF;
+
+                if( effect)
+                {
+                    effect.enabled = config.enableDOF;
+                }
+                if( legacyEffect)
+                {
+                    legacyEffect.enabled = false;
+                }
+
                 Cursor.visible = false;
                 instance.rotationY = -instance.transform.localEulerAngles.x;
             }
@@ -221,7 +234,7 @@ namespace FPSCamera
 
                 camera.fieldOfView = originalFieldOfView;
                 Cursor.visible = true;
-
+                effect.nearBlur = true;
             }
             
             onCameraModeChanged?.Invoke(fpsMode);
@@ -452,44 +465,48 @@ namespace FPSCamera
                 }
                 
             }
-            else if (vehicleCamera != null && vehicleCamera.following)
+            else
             {
-                if (config.integrateHideUI)
+                if (vehicleCamera != null && vehicleCamera.following)
                 {
-                    UIHider.Hide();
-                }
-                vehicleCamera.StopFollowing();
-            }
-            else if (citizenCamera != null && citizenCamera.following)
-            {
-                if (config.integrateHideUI)
-                {
-                    UIHider.Hide();
-                }
-                citizenCamera.StopFollowing();
-            }
-            else if (fpsModeEnabled)
-            {
-                if (config.animateTransitions && fpsModeEnabled)
-                {
-                    inModeTransition = true;
-                    transitionT = 0.0f;
-
-                    if ((gameObject.transform.position - mainCameraPosition).magnitude <= 1.0f)
+                    if (config.integrateHideUI)
                     {
-                        transitionT = 1.0f;
-                        mainCameraOrientation = gameObject.transform.rotation;
+                        UIHider.Hide();
+                    }
+                    vehicleCamera.StopFollowing();
+                }
+                if (citizenCamera != null && citizenCamera.following)
+                {
+                    if (config.integrateHideUI)
+                    {
+                        UIHider.Hide();
+                    }
+                    citizenCamera.StopFollowing();
+                }
+                if (fpsModeEnabled)
+                {
+                    if (config.animateTransitions && fpsModeEnabled)
+                    {
+                        inModeTransition = true;
+                        transitionT = 0.0f;
+
+                        if ((gameObject.transform.position - mainCameraPosition).magnitude <= 1.0f)
+                        {
+                            transitionT = 1.0f;
+                            mainCameraOrientation = gameObject.transform.rotation;
+                        }
+
+                        transitionStartPosition = gameObject.transform.position;
+                        transitionStartOrientation = gameObject.transform.rotation;
+
+                        transitionTargetPosition = mainCameraPosition;
+                        transitionTargetOrientation = mainCameraOrientation;
                     }
 
-                    transitionStartPosition = gameObject.transform.position;
-                    transitionStartOrientation = gameObject.transform.rotation;
-
-                    transitionTargetPosition = mainCameraPosition;
-                    transitionTargetOrientation = mainCameraOrientation;
+                    SetMode(!fpsModeEnabled);
                 }
-
-                SetMode(!fpsModeEnabled);
             }
+            
             ui.Hide();
         }
 
@@ -547,17 +564,45 @@ namespace FPSCamera
             ui.Hide();
         }
 
+        void LateUpdate()
+        {
+            if (!fpsModeEnabled && !cityWalkthroughMode && !vehicleCamera.following && !citizenCamera.following)
+            {
+                if (isIsometric)
+                {
+                    effect.enabled = false;
+                    legacyEffect.enabled = false;
+                }
+
+            }
+        }
+
         void Update()
         {
-            if (onUpdate != null)
+            onUpdate?.Invoke();
+
+            if (!fpsModeEnabled && !cityWalkthroughMode && !vehicleCamera.following && !citizenCamera.following)
             {
-                onUpdate();
+                if (Input.GetKeyDown(KeyCode.F9))
+                {
+                    isIsometric = !isIsometric;
+
+                }
+                camera.fieldOfView = isIsometric ? 8 : 45;
+                controller.m_maxDistance = isIsometric ? 1500 : 4000;
+                if (isIsometric)
+                {
+                    effect.enabled = false;
+                    legacyEffect.enabled = false;
+
+                }
+
             }
 
             UpdateCityWalkthrough();
 
             UpdateCameras();
-
+            
             if (Input.GetKeyDown(KeyCode.Escape))
             {
                 OnEscapePressed();
@@ -665,22 +710,25 @@ namespace FPSCamera
                 camera.fieldOfView = config.fieldOfView;
                 camera.nearClipPlane = 1.0f;
 
-                effect.enabled = config.enableDOF;
-                if (config.enableDOF)
+                if( effect )
                 {
-                    ushort buildingIndex;
-                    ushort vehicleIndex;
-                    ushort parkedVehicleIndex;
+                    effect.enabled = config.enableDOF;
+                    if (config.enableDOF)
+                    {
+                        ushort buildingIndex;
+                        ushort vehicleIndex;
+                        ushort parkedVehicleIndex;
 
-                    Vector3 hitPos;
-                    Segment3 scanSegment = new Segment3(camera.transform.position, camera.transform.position + camera.transform.forward * 1000);
-                    if (BuildingManager.instance.RayCast(scanSegment, ItemClass.Service.None, ItemClass.SubService.None, ItemClass.Layer.Default, Building.Flags.None, out hitPos,out buildingIndex))
-                    {
-                        effect.focalLength = Mathf.Abs(Vector3.Magnitude(hitPos - camera.transform.position));
-                    }
-                    if (VehicleManager.instance.RayCast(scanSegment, Vehicle.Flags.Deleted, VehicleParked.Flags.None, out hitPos, out vehicleIndex, out parkedVehicleIndex))
-                    {
-                        effect.focalLength = Mathf.Abs(Vector3.Magnitude(hitPos - camera.transform.position));
+                        Vector3 hitPos;
+                        Segment3 scanSegment = new Segment3(camera.transform.position, camera.transform.position + camera.transform.forward * 1000);
+                        if (BuildingManager.instance.RayCast(scanSegment, ItemClass.Service.None, ItemClass.SubService.None, ItemClass.Layer.Default, Building.Flags.None, out hitPos, out buildingIndex))
+                        {
+                            effect.focalLength = Mathf.Abs(Vector3.Magnitude(hitPos - camera.transform.position));
+                        }
+                        if (VehicleManager.instance.RayCast(scanSegment, Vehicle.Flags.Deleted, VehicleParked.Flags.None, out hitPos, out vehicleIndex, out parkedVehicleIndex))
+                        {
+                            effect.focalLength = Mathf.Abs(Vector3.Magnitude(hitPos - camera.transform.position));
+                        }
                     }
                 }
                 float height = FPSCamera.instance.camera.transform.position.y - TerrainManager.instance.SampleDetailHeight(FPSCamera.instance.camera.transform.position);
