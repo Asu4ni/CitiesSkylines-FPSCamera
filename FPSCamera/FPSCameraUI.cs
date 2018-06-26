@@ -59,14 +59,43 @@ namespace FPSCamera
             cameraModeButton.tooltip = "FPS Camera configuration";
             cameraModeButton.tooltipBox = uiView.defaultTooltipBox;
 
-            UIComponent escbutton = uiView.FindUIComponent("Esc");
-            cameraModeButton.relativePosition = new Vector2
-            (
-                escbutton.relativePosition.x + escbutton.width / 2.0f - cameraModeButton.width / 2.0f - escbutton.width - 8.0f,
-                escbutton.relativePosition.y + escbutton.height / 2.0f - cameraModeButton.height / 2.0f
-            );
+            if (FPSCamera.instance.config.position != Vector3.zero)
+            {
+                cameraModeButton.relativePosition = new Vector2
+                (
+                    FPSCamera.instance.config.position.x,
+                    FPSCamera.instance.config.position.y
+                );
+            }
+            else{
+                UIComponent escbutton = uiView.FindUIComponent("Esc");
 
-            cameraModeButton.eventClick += (component, param) => { panel.isVisible = !panel.isVisible; };
+                cameraModeButton.relativePosition = new Vector2
+                (
+                    escbutton.relativePosition.x + 4f,
+                    escbutton.relativePosition.y + cameraModeButton.height * 2.0f
+                );
+            }
+            
+
+            cameraModeButton.eventClick += (component, param) => {
+                panel.relativePosition = new Vector3(cameraModeButton.relativePosition.x - panel.size.x, cameraModeButton.relativePosition.y + 60.0f);
+                panel.isVisible = !panel.isVisible;
+            };
+            cameraModeButton.eventPositionChanged += (component, param) =>
+            {
+                FPSCamera.instance.config.position = cameraModeButton.relativePosition;
+                FPSCamera.instance.SaveConfig();
+            };
+
+            var dragObject = new GameObject("buttondragger");
+            dragObject.transform.parent = cameraModeButton.transform;
+            var drag = dragObject.AddComponent<UIDragHandle>();
+            drag.width = cameraModeButton.width;
+            drag.height = cameraModeButton.height;
+            drag.target = cameraModeButton;
+            drag.relativePosition = Vector3.zero;
+
 
             var labelObject = new GameObject();
             labelObject.transform.parent = uiView.transform;
@@ -101,7 +130,7 @@ namespace FPSCamera
             };
 
             panel = fullscreenContainer.AddUIComponent<UIPanel>();
-            panel.size = new Vector2(400, 700);
+            panel.size = new Vector2(400, 778);
             panel.isVisible = false;
             panel.backgroundSprite = "SubcategoriesPanel";
             panel.relativePosition = new Vector3(cameraModeButton.relativePosition.x - panel.size.x, cameraModeButton.relativePosition.y + 60.0f);
@@ -259,7 +288,7 @@ namespace FPSCamera
 
             MakeCheckbox(panel, "AnimatedTransitions", "Animated transitions", y, FPSCamera.instance.config.animateTransitions,
                value =>
-               {
+                {
                    FPSCamera.instance.config.animateTransitions = value;
                    FPSCamera.instance.SaveConfig();
                });
@@ -305,6 +334,15 @@ namespace FPSCamera
 
             if (!FPSCamera.editorMode)
             {
+                MakeCheckbox(panel, "AlwaysFrontVehicle", "Always go into front vehicle", y, FPSCamera.instance.config.alwaysFrontVehicle,
+                value =>
+                    {
+                        FPSCamera.instance.config.alwaysFrontVehicle = value;
+                        FPSCamera.instance.SaveConfig();
+                    });
+
+                y += 28.0f;
+
                 MakeCheckbox(panel, "AllowMovementVehicleMode", "Allow movement in vehicle/ citizen mode", y, FPSCamera.instance.config.allowUserOffsetInVehicleCitizenMode,
                    value =>
                    {
@@ -474,7 +512,12 @@ namespace FPSCamera
 
         void OnDestroy()
         {
-            Destroy(panel.gameObject);
+            if (panel != null)
+            {
+                Destroy(cameraModeButton.gameObject);
+                Destroy(cameraModeLabel.gameObject);
+                Destroy(panel.gameObject);
+            }
         }
 
         private void OnGUI()

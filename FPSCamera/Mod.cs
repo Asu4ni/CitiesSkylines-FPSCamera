@@ -3,6 +3,8 @@ using System.Resources;
 using ColossalFramework.UI;
 using ICities;
 using UnityEngine;
+using ColossalFramework.PlatformServices;
+using ColossalFramework.Plugins;
 
 namespace FPSCamera
 {
@@ -19,7 +21,6 @@ namespace FPSCamera
         {
             get { return "See your city from a different perspective"; }
         }
-
     }
 
     public class ModTerrainUtil : TerrainExtensionBase
@@ -45,7 +46,34 @@ namespace FPSCamera
 
     public class ModLoad : LoadingExtensionBase
     {
-       
+        public override void OnCreated(ILoading loading)
+        {
+            try
+            {
+                PublishedFileId originalModId = new PublishedFileId(406255342);
+
+                foreach (PluginManager.PluginInfo plugin in PluginManager.instance.GetPluginsInfo())
+                {
+                    if (plugin.publishedFileID == originalModId)
+                    {
+                        try
+                        {
+                            Log.Message("FPSCam: Disabling Original Mod");
+                            PlatformService.workshop.Unsubscribe(originalModId);
+                        }
+                        catch (Exception e)
+                        {
+                            Log.Error(e.ToString());
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Log.Error(e.ToString());
+            }
+        }
+
         public override void OnLevelLoaded(LoadMode mode)
         {
             FPSCamera.Initialize(mode);

@@ -1,3 +1,4 @@
+using System;
 using ColossalFramework.UI;
 using UnityEngine;
 
@@ -19,9 +20,12 @@ namespace FPSCamera
         private CitizenWorldInfoPanel citizenInfoPanel;
         private UIButton citizenCameraButton;
 
+        private TouristWorldInfoPanel touristCitizenInfoPanel;
+        private UIButton touristCitizenInfoButton;
+
         private UIView uiView;
 
-        private Vector3 cameraButtonOffset = new Vector3(-72.0f, 8.0f, 0.0f);
+        private Vector3 cameraButtonOffset = new Vector3(-8.0f, 36.0f, 0.0f);
         private int cameraButtonSize = 24;
 
         void Awake()
@@ -35,6 +39,7 @@ namespace FPSCamera
             Destroy(cityServiceVehicleCameraButton);
             Destroy(publicTransportCameraButton);
             Destroy(citizenCameraButton);
+            Destroy(touristCitizenInfoPanel);
         }
 
         void resetCamera()
@@ -106,8 +111,7 @@ namespace FPSCamera
                         InstanceID instance = Util.ReadPrivate<PublicTransportVehicleWorldInfoPanel, InstanceID>(publicTransportVehicleInfoPanel, "m_InstanceID");
                         resetCamera();
                         FPSCamera.instance.vehicleCamera.SetFollowInstance(instance.Vehicle);
-
-                     
+                        
                     }
                 );
 
@@ -130,6 +134,27 @@ namespace FPSCamera
                         resetCamera();
                         FPSCamera.instance.citizenCamera.SetFollowInstance(instance.Citizen);
                         
+                    }
+                );
+
+                //
+
+                touristCitizenInfoPanel = GameObject.Find("(Library) TouristWorldInfoPanel").GetComponent<TouristWorldInfoPanel>();
+                touristCitizenInfoPanel.Find<UITextField>("PersonName").width = 180;
+
+                touristCitizenInfoButton = CreateCameraButton
+                (
+                    touristCitizenInfoPanel.component,
+                    (component, param) =>
+                    {
+                        if (FPSCamera.instance.config.integrateHideUI)
+                        {
+                            UIHider.Hide();
+                        }
+                        InstanceID instance = Util.ReadPrivate<TouristWorldInfoPanel, InstanceID>(touristCitizenInfoPanel, "m_InstanceID");
+                        resetCamera();
+                        FPSCamera.instance.citizenCamera.SetFollowInstance(instance.Citizen);
+
                     }
                 );
 

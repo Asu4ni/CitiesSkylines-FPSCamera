@@ -1,6 +1,7 @@
 using ColossalFramework;
 using ColossalFramework.Math;
 using ICities;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityStandardAssets.ImageEffects;
 
@@ -45,13 +46,13 @@ namespace FPSCamera
 
         public static FPSCamera instance;
 
-        public static readonly string configPath = "FPSCameraConfig.xml";
         public Configuration config;
 
         public bool fpsModeEnabled = false;
         private CameraController controller;
         public Camera camera;
         float rotationY = 0f;
+
         public DepthOfField effect;
         public TiltShiftEffect legacyEffect;
 
@@ -75,7 +76,16 @@ namespace FPSCamera
 
         public float originalFieldOfView = 0.0f;
 
-        public bool isIsometric;
+        private static readonly List<int> focalDistanceList = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,11,12,13,14,15,16,17,18,19, 20,25,35,45, 50,75, 100,150, 200, 500,750, 1000, 2000, 5000, 10000 };
+        private int focalIndex = 9;
+
+        private bool inModeTransition = false;
+        private Vector3 transitionTargetPosition = Vector3.zero;
+        private Quaternion transitionTargetOrientation = Quaternion.identity;
+        private Vector3 transitionStartPosition = Vector3.zero;
+        private Quaternion transitionStartOrientation = Quaternion.identity;
+        private float transitionT = 0.0f;
+        private float existingTime = 0.0f;
 
         public FPSCameraUI ui;
 
@@ -87,7 +97,7 @@ namespace FPSCamera
             effect = controller.GetComponent<DepthOfField>();
             legacyEffect = controller.GetComponent<TiltShiftEffect>();
 
-            config = Configuration.Deserialize(configPath);
+            config = Configuration.Deserialize(Configuration.configPath);
             if (config == null)
             {
                 config = new Configuration();
@@ -114,34 +124,7 @@ namespace FPSCamera
 
         public void SaveConfig()
         {
-            Configuration.Serialize(configPath, config);
-        }
-
-        void GUICheckbox(string label, ref bool state)
-        {
-            GUILayout.BeginHorizontal();
-            GUILayout.Label(label, GUILayout.ExpandWidth(false));
-            state = GUILayout.Toggle(state, "");
-            GUILayout.FlexibleSpace();
-            GUILayout.EndHorizontal();
-        }
-
-        private Matrix4x4 sliderOffsetMatrix = Matrix4x4.TRS(new Vector3(0.0f, 6.0f, 0.0f), Quaternion.identity, Vector3.one);
-
-        void GUISlider(string label, ref float state, float min, float max)
-        {
-            GUILayout.BeginHorizontal();
-            GUILayout.Label(label, GUILayout.ExpandWidth(false));
-
-            var oldMatrix = GUI.matrix;
-            GUI.matrix *= sliderOffsetMatrix;
-
-            state = GUILayout.HorizontalSlider(state, min, max);
-
-            GUI.matrix = oldMatrix;
-
-            GUILayout.Label(state.ToString("0.00"), GUILayout.ExpandWidth(false));
-            GUILayout.EndHorizontal();
+            Configuration.Serialize(Configuration.configPath, config);
         }
 
         public void SetFieldOfView(float fov)
@@ -153,13 +136,6 @@ namespace FPSCamera
                 camera.fieldOfView = fov;
             }
         }
-
-        private bool inModeTransition = false;
-        private Vector3 transitionTargetPosition = Vector3.zero;
-        private Quaternion transitionTargetOrientation = Quaternion.identity;
-        private Vector3 transitionStartPosition = Vector3.zero;
-        private Quaternion transitionStartOrientation = Quaternion.identity;
-        private float transitionT = 0.0f;
 
         public void EnterWalkthroughMode()
         {
@@ -206,12 +182,13 @@ namespace FPSCamera
             if (instance.fpsModeEnabled)
             {
                 camera.fieldOfView = config.fieldOfView;
+                camera.nearClipPlane = 1.0f;
+
                 instance.controller.m_maxDistance = 50f;
                 instance.controller.m_currentSize = 5;
                 instance.controller.m_currentHeight =2f;
                 instance.controller.enabled = false;
-
-                if( effect)
+                if (effect)
                 {
                     effect.enabled = config.enableDOF;
                 }
@@ -564,40 +541,17 @@ namespace FPSCamera
             ui.Hide();
         }
 
-        void LateUpdate()
+        public void Update()
         {
-            if (!fpsModeEnabled && !cityWalkthroughMode && !vehicleCamera.following && !citizenCamera.following)
+            float time = Time.deltaTime;
+            if (time + existingTime <= 0.1)
             {
-                if (isIsometric)
-                {
-                    effect.enabled = false;
-                    legacyEffect.enabled = false;
-                }
-
+                existingTime+= time;
             }
-        }
+            existingTime = 0.0f;
 
-        void Update()
-        {
+
             onUpdate?.Invoke();
-
-            if (!fpsModeEnabled && !cityWalkthroughMode && !vehicleCamera.following && !citizenCamera.following)
-            {
-                if (Input.GetKeyDown(KeyCode.F9))
-                {
-                    isIsometric = !isIsometric;
-
-                }
-                camera.fieldOfView = isIsometric ? 8 : 45;
-                controller.m_maxDistance = isIsometric ? 1500 : 4000;
-                if (isIsometric)
-                {
-                    effect.enabled = false;
-                    legacyEffect.enabled = false;
-
-                }
-
-            }
 
             UpdateCityWalkthrough();
 
@@ -646,9 +600,8 @@ namespace FPSCamera
                     ushort nodeIndex;
                     ushort segmentIndex;
                     Vector3 hitPos2;
-
-                    if (NetManager.instance.RayCast(null, ray, 0f, ItemClass.Service.Road, ItemClass.Service.PublicTransport, ItemClass.SubService.None, ItemClass.SubService.None, ItemClass.Layer.Default, ItemClass.Layer.None, NetNode.Flags.None, NetSegment.Flags.None, out hitPos, out nodeIndex, out segmentIndex)
-                        | NetManager.instance.RayCast(null, ray, 0f, ItemClass.Service.Beautification, ItemClass.Service.Water, ItemClass.SubService.None, ItemClass.SubService.None, ItemClass.Layer.Default, ItemClass.Layer.None, NetNode.Flags.None, NetSegment.Flags.None, out hitPos2, out nodeIndex, out segmentIndex))
+                    if (NetManager.instance.RayCast(null, ray, 0f, false, ItemClass.Service.Road, ItemClass.Service.PublicTransport, ItemClass.SubService.None, ItemClass.SubService.None, ItemClass.Layer.Default, ItemClass.Layer.None, NetNode.Flags.None, NetSegment.Flags.None, out hitPos, out nodeIndex, out segmentIndex)
+                        | NetManager.instance.RayCast(null, ray, 0f, false, ItemClass.Service.Beautification, ItemClass.Service.Water, ItemClass.SubService.None, ItemClass.SubService.None, ItemClass.Layer.Default, ItemClass.Layer.None, NetNode.Flags.None, NetSegment.Flags.None, out hitPos2, out nodeIndex, out segmentIndex))
                     {
                         terrainY = Mathf.Max(terrainY, Mathf.Max(hitPos.y, hitPos2.y));
                     }
@@ -663,76 +616,17 @@ namespace FPSCamera
                     speedFactor = Mathf.Clamp(speedFactor, 1.0f, 256.0f);
                 }
 
-                if (Input.GetKey(config.goFasterHotKey))
-                {
-                    speedFactor *= config.goFasterSpeedMultiplier;
-                }
+                speedFactor = UserInput(speedFactor);
 
-                if (cameraMoveForward.IsPressed())
-                {
-                    gameObject.transform.position += gameObject.transform.forward * config.cameraMoveSpeed * speedFactor * Time.deltaTime;
-                }
-                else if (cameraMoveBackward.IsPressed())
-                {
-                    gameObject.transform.position -= gameObject.transform.forward * config.cameraMoveSpeed * speedFactor * Time.deltaTime;
-                }
-
-                if (cameraMoveLeft.IsPressed())
-                {
-                    gameObject.transform.position -= gameObject.transform.right * config.cameraMoveSpeed * speedFactor * Time.deltaTime;
-                }
-                else if (cameraMoveRight.IsPressed())
-                {
-                    gameObject.transform.position += gameObject.transform.right * config.cameraMoveSpeed * speedFactor * Time.deltaTime;
-                }
-
-                if (cameraZoomAway.IsPressed())
-                {
-                    gameObject.transform.position -= gameObject.transform.up * config.cameraMoveSpeed * speedFactor * Time.deltaTime;
-                }
-                else if (cameraZoomCloser.IsPressed())
-                {
-                    gameObject.transform.position += gameObject.transform.up * config.cameraMoveSpeed * speedFactor * Time.deltaTime;
-                }
-
-                if (Input.GetKey(config.showMouseHotkey))
-                {
-                    Cursor.visible = true;
-                }
-                else
-                {
-                    float rotationX = transform.localEulerAngles.y + Input.GetAxis("Mouse X") * config.cameraRotationSensitivity;
-                    rotationY += Input.GetAxis("Mouse Y") * config.cameraRotationSensitivity * (config.invertYAxis ? -1.0f : 1.0f);
-                    transform.localEulerAngles = new Vector3(-rotationY, rotationX, 0);
-                    Cursor.visible = false;
-                }
-
-                camera.fieldOfView = config.fieldOfView;
-                camera.nearClipPlane = 1.0f;
-
-                if( effect )
+                if (effect != null)
                 {
                     effect.enabled = config.enableDOF;
                     if (config.enableDOF)
                     {
-                        ushort buildingIndex;
-                        ushort vehicleIndex;
-                        ushort parkedVehicleIndex;
-
-                        Vector3 hitPos;
-                        Segment3 scanSegment = new Segment3(camera.transform.position, camera.transform.position + camera.transform.forward * 1000);
-                        if (BuildingManager.instance.RayCast(scanSegment, ItemClass.Service.None, ItemClass.SubService.None, ItemClass.Layer.Default, Building.Flags.None, out hitPos, out buildingIndex))
-                        {
-                            effect.focalLength = Mathf.Abs(Vector3.Magnitude(hitPos - camera.transform.position));
-                        }
-                        if (VehicleManager.instance.RayCast(scanSegment, Vehicle.Flags.Deleted, VehicleParked.Flags.None, out hitPos, out vehicleIndex, out parkedVehicleIndex))
-                        {
-                            effect.focalLength = Mathf.Abs(Vector3.Magnitude(hitPos - camera.transform.position));
-                        }
+                        effect.focalLength = focalDistanceList[focalIndex];
                     }
                 }
-                float height = FPSCamera.instance.camera.transform.position.y - TerrainManager.instance.SampleDetailHeight(FPSCamera.instance.camera.transform.position);
-                float otherHeight = TerrainManager.instance.SampleRawHeightSmoothWithWater(FPSCamera.instance.camera.transform.position, true, 2f);
+                float height = instance.camera.transform.position.y - TerrainManager.instance.SampleDetailHeight(instance.camera.transform.position);
                 RenderManager.instance.CameraHeight = height;
 
             }
@@ -751,8 +645,8 @@ namespace FPSCamera
                 ushort segmentIndex;
                 Vector3 hitPos2;
 
-                if (NetManager.instance.RayCast(null, ray, 0f, ItemClass.Service.Road, ItemClass.Service.PublicTransport, ItemClass.SubService.None, ItemClass.SubService.None, ItemClass.Layer.Default, ItemClass.Layer.None, NetNode.Flags.None, NetSegment.Flags.None, out hitPos, out nodeIndex, out segmentIndex)
-                    | NetManager.instance.RayCast(null, ray, 0f, ItemClass.Service.Beautification, ItemClass.Service.Water, ItemClass.SubService.None, ItemClass.SubService.None, ItemClass.Layer.Default, ItemClass.Layer.None, NetNode.Flags.None, NetSegment.Flags.None, out hitPos2, out nodeIndex, out segmentIndex))
+                if (NetManager.instance.RayCast(null, ray, 0f, false, ItemClass.Service.Road, ItemClass.Service.PublicTransport, ItemClass.SubService.None, ItemClass.SubService.None, ItemClass.Layer.Default, ItemClass.Layer.None, NetNode.Flags.None, NetSegment.Flags.None, out hitPos, out nodeIndex, out segmentIndex)
+                    | NetManager.instance.RayCast(null, ray, 0f, false, ItemClass.Service.Beautification, ItemClass.Service.Water, ItemClass.SubService.None, ItemClass.SubService.None, ItemClass.Layer.Default, ItemClass.Layer.None, NetNode.Flags.None, NetSegment.Flags.None, out hitPos2, out nodeIndex, out segmentIndex))
                 {
                     terrainY = Mathf.Max(terrainY, Mathf.Max(hitPos.y, hitPos2.y));
                 }
@@ -762,6 +656,65 @@ namespace FPSCamera
                     transform.position = new Vector3(transform.position.x, terrainY + config.groundOffset, transform.position.z);
                 }
             }
+        }
+
+        private float UserInput(float speedFactor)
+        {
+            if (Input.GetKey(config.goFasterHotKey))
+            {
+                speedFactor *= config.goFasterSpeedMultiplier;
+            }
+
+            if (cameraMoveForward.IsPressed())
+            {
+                gameObject.transform.position += gameObject.transform.forward * config.cameraMoveSpeed * speedFactor * Time.deltaTime;
+            }
+            else if (cameraMoveBackward.IsPressed())
+            {
+                gameObject.transform.position -= gameObject.transform.forward * config.cameraMoveSpeed * speedFactor * Time.deltaTime;
+            }
+
+            if (cameraMoveLeft.IsPressed())
+            {
+                gameObject.transform.position -= gameObject.transform.right * config.cameraMoveSpeed * speedFactor * Time.deltaTime;
+            }
+            else if (cameraMoveRight.IsPressed())
+            {
+                gameObject.transform.position += gameObject.transform.right * config.cameraMoveSpeed * speedFactor * Time.deltaTime;
+            }
+
+            if (cameraZoomAway.IsPressed())
+            {
+                gameObject.transform.position -= gameObject.transform.up * config.cameraMoveSpeed * speedFactor * Time.deltaTime;
+            }
+            else if (cameraZoomCloser.IsPressed())
+            {
+                gameObject.transform.position += gameObject.transform.up * config.cameraMoveSpeed * speedFactor * Time.deltaTime;
+            }
+
+            if (Input.GetKey(config.showMouseHotkey))
+            {
+                Cursor.visible = true;
+            }
+            else
+            {
+                float rotationX = transform.localEulerAngles.y + Input.GetAxis("Mouse X") * config.cameraRotationSensitivity;
+                rotationY += Input.GetAxis("Mouse Y") * config.cameraRotationSensitivity * (config.invertYAxis ? -1.0f : 1.0f);
+                transform.localEulerAngles = new Vector3(-rotationY, rotationX, 0);
+                Cursor.visible = false;
+            }
+
+            var d = Input.GetAxis("Mouse ScrollWheel");
+            if (d > 0f && focalIndex >= 0)
+            {
+                focalIndex--;
+            }
+            else if (d < 0f && focalIndex < focalDistanceList.Count)
+            {
+                focalIndex++;
+            }
+
+            return speedFactor;
         }
     }
 

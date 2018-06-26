@@ -7,6 +7,7 @@ namespace FPSCamera
 
     public class Configuration
     {
+        public static readonly string configPath = "FPSCameraUpdatedConfig.xml";
 
         public float cameraMoveSpeed = 128.0f;
         public float cameraRotationSensitivity = 1.0f;
@@ -30,6 +31,8 @@ namespace FPSCamera
         public float vehicleCameraOffsetX = 0f;
         public float vehicleCameraOffsetY = 0f;
         public bool enableDOF = false;
+        public bool alwaysFrontVehicle = true;
+        public Vector3 position = Vector3.zero;
 
         public void OnPreSerialize()
         {

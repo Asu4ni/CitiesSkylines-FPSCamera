@@ -1,3 +1,4 @@
+using FPSCamera.Utils;
 using System;
 using UnityEngine;
 using UnityStandardAssets.ImageEffects;
@@ -25,7 +26,7 @@ namespace FPSCamera
             FPSCamera.instance.SetMode(false);
             followInstance = instance;
             following = true;
-            CameraUtils.setCamera(cameraController, camera);
+            CameraUtils.SetCamera(cameraController, camera);
             FPSCamera.onCameraModeChanged(true);
         }
 
@@ -46,6 +47,7 @@ namespace FPSCamera
         {
             cameraController = GetComponent<CameraController>();
             camera = GetComponent<Camera>();
+            effect = cameraController.GetComponent<DepthOfField>();
             cManager = CitizenManager.instance;
         }
 
@@ -82,10 +84,10 @@ namespace FPSCamera
                         ushort vehicleId = citizen.m_vehicle;
                         if((VehicleManager.instance.m_vehicles.m_buffer[vehicleId].Info.GetService() == ItemClass.Service.PublicTransport))
                         {
-                            while(VehicleManager.instance.m_vehicles.m_buffer[vehicleId].m_leadingVehicle != 0)
-                            {
-                                vehicleId = VehicleManager.instance.m_vehicles.m_buffer[vehicleId].m_leadingVehicle;
-                            }
+                            bool isReversed = AIUtils.GetReversedStatus(VehicleManager.instance, vehicleId);
+                            vehicleId = isReversed ?
+                                VehicleManager.instance.m_vehicles.m_buffer[vehicleId].GetLastVehicle(vehicleId) :
+                                VehicleManager.instance.m_vehicles.m_buffer[vehicleId].GetFirstVehicle(vehicleId);
                             inVehicle = true;
                             vehicleCamera.SetFollowInstance(vehicleId);
                             return;
@@ -104,7 +106,7 @@ namespace FPSCamera
                 Vector3 forward = orientation * Vector3.forward;
                 Vector3 up = orientation * Vector3.up;
 
-                camera.transform.position = GetOffset(position, forward, up, userOffset);
+                camera.transform.position = GetOffset(position, forward, up) + userOffset;
                 Vector3 lookAt = camera.transform.position + (orientation * Vector3.forward) * 1.0f;
                 var currentOrientation = camera.transform.rotation;
                 camera.transform.LookAt(lookAt, Vector3.up);
@@ -112,7 +114,7 @@ namespace FPSCamera
                     Time.deltaTime*2.0f);
 
                 float height = camera.transform.position.y - TerrainManager.instance.SampleDetailHeight(camera.transform.position);
-                cameraController.m_currentPosition = camera.transform.position;
+                cameraController.m_targetPosition = camera.transform.position;
 
                 if(effect)
                 {
@@ -122,12 +124,12 @@ namespace FPSCamera
             }
         }
 
-        public Vector3 GetOffset( Vector3 position, Vector3 forward, Vector3 up, Vector3 userOffset)
+        public Vector3 GetOffset( Vector3 position, Vector3 forward, Vector3 up)
         {
             Vector3 retVal = position +
                           forward * CameraUtils.CAMERAOFFSETFORWARD +
                           up * CameraUtils.CAMERAOFFSETUP;
-            return retVal + userOffset;
+            return retVal;
         }
         
     }

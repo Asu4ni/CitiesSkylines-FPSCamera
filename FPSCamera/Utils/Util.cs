@@ -1,12 +1,10 @@
-using System;
-using System.IO;
 using System.Reflection;
-using ColossalFramework;
-using UnityEngine;
 
 namespace FPSCamera
 {
-
+    /// <summary>
+    /// A Bunch of Reflection utility helpers
+    /// </summary>
     public static class Util
     {
         public static MethodInfo FindMethod<T>(T o, string methodName)
