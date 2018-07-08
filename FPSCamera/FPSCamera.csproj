@@ -53,7 +53,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CameraManipulatorRenderingManager.cs" />
+    <Compile Include="FPSCameraSpeedUI.cs" />
     <Compile Include="Utils\AIUtils.cs" />
     <Compile Include="Utils\CameraUtils.cs" />
     <Compile Include="CitizenCamera.cs" />

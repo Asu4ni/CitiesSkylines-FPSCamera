@@ -77,15 +77,6 @@ namespace FPSCamera
         public override void OnLevelLoaded(LoadMode mode)
         {
             FPSCamera.Initialize(mode);
-            /*var m_renderingManager = CameraManipulatorManager.instance;
-            m_renderingManager.enabled = true;
-
-            if (m_renderingManager != null && !m_renderingManager.m_registered)
-            {
-                RenderManager.RegisterRenderableManager(m_renderingManager);
-                m_renderingManager.m_registered = true;
-            }*/
-
         }
 
         public override void OnLevelUnloading()

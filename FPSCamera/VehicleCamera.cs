@@ -34,7 +34,6 @@ namespace FPSCamera
             if (following)
             {
 
-
                 if ((vManager.m_vehicles.m_buffer[followInstance].m_flags & (Vehicle.Flags.Created | Vehicle.Flags.Deleted)) != Vehicle.Flags.Created)
                 {
                     StopFollowing();
@@ -83,12 +82,27 @@ namespace FPSCamera
                 var currentOrientation = camera.transform.rotation;
                 camera.transform.LookAt(lookAt, Vector3.up);
                 camera.transform.rotation = Quaternion.Slerp(currentOrientation, camera.transform.rotation,
-                    Time.deltaTime * 3.0f);
+                    Time.deltaTime * 5f);
 
                 float height = camera.transform.position.y - TerrainManager.instance.SampleDetailHeight(camera.transform.position);
                 cameraController.m_targetPosition = camera.transform.position;
-                effect.enabled = FPSCamera.instance.config.enableDOF;
+
+                if (effect)
+                {
+                    effect.enabled = FPSCamera.instance.config.enableDOF;
+                }
+                if (FPSCamera.instance.config.displaySpeed)
+                {
+                    GetInstanceSpeed();
+                }
             }
+        }
+
+        public void GetInstanceSpeed()
+        {
+            Vehicle v = vManager.m_vehicles.m_buffer[followInstance];
+            Vector3 velocity = v.GetSmoothVelocity(followInstance);
+            FPSCameraSpeedUI.Instance.speed = velocity.magnitude;
         }
 
         public void SetFollowInstance(uint instance)
@@ -106,17 +120,21 @@ namespace FPSCamera
             following = true;
 
             CameraUtils.SetCamera(cameraController, camera);
-
+            if (FPSCamera.instance.config.displaySpeed)
+            {
+                FPSCameraSpeedUI.Instance.enabled = true;
+            }
             FPSCamera.onCameraModeChanged(true);
             userOffset = Vector3.zero;
+
         }
 
         public void StopFollowing()
         {
             followInstance = 0;
             following = false;
-
-            CameraUtils.stopCamera(cameraController, camera);
+            FPSCameraSpeedUI.Instance.enabled = false;
+            CameraUtils.StopCamera(cameraController, camera);
             FPSCamera.onCameraModeChanged(false);
         }
 

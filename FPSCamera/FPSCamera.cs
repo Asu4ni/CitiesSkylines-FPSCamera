@@ -76,7 +76,7 @@ namespace FPSCamera
 
         public float originalFieldOfView = 0.0f;
 
-        private static readonly List<int> focalDistanceList = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,11,12,13,14,15,16,17,18,19, 20,25,35,45, 50,75, 100,150, 200, 500,750, 1000, 2000, 5000, 10000 };
+        private static readonly List<int> focalDistanceList = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 25, 35, 45, 50, 75, 100, 150, 200, 500, 750, 1000, 2000, 5000, 10000 };
         private int focalIndex = 9;
 
         private bool inModeTransition = false;
@@ -88,6 +88,9 @@ namespace FPSCamera
         private float existingTime = 0.0f;
 
         public FPSCameraUI ui;
+        public FPSCameraSpeedUI speedUi;
+
+        public Mesh mesh;
 
         void Start()
         {
@@ -120,6 +123,9 @@ namespace FPSCamera
             rotationY = -instance.transform.localEulerAngles.x;
 
             ui = FPSCameraUI.Instance;
+            speedUi = FPSCameraSpeedUI.Instance;
+            speedUi.enabled = false;
+            
         }
 
         public void SaveConfig()
@@ -422,6 +428,7 @@ namespace FPSCamera
 
         void OnEscapePressed()
         {
+
             if (cityWalkthroughMode)
             {
 

@@ -58,7 +58,7 @@ namespace FPSCamera
         /// <seealso cref="SetCamera(CameraController, Camera)"/>
         /// <param name="controller"></param>
         /// <param name="camera"></param>
-        public static void stopCamera(CameraController controller, Camera camera)
+        public static void StopCamera(CameraController controller, Camera camera)
         {
             DepthOfField effect = controller.GetComponent<DepthOfField>();
             TiltShiftEffect legacyEffect = controller.GetComponent<TiltShiftEffect>();

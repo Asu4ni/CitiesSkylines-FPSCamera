@@ -33,6 +33,8 @@ namespace FPSCamera
         public bool enableDOF = false;
         public bool alwaysFrontVehicle = true;
         public Vector3 position = Vector3.zero;
+        public bool displaySpeed = false;
+        public bool isMPH = false;
 
         public void OnPreSerialize()
         {

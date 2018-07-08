@@ -2,6 +2,7 @@ using FPSCamera.Utils;
 using System;
 using UnityEngine;
 using UnityStandardAssets.ImageEffects;
+using static CitizenInstance;
 
 namespace FPSCamera
 {
@@ -27,20 +28,37 @@ namespace FPSCamera
             followInstance = instance;
             following = true;
             CameraUtils.SetCamera(cameraController, camera);
+            if (FPSCamera.instance.config.displaySpeed)
+            {
+                FPSCameraSpeedUI.Instance.enabled = true;
+            }
             FPSCamera.onCameraModeChanged(true);
         }
 
         public void StopFollowing()
         {
             following = false;
-            CameraUtils.stopCamera(cameraController, camera);
+            CameraUtils.StopCamera(cameraController, camera);
             userOffset = Vector3.zero;
             camera.fieldOfView = FPSCamera.instance.originalFieldOfView;
+            FPSCameraSpeedUI.Instance.enabled = false;
             FPSCamera.onCameraModeChanged(false);
             if(!inVehicle)
             {
                 vehicleCamera.StopFollowing();
             }
+        }
+
+        public void GetInstanceSpeed()
+        {
+            var citizen = CitizenManager.instance.m_citizens.m_buffer[followInstance];
+
+            CitizenInstance citizenInstance = CitizenManager.instance.m_instances.m_buffer[citizen.m_instance];
+            uint targetFrame = SimulationManager.instance.m_referenceFrameIndex - ((uint)citizen.m_instance << 4) / 65536U;
+            Vector3 velocity = Vector3.Lerp(citizenInstance.GetFrameData(targetFrame - 32U).m_velocity,
+                citizenInstance.GetFrameData(targetFrame - 16U).m_velocity,
+                (float)(((targetFrame & 15U) + SimulationManager.instance.m_referenceTimer) * (1.0 / 16.0))) * 3.75f;
+            FPSCameraSpeedUI.Instance.speed = velocity.magnitude;
         }
 
         void Awake()
@@ -121,6 +139,10 @@ namespace FPSCamera
                     effect.enabled = FPSCamera.instance.config.enableDOF;
                 }
 
+                if (FPSCamera.instance.config.displaySpeed)
+                {
+                    GetInstanceSpeed();
+                }
             }
         }
 

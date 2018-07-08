@@ -96,7 +96,6 @@ namespace FPSCamera
             drag.target = cameraModeButton;
             drag.relativePosition = Vector3.zero;
 
-
             var labelObject = new GameObject();
             labelObject.transform.parent = uiView.transform;
 
@@ -104,7 +103,7 @@ namespace FPSCamera
             cameraModeLabel.textColor = new Color32(255, 255, 255, 255);
             cameraModeLabel.Hide();
 
-            FPSCamera.onCameraModeChanged = state =>
+            FPSCamera.onCameraModeChanged += state =>
             {
                 if (state)
                 {
@@ -130,7 +129,7 @@ namespace FPSCamera
             };
 
             panel = fullscreenContainer.AddUIComponent<UIPanel>();
-            panel.size = new Vector2(400, 778);
+            panel.size = new Vector2(400, 700);
             panel.isVisible = false;
             panel.backgroundSprite = "SubcategoriesPanel";
             panel.relativePosition = new Vector3(cameraModeButton.relativePosition.x - panel.size.x, cameraModeButton.relativePosition.y + 60.0f);
@@ -209,7 +208,7 @@ namespace FPSCamera
                     FPSCamera.instance.SaveConfig();
                 });
 
-            y += 28.0f + 16.0f;
+            y += 28.0f;
 
             MakeCheckbox(panel, "HideUI", "Hide UI", y, FPSCamera.instance.config.integrateHideUI,
                  value =>
@@ -218,7 +217,7 @@ namespace FPSCamera
                      FPSCamera.instance.SaveConfig();
                  });
 
-            y += 28.0f + 8.0f;
+            y += 28.0f;
 
             MakeSlider(panel, "FieldOfView", "Field of view", y,
                 FPSCamera.instance.config.fieldOfView, 5.0f, 120.0f,
@@ -237,7 +236,7 @@ namespace FPSCamera
                     FPSCamera.instance.SaveConfig();
                 });
 
-            y += 28.0f + 16.0f;
+            y += 28.0f;
 
             MakeSlider(panel, "Sensitivity", "Sensitivity", y,
                 FPSCamera.instance.config.cameraRotationSensitivity, 0.25f, 3.0f,
@@ -256,7 +255,7 @@ namespace FPSCamera
                     FPSCamera.instance.SaveConfig();
                 });
 
-            y += 28.0f + 16.0f;
+            y += 28.0f;
 
             MakeCheckbox(panel, "SnapToGround", "Snap to ground", y, FPSCamera.instance.config.snapToGround,
                value =>
@@ -284,7 +283,7 @@ namespace FPSCamera
                    FPSCamera.instance.SaveConfig();
                });
 
-            y += 28.0f + 16.0f;
+            y += 28.0f;
 
             MakeCheckbox(panel, "AnimatedTransitions", "Animated transitions", y, FPSCamera.instance.config.animateTransitions,
                value =>
@@ -303,7 +302,7 @@ namespace FPSCamera
                     FPSCamera.instance.SaveConfig();
                 });
 
-            y += 28.0f + 16.0f;
+            y += 28.0f;
 
             MakeSlider(panel, "VehicleXOffset", "Vehicle camera X offset", y, FPSCamera.instance.config.vehicleCameraOffsetX, -6f, 6.0f,
                 value =>
@@ -338,6 +337,15 @@ namespace FPSCamera
                 value =>
                     {
                         FPSCamera.instance.config.alwaysFrontVehicle = value;
+                        FPSCamera.instance.SaveConfig();
+                    });
+
+                y += 28.0f;
+
+                MakeCheckbox(panel, "SpeedDisplay", "Speed Display in vehicle/citizen mode", y, FPSCamera.instance.config.displaySpeed,
+                value =>
+                    {
+                        FPSCamera.instance.config.displaySpeed = value;
                         FPSCamera.instance.SaveConfig();
                     });
 
@@ -379,7 +387,7 @@ namespace FPSCamera
                 walkthroughModeButton.relativePosition = new Vector3(2.0f, y - 6.0f);
                 walkthroughModeButton.size = new Vector2(200.0f, 24.0f);
 
-                y += 28.0f + 16.0f;
+                y += 28.0f;
             }
 
             var resetConfig = MakeButton(panel, "ResetConfigButton", "Reset configuration", y,
