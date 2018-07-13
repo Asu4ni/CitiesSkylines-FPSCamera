@@ -2,7 +2,7 @@ using FPSCamera.Utils;
 using System;
 using UnityEngine;
 using UnityStandardAssets.ImageEffects;
-using static CitizenInstance;
+using static ToolBase;
 
 namespace FPSCamera
 {
@@ -49,7 +49,7 @@ namespace FPSCamera
             }
         }
 
-        public void GetInstanceSpeed()
+        public void GetInstanceSpeed(Vector3 position)
         {
             var citizen = CitizenManager.instance.m_citizens.m_buffer[followInstance];
 
@@ -58,7 +58,55 @@ namespace FPSCamera
             Vector3 velocity = Vector3.Lerp(citizenInstance.GetFrameData(targetFrame - 32U).m_velocity,
                 citizenInstance.GetFrameData(targetFrame - 16U).m_velocity,
                 (float)(((targetFrame & 15U) + SimulationManager.instance.m_referenceTimer) * (1.0 / 16.0))) * 3.75f;
+
             FPSCameraSpeedUI.Instance.speed = velocity.magnitude;
+            FPSCameraSpeedUI.Instance.destinationName = GetDestination();
+            FPSCameraSpeedUI.Instance.streetName = RaycastRoad(position);
+        }
+
+        private string GetDestination()
+        {
+            var citizen = CitizenManager.instance.m_citizens.m_buffer[followInstance];
+            CitizenInstance citizenInstance = CitizenManager.instance.m_instances.m_buffer[citizen.m_instance];
+            CitizenInfo info = citizenInstance.Info;
+            InstanceID instanceID2 = default(InstanceID);
+
+            info.m_citizenAI.GetLocalizedStatus(followInstance, ref citizen, out instanceID2);
+            String buildingName = BuildingManager.instance.GetBuildingName(citizenInstance.m_targetBuilding, default(InstanceID)) ?? "?";
+            String altBuildingName = BuildingManager.instance.GetBuildingName(instanceID2.Building, default(InstanceID)) ?? "?";
+
+            if (buildingName != null) {
+                return buildingName;
+            } else if(altBuildingName != null)
+            {
+                return altBuildingName;
+            }
+            else
+            {
+                return "?";
+            }
+        }
+
+        private String RaycastRoad(Vector3 position)
+        {
+            RaycastOutput output = new RaycastOutput();
+            RaycastInput raycastInput = new RaycastInput(Camera.main.ScreenPointToRay(camera.transform.position), Camera.main.farClipPlane);
+            raycastInput.m_netService.m_service = ItemClass.Service.Road;
+            raycastInput.m_netService.m_itemLayers = ItemClass.Layer.Default | ItemClass.Layer.MetroTunnels;
+            raycastInput.m_ignoreSegmentFlags = NetSegment.Flags.None;
+            raycastInput.m_ignoreNodeFlags = NetNode.Flags.None;
+            raycastInput.m_ignoreTerrain = true;
+
+            ColossalFramework.Math.Segment3 ray = new ColossalFramework.Math.Segment3(position, position + new Vector3(0, -1000, 0));
+            bool blah = NetManager.instance.RayCast(raycastInput.m_buildObject as NetInfo, ray, raycastInput.m_netSnap, raycastInput.m_segmentNameOnly, raycastInput.m_netService.m_service, raycastInput.m_netService2.m_service, raycastInput.m_netService.m_subService, raycastInput.m_netService2.m_subService, raycastInput.m_netService.m_itemLayers, raycastInput.m_netService2.m_itemLayers, raycastInput.m_ignoreNodeFlags, raycastInput.m_ignoreSegmentFlags, out position, out output.m_netNode, out output.m_netSegment);
+            if (blah)
+            {
+                return NetManager.instance.GetSegmentName(output.m_netSegment) ?? "?";
+            }
+            else
+            {
+                return "?";
+            }
         }
 
         void Awake()
@@ -129,7 +177,7 @@ namespace FPSCamera
                 var currentOrientation = camera.transform.rotation;
                 camera.transform.LookAt(lookAt, Vector3.up);
                 camera.transform.rotation = Quaternion.Slerp(currentOrientation, camera.transform.rotation,
-                    Time.deltaTime*2.0f);
+                    Time.deltaTime);
 
                 float height = camera.transform.position.y - TerrainManager.instance.SampleDetailHeight(camera.transform.position);
                 cameraController.m_targetPosition = camera.transform.position;
@@ -141,7 +189,7 @@ namespace FPSCamera
 
                 if (FPSCamera.instance.config.displaySpeed)
                 {
-                    GetInstanceSpeed();
+                    GetInstanceSpeed(camera.transform.position - userOffset);
                 }
             }
         }

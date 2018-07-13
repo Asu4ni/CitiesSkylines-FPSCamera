@@ -53,21 +53,24 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FPSCameraSpeedUI.cs" />
+    <Compile Include="UI\FPSCameraSpeedUI.cs" />
     <Compile Include="Utils\AIUtils.cs" />
     <Compile Include="Utils\CameraUtils.cs" />
-    <Compile Include="CitizenCamera.cs" />
+    <Compile Include="InstanceCameras\CitizenCamera.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="FPSCamera.cs" />
-    <Compile Include="FPSCameraUI.cs" />
-    <Compile Include="GamePanelExtender.cs" />
-    <Compile Include="InstanceCamera.cs" />
+    <Compile Include="UI\FPSCameraUI.cs" />
+    <Compile Include="UI\GamePanelExtender.cs" />
+    <Compile Include="InstanceCameras\InstanceCamera.cs" />
     <Compile Include="Log.cs" />
     <Compile Include="Mod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UIHider.cs" />
+    <Compile Include="UI\UIHider.cs" />
     <Compile Include="Utils\Util.cs" />
-    <Compile Include="VehicleCamera.cs" />
+    <Compile Include="InstanceCameras\VehicleCamera.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Patches\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

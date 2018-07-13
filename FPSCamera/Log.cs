@@ -1,19 +1,21 @@
+using UnityEngine;
+
 namespace FPSCamera
 {
     public static class Log
     {
         public static void Message(string s)
         {
-            DebugOutputPanel.AddMessage(ColossalFramework.Plugins.PluginManager.MessageType.Message, s);
+            Debug.Log(s);
         }
 
         public static void Error(string s)
         {
-            DebugOutputPanel.AddMessage(ColossalFramework.Plugins.PluginManager.MessageType.Error, s);
+            Debug.LogError(s);
         }
         public static void Warning(string s)
         {
-            DebugOutputPanel.AddMessage(ColossalFramework.Plugins.PluginManager.MessageType.Warning, s);
+            Debug.LogWarning(s);
         }
     }
 }
