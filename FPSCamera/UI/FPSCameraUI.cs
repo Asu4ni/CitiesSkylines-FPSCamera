@@ -129,7 +129,7 @@ namespace FPSCamera
             };
 
             panel = fullscreenContainer.AddUIComponent<UIPanel>();
-            panel.size = new Vector2(400, 700);
+            panel.size = new Vector2(400, 728);
             panel.isVisible = false;
             panel.backgroundSprite = "SubcategoriesPanel";
             panel.relativePosition = new Vector3(cameraModeButton.relativePosition.x - panel.size.x, cameraModeButton.relativePosition.y + 60.0f);
@@ -304,7 +304,7 @@ namespace FPSCamera
 
             y += 28.0f;
 
-            MakeSlider(panel, "VehicleXOffset", "Vehicle camera X offset", y, FPSCamera.instance.config.vehicleCameraOffsetX, -6f, 6.0f,
+            MakeSlider(panel, "VehicleXOffset", "Vehicle camera X offset", y, FPSCamera.instance.config.vehicleCameraOffsetX, -10f, 10.0f,
                 value =>
                 {
                     FPSCamera.instance.config.vehicleCameraOffsetX = value;
@@ -313,10 +313,19 @@ namespace FPSCamera
 
             y += 28.0f;
 
-            MakeSlider(panel, "VehicleYOffset", "Vehicle camera Y offset", y, FPSCamera.instance.config.vehicleCameraOffsetY, -1f, 6.0f,
+            MakeSlider(panel, "VehicleYOffset", "Vehicle camera Y offset", y, FPSCamera.instance.config.vehicleCameraOffsetY, -2f, 10.0f,
                 value =>
                 {
                     FPSCamera.instance.config.vehicleCameraOffsetY = value;
+                    FPSCamera.instance.SaveConfig();
+                });
+
+            y += 28.0f;
+
+            MakeSlider(panel, "VehicleZOffset", "Vehicle camera Z offset", y, FPSCamera.instance.config.vehicleCameraOffsetZ, -10f, 10.0f,
+                value =>
+                {
+                    FPSCamera.instance.config.vehicleCameraOffsetZ = value;
                     FPSCamera.instance.SaveConfig();
                 });
 
@@ -474,7 +483,7 @@ namespace FPSCamera
 
         private delegate void SliderSetValue(float value);
 
-        private static UISlider MakeSlider(UIPanel panel, string name, string text, float y, float value, float min, float max, SliderSetValue setValue)
+        private static UISlider MakeSlider(UIPanel panel, string name, string text, float y, float value, float min, float max, SliderSetValue setValue, float stepSize = 0.25f)
         {
             var label = panel.AddUIComponent<UILabel>();
             label.name = name + "Label";
@@ -486,7 +495,7 @@ namespace FPSCamera
             slider.name = name + "Slider";
             slider.minValue = min;
             slider.maxValue = max;
-            slider.stepSize = 0.25f;
+            slider.stepSize = stepSize;
             slider.value = value;
             slider.relativePosition = new Vector3(200.0f, y);
             slider.size = new Vector2(158.0f, 16.0f);

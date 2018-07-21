@@ -4,7 +4,6 @@ namespace FPSCamera
 {
     interface InstanceCamera
     {
-
         void SetFollowInstance(uint instance);
         void GetInstanceSpeed(Vector3 position);
         void StopFollowing();

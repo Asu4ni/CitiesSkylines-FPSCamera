@@ -53,6 +53,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="UI\FPSCameraControlsOptionsUI.cs" />
     <Compile Include="UI\FPSCameraSpeedUI.cs" />
     <Compile Include="Utils\AIUtils.cs" />
     <Compile Include="Utils\CameraUtils.cs" />

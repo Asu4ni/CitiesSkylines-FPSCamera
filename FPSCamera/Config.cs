@@ -1,3 +1,4 @@
+using ColossalFramework;
 using System.IO;
 using System.Xml.Serialization;
 using UnityEngine;
@@ -30,11 +31,22 @@ namespace FPSCamera
         public bool allowUserOffsetInVehicleCitizenMode = false;
         public float vehicleCameraOffsetX = 0f;
         public float vehicleCameraOffsetY = 0f;
+        public float vehicleCameraOffsetZ = 0f;
+        
         public bool enableDOF = false;
         public bool alwaysFrontVehicle = true;
         public Vector3 position = Vector3.zero;
         public bool displaySpeed = false;
         public bool isMPH = false;
+
+        public KeyCode cameraMoveLeft = (KeyCode)(new SavedInputKey(Settings.cameraMoveLeft, Settings.gameSettingsFile, DefaultSettings.cameraMoveLeft, true).value & 268435455);
+        public KeyCode cameraMoveRight = (KeyCode)(new SavedInputKey(Settings.cameraMoveRight, Settings.gameSettingsFile, DefaultSettings.cameraMoveRight, true).value & 268435455);
+        public KeyCode cameraMoveForward = (KeyCode)(new SavedInputKey(Settings.cameraMoveForward, Settings.gameSettingsFile, DefaultSettings.cameraMoveForward, true).value & 268435455);
+        public KeyCode cameraMoveBackward = (KeyCode)(new SavedInputKey(Settings.cameraMoveBackward, Settings.gameSettingsFile, DefaultSettings.cameraMoveBackward, true).value & 268435455);
+        public KeyCode cameraZoomCloser = (KeyCode)(new SavedInputKey(Settings.cameraZoomCloser, Settings.gameSettingsFile, DefaultSettings.cameraZoomCloser, true).value & 268435455);
+        public KeyCode cameraZoomAway = (KeyCode)(new SavedInputKey(Settings.cameraZoomAway, Settings.gameSettingsFile, DefaultSettings.cameraZoomAway, true).value & 268435455);
+        public KeyCode cameraRotateLeft = KeyCode.LeftShift;
+        public KeyCode cameraRotateRight = KeyCode.RightShift;
 
         public void OnPreSerialize()
         {
@@ -73,5 +85,4 @@ namespace FPSCamera
             return null;
         }
     }
-
 }

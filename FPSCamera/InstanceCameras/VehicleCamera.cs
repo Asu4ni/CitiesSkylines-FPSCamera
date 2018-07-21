@@ -21,7 +21,11 @@ namespace FPSCamera
         private VehicleManager vManager;
         private bool isReversed;
         public Vector3 userOffset = Vector3.zero;
-        
+
+        private Vector3 vehicleVelocity = Vector3.zero;
+
+        public int cameraRotationOffset = 0;
+
         void Awake()
         {
             cameraController = GetComponent<CameraController>();
@@ -47,9 +51,10 @@ namespace FPSCamera
                     return;
                 }
 
-                if(FPSCamera.instance.config.alwaysFrontVehicle)
+                bool currentReversedStatus = AIUtils.GetReversedStatus(vManager, followInstance);
+
+                if (FPSCamera.instance.config.alwaysFrontVehicle)
                 {
-                    bool currentReversedStatus = AIUtils.GetReversedStatus(vManager, followInstance);
                     if (currentReversedStatus != isReversed)
                     {
                         followInstance = currentReversedStatus ?
@@ -66,6 +71,7 @@ namespace FPSCamera
                 v.GetSmoothPosition((ushort)followInstance, out position, out orientation);
                 Vector3 forward = orientation * Vector3.forward;
                 Vector3 up = orientation * Vector3.up;
+                Vector3 right = orientation * Vector3.right;
 
                 Vector3 vehicleOffset = forward * v.Info.m_attachOffsetFront;
                 if (v.m_leadingVehicle != 0 && v.m_trailingVehicle != 0)
@@ -76,14 +82,42 @@ namespace FPSCamera
 
                 var pos = GetOffset(position, forward, up) + vehicleOffset +
                           forward * FPSCamera.instance.config.vehicleCameraOffsetX +
-                          up * FPSCamera.instance.config.vehicleCameraOffsetY;
+                          up * FPSCamera.instance.config.vehicleCameraOffsetY +
+                          right * FPSCamera.instance.config.vehicleCameraOffsetZ;
                 camera.transform.position = pos + this.userOffset;
-                Vector3 lookAt = pos + (orientation * Vector3.forward) * 1.0f;
+
+                Vector3 offset = v.GetSmoothVelocity(followInstance);
+                Vector3 direction = Vector3.forward;
+
+                if ((v.Info.m_vehicleType == VehicleInfo.VehicleType.Tram ||
+                    v.Info.m_vehicleType == VehicleInfo.VehicleType.Metro ||
+                    v.Info.m_vehicleType == VehicleInfo.VehicleType.Train ||
+                    v.Info.m_vehicleType == VehicleInfo.VehicleType.Monorail)) {
+                    bool isLastCarInTrain = (currentReversedStatus && v.m_trailingVehicle != 0 && v.m_leadingVehicle == 0) ||
+                        (!currentReversedStatus && v.m_trailingVehicle == 0 && v.m_leadingVehicle != 0);
+                    if (isLastCarInTrain)
+                    {
+                        offset *= -1;
+                    }
+                }
+                if (offset.magnitude > 1)
+                {
+                    vehicleVelocity = offset;
+                }
+
+                if(Vector3.Dot(orientation * Vector3.forward, vehicleVelocity) <0)
+                {
+                    direction = Vector3.back;
+                }
+
+
+                Vector3 lookAt = pos +  (orientation * direction) * 1f;
 
                 var currentOrientation = camera.transform.rotation;
                 camera.transform.LookAt(lookAt, Vector3.up);
+                camera.transform.Rotate(new Vector3(0, cameraRotationOffset));
                 camera.transform.rotation = Quaternion.Slerp(currentOrientation, camera.transform.rotation,
-                    Time.deltaTime * 3f);
+                    Time.deltaTime * 1.5f);
 
                 float height = camera.transform.position.y - TerrainManager.instance.SampleDetailHeight(camera.transform.position);
                 cameraController.m_targetPosition = camera.transform.position;
@@ -130,10 +164,11 @@ namespace FPSCamera
             }
             FPSCamera.onCameraModeChanged(true);
             userOffset = Vector3.zero;
-
+            vehicleVelocity = Vector3.zero;
+            cameraRotationOffset = 0;
         }
 
-        public void StopFollowing()
+    public void StopFollowing()
         {
             followInstance = 0;
             following = false;

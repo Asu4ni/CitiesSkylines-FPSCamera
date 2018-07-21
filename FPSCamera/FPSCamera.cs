@@ -59,13 +59,6 @@ namespace FPSCamera
         private Vector3 mainCameraPosition;
         private Quaternion mainCameraOrientation;
 
-        private SavedInputKey cameraMoveLeft;
-        private SavedInputKey cameraMoveRight;
-        private SavedInputKey cameraMoveForward;
-        private SavedInputKey cameraMoveBackward;
-        private SavedInputKey cameraZoomCloser;
-        private SavedInputKey cameraZoomAway;
-
         public bool checkedForHideUI = false;
 
         public VehicleCamera vehicleCamera;
@@ -100,23 +93,12 @@ namespace FPSCamera
             effect = controller.GetComponent<DepthOfField>();
             legacyEffect = controller.GetComponent<TiltShiftEffect>();
 
-            config = Configuration.Deserialize(Configuration.configPath);
-            if (config == null)
-            {
-                config = new Configuration();
-            }
+            config = Configuration.Deserialize(Configuration.configPath) ?? new Configuration();
 
             SaveConfig();
 
             mainCameraPosition = gameObject.transform.position;
             mainCameraOrientation = gameObject.transform.rotation;
-
-            cameraMoveLeft = new SavedInputKey(Settings.cameraMoveLeft, Settings.gameSettingsFile, DefaultSettings.cameraMoveLeft, true);
-            cameraMoveRight = new SavedInputKey(Settings.cameraMoveRight, Settings.gameSettingsFile, DefaultSettings.cameraMoveRight, true);
-            cameraMoveForward = new SavedInputKey(Settings.cameraMoveForward, Settings.gameSettingsFile, DefaultSettings.cameraMoveForward, true);
-            cameraMoveBackward = new SavedInputKey(Settings.cameraMoveBackward, Settings.gameSettingsFile, DefaultSettings.cameraMoveBackward, true);
-            cameraZoomCloser = new SavedInputKey(Settings.cameraZoomCloser, Settings.gameSettingsFile, DefaultSettings.cameraZoomCloser, true);
-            cameraZoomAway = new SavedInputKey(Settings.cameraZoomAway, Settings.gameSettingsFile, DefaultSettings.cameraZoomAway, true);
 
             mainCameraPosition = gameObject.transform.position;
             mainCameraOrientation = gameObject.transform.rotation;
@@ -367,59 +349,76 @@ namespace FPSCamera
         {
             if (vehicleCamera != null && vehicleCamera.following && config.allowUserOffsetInVehicleCitizenMode)
             {
-                if (cameraMoveForward.IsPressed())
+                if (Input.GetKey(config.cameraMoveForward))
                 {
                     vehicleCamera.userOffset += gameObject.transform.forward * config.cameraMoveSpeed * 0.25f * Time.deltaTime;
                 }
-                else if (cameraMoveBackward.IsPressed())
+                else if (Input.GetKey(config.cameraMoveBackward))
                 {
                     vehicleCamera.userOffset -= gameObject.transform.forward * config.cameraMoveSpeed * 0.25f * Time.deltaTime;
                 }
 
-                if (cameraMoveLeft.IsPressed())
+                if (Input.GetKey(config.cameraMoveLeft))
                 {
                     vehicleCamera.userOffset -= gameObject.transform.right * config.cameraMoveSpeed * 0.25f * Time.deltaTime;
                 }
-                else if (cameraMoveRight.IsPressed())
+                else if (Input.GetKey(config.cameraMoveRight))
                 {
                     vehicleCamera.userOffset += gameObject.transform.right * config.cameraMoveSpeed * 0.25f * Time.deltaTime;
                 }
 
-                if (cameraZoomAway.IsPressed())
+                if (Input.GetKey(config.cameraZoomAway))
                 {
                     vehicleCamera.userOffset -= gameObject.transform.up * config.cameraMoveSpeed * 0.25f * Time.deltaTime;
                 }
-                else if (cameraZoomCloser.IsPressed())
+                else if (Input.GetKey(config.cameraZoomCloser))
                 {
                     vehicleCamera.userOffset += gameObject.transform.up * config.cameraMoveSpeed * 0.25f * Time.deltaTime;
+                }
+
+                if(Input.GetKeyDown(config.cameraRotateLeft))
+                {
+                    vehicleCamera.cameraRotationOffset -= 45;
+                    if(vehicleCamera.cameraRotationOffset <= -360)
+                    {
+                        vehicleCamera.cameraRotationOffset = 0;
+                    }
+                }
+                else if(Input.GetKeyDown(config.cameraRotateRight))
+                {
+                    vehicleCamera.cameraRotationOffset += 45;
+                    if (vehicleCamera.cameraRotationOffset >= 360)
+                    {
+                        vehicleCamera.cameraRotationOffset = 0;
+                    }
                 }
             }
 
             if (citizenCamera != null && citizenCamera.following && config.allowUserOffsetInVehicleCitizenMode)
             {
-                if (cameraMoveForward.IsPressed())
+                if (Input.GetKey(config.cameraMoveForward))
                 {
                     citizenCamera.userOffset += gameObject.transform.forward * config.cameraMoveSpeed * 0.25f * Time.deltaTime;
                 }
-                else if (cameraMoveBackward.IsPressed())
+                else if (Input.GetKey(config.cameraMoveBackward))
                 {
                     citizenCamera.userOffset -= gameObject.transform.forward * config.cameraMoveSpeed * 0.25f * Time.deltaTime;
                 }
 
-                if (cameraMoveLeft.IsPressed())
+                if (Input.GetKey(config.cameraMoveLeft))
                 {
                     citizenCamera.userOffset -= gameObject.transform.right * config.cameraMoveSpeed * 0.25f * Time.deltaTime;
                 }
-                else if (cameraMoveRight.IsPressed())
+                else if (Input.GetKey(config.cameraMoveRight))
                 {
                     citizenCamera.userOffset += gameObject.transform.right * config.cameraMoveSpeed * 0.25f * Time.deltaTime;
                 }
 
-                if (cameraZoomAway.IsPressed())
+                if (Input.GetKey(config.cameraZoomAway))
                 {
                     citizenCamera.userOffset -= gameObject.transform.up * config.cameraMoveSpeed * 0.25f * Time.deltaTime;
                 }
-                else if (cameraZoomCloser.IsPressed())
+                else if (Input.GetKey(config.cameraZoomCloser))
                 {
                     citizenCamera.userOffset += gameObject.transform.up * config.cameraMoveSpeed * 0.25f * Time.deltaTime;
                 }
@@ -433,7 +432,7 @@ namespace FPSCamera
             {
 
                 cityWalkthroughMode = false;
-                if( config.integrateHideUI)
+                if(config.integrateHideUI)
                 {
                     UIHider.Hide();
                 }
@@ -672,29 +671,29 @@ namespace FPSCamera
                 speedFactor *= config.goFasterSpeedMultiplier;
             }
 
-            if (cameraMoveForward.IsPressed())
+            if (Input.GetKey(config.cameraMoveForward))
             {
                 gameObject.transform.position += gameObject.transform.forward * config.cameraMoveSpeed * speedFactor * Time.deltaTime;
             }
-            else if (cameraMoveBackward.IsPressed())
+            else if (Input.GetKey(config.cameraMoveBackward))
             {
                 gameObject.transform.position -= gameObject.transform.forward * config.cameraMoveSpeed * speedFactor * Time.deltaTime;
             }
 
-            if (cameraMoveLeft.IsPressed())
+            if (Input.GetKey(config.cameraMoveLeft))
             {
                 gameObject.transform.position -= gameObject.transform.right * config.cameraMoveSpeed * speedFactor * Time.deltaTime;
             }
-            else if (cameraMoveRight.IsPressed())
+            else if (Input.GetKey(config.cameraMoveRight))
             {
                 gameObject.transform.position += gameObject.transform.right * config.cameraMoveSpeed * speedFactor * Time.deltaTime;
             }
 
-            if (cameraZoomAway.IsPressed())
+            if (Input.GetKey(config.cameraZoomAway))
             {
                 gameObject.transform.position -= gameObject.transform.up * config.cameraMoveSpeed * speedFactor * Time.deltaTime;
             }
-            else if (cameraZoomCloser.IsPressed())
+            else if (Input.GetKey(config.cameraZoomCloser))
             {
                 gameObject.transform.position += gameObject.transform.up * config.cameraMoveSpeed * speedFactor * Time.deltaTime;
             }

@@ -39,13 +39,13 @@ namespace FPSCamera
             style.normal.textColor = Color.white;
             style.alignment = TextAnchor.UpperCenter;
 
-            GUI.Label(streetNameRect, streetName == null ? "?" : streetName, style);
+            GUI.Label(streetNameRect, streetName ?? "?", style);
 
             GUI.Label(speedTextRect,
-                String.Format("Speed is:{0} {1}", Math.Round(speed * (FPSCamera.instance.config.isMPH ? 0.83125f : 1.33f)), FPSCamera.instance.config.isMPH ? "mph" : "km/h"),
+                String.Format("Speed is:{0} {1}", Math.Round(speed * (FPSCamera.instance.config.isMPH ? 1.044f : 1.67f)), FPSCamera.instance.config.isMPH ? "mph" : "km/h"),
                 style);
 
-            GUI.Label(destinationNameRect, destinationName == null ? "?" : destinationName, style);
+            GUI.Label(destinationNameRect, destinationName ?? "?", style);
 
             if (GUI.Button(buttonRect, "km/h \\ mph"))
             {
