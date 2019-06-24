@@ -15,7 +15,7 @@ namespace FPSCamera
 
         public string Name
         {
-            get { return "First Person Camera - edited"; }
+            get { return "First Person Camera"; }
         }
 
         public string Description

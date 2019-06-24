@@ -129,7 +129,7 @@ namespace FPSCamera
             };
 
             panel = fullscreenContainer.AddUIComponent<UIPanel>();
-            panel.size = new Vector2(400, 728);
+            panel.size = new Vector2(400, 756);
             panel.isVisible = false;
             panel.backgroundSprite = "SubcategoriesPanel";
             panel.relativePosition = new Vector3(cameraModeButton.relativePosition.x - panel.size.x, cameraModeButton.relativePosition.y + 60.0f);
@@ -336,6 +336,15 @@ namespace FPSCamera
                 {
                    FPSCamera.instance.config.enableDOF = value;
                    FPSCamera.instance.SaveConfig();
+                });
+
+            y += 28.0f;
+
+            MakeCheckbox(panel, "ShowPassengers", "Show passenger count", y, FPSCamera.instance.config.showPassengerCount,
+                value =>
+                {
+                    FPSCamera.instance.config.showPassengerCount = value;
+                    FPSCamera.instance.SaveConfig();
                 });
 
             y += 28.0f;

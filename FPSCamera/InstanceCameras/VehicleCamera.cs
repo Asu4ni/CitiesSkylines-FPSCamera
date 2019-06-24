@@ -128,7 +128,15 @@ namespace FPSCamera
                 }
                 if (FPSCamera.instance.config.displaySpeed)
                 {
-                    GetInstanceSpeed(pos);
+                    try
+                    {
+                        GetInstanceSpeed(pos);
+                    }
+                    catch (System.IO.FileNotFoundException e)
+                    {
+                        Log.Error(String.Format("IPT2 thing: {0}", e.ToString()));
+                    }
+                    
                 }
             }
         }
@@ -144,15 +152,30 @@ namespace FPSCamera
             ushort firstVehicle = vManager.m_vehicles.m_buffer[(int)followInstance].GetFirstVehicle(followInstance);
             VehicleInfo info = vManager.m_vehicles.m_buffer[firstVehicle].Info;
 
-            if (info.GetService() == ItemClass.Service.PublicTransport)
+            if (info.GetService() == ItemClass.Service.PublicTransport && FPSCamera.instance.config.showPassengerCount)
             {
                 FPSCameraSpeedUI.Instance.passengerOrStreet = GetPassengerNumbers();
-            } else
+                try
+                {
+                    GetLastStop();
+                }
+                catch (System.IO.FileNotFoundException)
+                {
+                    FPSCameraSpeedUI.Instance.lastExchange = "";
+                }
+            } 
+            else
             {
                 FPSCameraSpeedUI.Instance.passengerOrStreet = RaycastRoad(position);
+                FPSCameraSpeedUI.Instance.lastExchange = "";
             }
-            
-            
+        }
+
+        public void GetLastStop()
+        {
+            int lastGone = ImprovedPublicTransport2.Detour.VehicleManagerMod.m_cachedVehicleData[(int)followInstance].LastStopGonePassengers;
+            int lastNew = ImprovedPublicTransport2.Detour.VehicleManagerMod.m_cachedVehicleData[(int)followInstance].LastStopNewPassengers;
+            FPSCameraSpeedUI.Instance.lastExchange = String.Format("Last stop: -{0} | +{1}", lastGone, lastNew);
         }
 
         public void SetFollowInstance(uint instance)
