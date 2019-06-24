@@ -61,7 +61,7 @@ namespace FPSCamera
 
             FPSCameraSpeedUI.Instance.speed = velocity.magnitude;
             FPSCameraSpeedUI.Instance.destinationName = GetDestination();
-            FPSCameraSpeedUI.Instance.streetName = RaycastRoad(position);
+            FPSCameraSpeedUI.Instance.passengerOrStreet = RaycastRoad(position);
         }
 
         private string GetDestination()

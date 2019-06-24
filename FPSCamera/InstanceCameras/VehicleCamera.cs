@@ -140,7 +140,19 @@ namespace FPSCamera
             Vector3 velocity = v.GetSmoothVelocity(followInstance);
             FPSCameraSpeedUI.Instance.speed = velocity.magnitude;
             FPSCameraSpeedUI.Instance.destinationName = GetDestination();
-            FPSCameraSpeedUI.Instance.streetName = RaycastRoad(position);
+
+            ushort firstVehicle = vManager.m_vehicles.m_buffer[(int)followInstance].GetFirstVehicle(followInstance);
+            VehicleInfo info = vManager.m_vehicles.m_buffer[firstVehicle].Info;
+
+            if (info.GetService() == ItemClass.Service.PublicTransport)
+            {
+                FPSCameraSpeedUI.Instance.passengerOrStreet = GetPassengerNumbers();
+            } else
+            {
+                FPSCameraSpeedUI.Instance.passengerOrStreet = RaycastRoad(position);
+            }
+            
+            
         }
 
         public void SetFollowInstance(uint instance)
@@ -270,6 +282,21 @@ namespace FPSCamera
                 }
 
             }
+        }
+
+        private string GetPassengerNumbers()
+        {
+            Vehicle v = vManager.m_vehicles.m_buffer[followInstance];
+            ushort firstVehicle = vManager.m_vehicles.m_buffer[(int)followInstance].GetFirstVehicle(followInstance);
+            v = vManager.m_vehicles.m_buffer[firstVehicle];
+            VehicleInfo info = vManager.m_vehicles.m_buffer[firstVehicle].Info;
+
+            int fill = 0;
+            int cap = 0;
+
+            info.m_vehicleAI.GetBufferStatus(firstVehicle, ref v, out string text, out fill, out cap);
+
+            return String.Format("Passengers: {0}/{1}", fill, cap);
         }
 
     }
