@@ -128,15 +128,7 @@ namespace FPSCamera
                 }
                 if (FPSCamera.instance.config.displaySpeed)
                 {
-                    try
-                    {
-                        GetInstanceSpeed(pos);
-                    }
-                    catch (System.IO.FileNotFoundException e)
-                    {
-                        Log.Error(String.Format("IPT2 thing: {0}", e.ToString()));
-                    }
-                    
+                    GetInstanceSpeed(pos);
                 }
             }
         }
@@ -154,7 +146,7 @@ namespace FPSCamera
 
             if (info.GetService() == ItemClass.Service.PublicTransport && FPSCamera.instance.config.showPassengerCount)
             {
-                FPSCameraSpeedUI.Instance.passengerOrStreet = GetPassengerNumbers();
+                FPSCameraSpeedUI.Instance.passengersOrStreet = GetPassengerNumbers();
                 if (info.m_vehicleType != VehicleInfo.VehicleType.CableCar)
                 {
                     try
@@ -173,7 +165,7 @@ namespace FPSCamera
             } 
             else
             {
-                FPSCameraSpeedUI.Instance.passengerOrStreet = RaycastRoad(position);
+                FPSCameraSpeedUI.Instance.passengersOrStreet = RaycastRoad(position);
                 FPSCameraSpeedUI.Instance.lastExchange = "";
             }
         }
