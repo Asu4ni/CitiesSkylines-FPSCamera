@@ -6,8 +6,6 @@ namespace FPSCamera
     public class FPSCameraSpeedUI : MonoBehaviour
     {
         private readonly Rect windowRect = new Rect(0, 0, Screen.width, 55);
-        // private  Rect streetNameRect = new Rect(20, 30, 200, 50);
-        // private  Rect passengerCountRect = new Rect(20, 5, 200, 50);
         private  Rect passengersOrStreetRect = new Rect(20, 5, 200, 50);
         private  Rect lastExhangeRect = new Rect(20, 30, 200, 50);
         private  Rect destinationNameRect = new Rect((Screen.width) - 300, 5, 350, 50);
