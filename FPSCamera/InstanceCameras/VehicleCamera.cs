@@ -155,11 +155,18 @@ namespace FPSCamera
             if (info.GetService() == ItemClass.Service.PublicTransport && FPSCamera.instance.config.showPassengerCount)
             {
                 FPSCameraSpeedUI.Instance.passengerOrStreet = GetPassengerNumbers();
-                try
+                if (info.m_vehicleType != VehicleInfo.VehicleType.CableCar)
                 {
-                    GetLastStop();
+                    try
+                    {
+                        GetLastStopExchange();
+                    }
+                    catch (System.IO.FileNotFoundException)
+                    {
+                        FPSCameraSpeedUI.Instance.lastExchange = "";
+                    }
                 }
-                catch (System.IO.FileNotFoundException)
+                else
                 {
                     FPSCameraSpeedUI.Instance.lastExchange = "";
                 }
@@ -171,7 +178,7 @@ namespace FPSCamera
             }
         }
 
-        public void GetLastStop()
+        public void GetLastStopExchange()
         {
             int lastGone = ImprovedPublicTransport2.Detour.VehicleManagerMod.m_cachedVehicleData[(int)followInstance].LastStopGonePassengers;
             int lastNew = ImprovedPublicTransport2.Detour.VehicleManagerMod.m_cachedVehicleData[(int)followInstance].LastStopNewPassengers;
