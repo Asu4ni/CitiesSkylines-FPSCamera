@@ -149,11 +149,11 @@ namespace FPSCamera
                 FPSCameraSpeedUI.Instance.passengersOrStreet = GetPassengerNumbers();
                 if (info.m_vehicleType != VehicleInfo.VehicleType.CableCar)
                 {
-                    try
+                    if (FPSCamera.ipt2Enabled)
                     {
                         GetLastStopExchange();
                     }
-                    catch (System.IO.FileNotFoundException)
+                    else
                     {
                         FPSCameraSpeedUI.Instance.lastExchange = "";
                     }

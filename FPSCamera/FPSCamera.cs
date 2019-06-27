@@ -20,6 +20,8 @@ namespace FPSCamera
 
         public static bool editorMode = false;
 
+        public static bool ipt2Enabled = false;
+
         public static void Initialize(LoadMode mode)
         {
             var controller = GameObject.FindObjectOfType<CameraController>();
@@ -32,6 +34,18 @@ namespace FPSCamera
                 instance.citizenCamera = instance.gameObject.AddComponent<CitizenCamera>();
                 instance.citizenCamera.vehicleCamera = instance.vehicleCamera;
                 editorMode = false;
+
+                foreach(System.Reflection.Assembly assembly in System.AppDomain.CurrentDomain.GetAssemblies())
+                {
+                    foreach(System.Type type in assembly.GetTypes())
+                    {
+                        if (type.Namespace == "ImprovedPublicTransport2")
+                        {
+                            ipt2Enabled = true;
+                            break;
+                        }
+                    }
+                }
             }
             else
             {
