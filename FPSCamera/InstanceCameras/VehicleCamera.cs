@@ -151,7 +151,17 @@ namespace FPSCamera
                 {
                     if (FPSCamera.ipt2Enabled)
                     {
-                        GetLastStopExchange();
+                        try
+                        {
+                            GetLastStopExchange();
+                        }
+                        catch (NullReferenceException)
+                        {
+                            // It finds IPT2 but it is not enabled so it can't be used..
+                            Log.Message("IPT2 is not enabled.");
+                            FPSCamera.ipt2Enabled = false;
+                        }
+                        
                     }
                     else
                     {

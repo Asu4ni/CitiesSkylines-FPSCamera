@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace FPSCamera
@@ -71,6 +73,20 @@ namespace FPSCamera
             }
 
             field.SetValue(o, value);
+        }
+
+
+        public static IEnumerable<System.Type> GetLoadableTypes(this Assembly assembly)
+        {
+            if (assembly == null) throw new System.ArgumentNullException(nameof(assembly));
+            try
+            {
+                return assembly.GetTypes();
+            }
+            catch (ReflectionTypeLoadException e)
+            {
+                return e.Types.Where(t => t != null);
+            }
         }
 
     }
