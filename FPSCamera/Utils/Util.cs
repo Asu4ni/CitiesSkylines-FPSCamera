@@ -1,3 +1,5 @@
+using ColossalFramework.Plugins;
+using System.Linq;
 using System.Reflection;
 
 namespace FPSCamera
@@ -71,6 +73,29 @@ namespace FPSCamera
             }
 
             field.SetValue(o, value);
+        }
+
+        public static ulong[] GetUserModsList()
+        {
+            return PluginManager.instance.GetPluginsInfo().Where(plugin => plugin.isEnabled).Select(info => info.publishedFileID.AsUInt64).ToArray();
+        }
+
+        public static bool FindIPT2()
+        {
+            ulong[] userModList = GetUserModsList();
+
+            for (int i = 0; i < userModList.Length; i++)
+            {
+                if (userModList[i] == 928128676)
+                // IPT2's id. Only works with IPT2 from the workshop, not local.
+                // Locally IPT2 has another ID which it shares with the preinstalled mods from Colossal Order. (18446744073709551615)
+                {
+                    Log.Message("IPT2 is loaded.");
+                    return true;
+                }
+            }
+            Log.Message("IPT2 is not loaded.");
+            return false;
         }
 
     }

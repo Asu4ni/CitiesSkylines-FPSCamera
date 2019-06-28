@@ -1,4 +1,3 @@
-using ColossalFramework;
 using ColossalFramework.Math;
 using ICities;
 using System.Collections.Generic;
@@ -20,6 +19,8 @@ namespace FPSCamera
 
         public static bool editorMode = false;
 
+        public static bool ipt2Enabled = false;
+
         public static void Initialize(LoadMode mode)
         {
             var controller = GameObject.FindObjectOfType<CameraController>();
@@ -32,6 +33,8 @@ namespace FPSCamera
                 instance.citizenCamera = instance.gameObject.AddComponent<CitizenCamera>();
                 instance.citizenCamera.vehicleCamera = instance.vehicleCamera;
                 editorMode = false;
+
+                ipt2Enabled = Util.FindIPT2();
             }
             else
             {

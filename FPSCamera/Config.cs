@@ -38,6 +38,7 @@ namespace FPSCamera
         public Vector3 position = Vector3.zero;
         public bool displaySpeed = false;
         public bool isMPH = false;
+        public bool showPassengerCount = true;
 
         public KeyCode cameraMoveLeft = (KeyCode)(new SavedInputKey(Settings.cameraMoveLeft, Settings.gameSettingsFile, DefaultSettings.cameraMoveLeft, true).value & 268435455);
         public KeyCode cameraMoveRight = (KeyCode)(new SavedInputKey(Settings.cameraMoveRight, Settings.gameSettingsFile, DefaultSettings.cameraMoveRight, true).value & 268435455);
