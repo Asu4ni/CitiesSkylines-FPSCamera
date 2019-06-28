@@ -1,8 +1,6 @@
-using ColossalFramework;
 using ColossalFramework.Math;
 using ICities;
 using System.Collections.Generic;
-using System.Reflection;
 using UnityEngine;
 using UnityStandardAssets.ImageEffects;
 
@@ -36,23 +34,7 @@ namespace FPSCamera
                 instance.citizenCamera.vehicleCamera = instance.vehicleCamera;
                 editorMode = false;
 
-                foreach(Assembly assembly in System.AppDomain.CurrentDomain.GetAssemblies())
-                {
-                    foreach (System.Type type in Util.GetLoadableTypes(assembly))
-                    {
-                        if (type.Namespace == "ImprovedPublicTransport2")
-                        {
-                            ipt2Enabled = true;
-                            Log.Message("IPT2 found");
-                            break;
-                        }
-                    }
-                    
-                    if (ipt2Enabled)
-                    {
-                        break;
-                    }
-                }
+                ipt2Enabled = Util.FindIPT2();
             }
             else
             {
