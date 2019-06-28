@@ -24,6 +24,7 @@ namespace FPSCamera
 
         public void SetFollowInstance(uint instance)
         {
+            this.enabled = true;
             FPSCamera.instance.SetMode(false);
             followInstance = instance;
             following = true;
@@ -43,10 +44,11 @@ namespace FPSCamera
             camera.fieldOfView = FPSCamera.instance.originalFieldOfView;
             FPSCameraSpeedUI.Instance.enabled = false;
             FPSCamera.onCameraModeChanged(false);
-            if(!inVehicle)
+            if (!inVehicle)
             {
                 vehicleCamera.StopFollowing();
             }
+            this.enabled = false;
         }
 
         public void GetInstanceSpeed(Vector3 position)
@@ -75,9 +77,11 @@ namespace FPSCamera
             String buildingName = BuildingManager.instance.GetBuildingName(citizenInstance.m_targetBuilding, default(InstanceID)) ?? "?";
             String altBuildingName = BuildingManager.instance.GetBuildingName(instanceID2.Building, default(InstanceID)) ?? "?";
 
-            if (buildingName != null) {
+            if (buildingName != null)
+            {
                 return buildingName;
-            } else if(altBuildingName != null)
+            }
+            else if (altBuildingName != null)
             {
                 return altBuildingName;
             }
@@ -98,8 +102,8 @@ namespace FPSCamera
             raycastInput.m_ignoreTerrain = true;
 
             ColossalFramework.Math.Segment3 ray = new ColossalFramework.Math.Segment3(position, position + new Vector3(0, -1000, 0));
-            bool blah = NetManager.instance.RayCast(raycastInput.m_buildObject as NetInfo, ray, raycastInput.m_netSnap, raycastInput.m_segmentNameOnly, raycastInput.m_netService.m_service, raycastInput.m_netService2.m_service, raycastInput.m_netService.m_subService, raycastInput.m_netService2.m_subService, raycastInput.m_netService.m_itemLayers, raycastInput.m_netService2.m_itemLayers, raycastInput.m_ignoreNodeFlags, raycastInput.m_ignoreSegmentFlags, out position, out output.m_netNode, out output.m_netSegment);
-            if (blah)
+            bool success = NetManager.instance.RayCast(raycastInput.m_buildObject as NetInfo, ray, raycastInput.m_netSnap, raycastInput.m_segmentNameOnly, raycastInput.m_netService.m_service, raycastInput.m_netService2.m_service, raycastInput.m_netService.m_subService, raycastInput.m_netService2.m_subService, raycastInput.m_netService.m_itemLayers, raycastInput.m_netService2.m_itemLayers, raycastInput.m_ignoreNodeFlags, raycastInput.m_ignoreSegmentFlags, out position, out output.m_netNode, out output.m_netSegment);
+            if (success)
             {
                 return NetManager.instance.GetSegmentName(output.m_netSegment) ?? "?";
             }
@@ -117,7 +121,7 @@ namespace FPSCamera
             cManager = CitizenManager.instance;
         }
 
-        void Update()
+        void LateUpdate()
         {
             if (following)
             {
@@ -125,7 +129,7 @@ namespace FPSCamera
                 var i = citizen.m_instance;
                 var flags = cManager.m_instances.m_buffer[i].m_flags;
 
-                if ( inVehicle )
+                if (inVehicle)
                 {
                     if (citizen.m_vehicle == 0)
                     {
@@ -135,7 +139,7 @@ namespace FPSCamera
                     }
                     return;
                 }
-                
+
                 if ((flags & (CitizenInstance.Flags.Created | CitizenInstance.Flags.Deleted)) != CitizenInstance.Flags.Created)
                 {
                     inVehicle = false;
@@ -144,11 +148,11 @@ namespace FPSCamera
                 }
 
                 if ((flags & CitizenInstance.Flags.EnteringVehicle) != 0)
-                {                    
-                    if ( citizen.m_vehicle != 0 )
+                {
+                    if (citizen.m_vehicle != 0)
                     {
                         ushort vehicleId = citizen.m_vehicle;
-                        if((VehicleManager.instance.m_vehicles.m_buffer[vehicleId].Info.GetService() == ItemClass.Service.PublicTransport))
+                        if ((VehicleManager.instance.m_vehicles.m_buffer[vehicleId].Info.GetService() == ItemClass.Service.PublicTransport))
                         {
                             bool isReversed = AIUtils.GetReversedStatus(VehicleManager.instance, vehicleId);
                             vehicleId = isReversed ?
@@ -182,7 +186,7 @@ namespace FPSCamera
                 float height = camera.transform.position.y - TerrainManager.instance.SampleDetailHeight(camera.transform.position);
                 cameraController.m_targetPosition = camera.transform.position;
 
-                if(effect)
+                if (effect)
                 {
                     effect.enabled = FPSCamera.instance.config.enableDOF;
                 }
@@ -194,14 +198,14 @@ namespace FPSCamera
             }
         }
 
-        public Vector3 GetOffset( Vector3 position, Vector3 forward, Vector3 up)
+        public Vector3 GetOffset(Vector3 position, Vector3 forward, Vector3 up)
         {
             Vector3 retVal = position +
                           forward * CameraUtils.CAMERAOFFSETFORWARD +
                           up * CameraUtils.CAMERAOFFSETUP;
             return retVal;
         }
-        
+
     }
 
 }

@@ -34,7 +34,7 @@ namespace FPSCamera
             vManager = VehicleManager.instance;
         }
 
-        void Update()
+        void LateUpdate()
         {
             if (following)
             {
@@ -92,7 +92,8 @@ namespace FPSCamera
                 if ((v.Info.m_vehicleType == VehicleInfo.VehicleType.Tram ||
                     v.Info.m_vehicleType == VehicleInfo.VehicleType.Metro ||
                     v.Info.m_vehicleType == VehicleInfo.VehicleType.Train ||
-                    v.Info.m_vehicleType == VehicleInfo.VehicleType.Monorail)) {
+                    v.Info.m_vehicleType == VehicleInfo.VehicleType.Monorail))
+                {
                     bool isLastCarInTrain = (currentReversedStatus && v.m_trailingVehicle != 0 && v.m_leadingVehicle == 0) ||
                         (!currentReversedStatus && v.m_trailingVehicle == 0 && v.m_leadingVehicle != 0);
                     if (isLastCarInTrain)
@@ -105,13 +106,13 @@ namespace FPSCamera
                     vehicleVelocity = offset;
                 }
 
-                if(Vector3.Dot(orientation * Vector3.forward, vehicleVelocity) <0)
+                if (Vector3.Dot(orientation * Vector3.forward, vehicleVelocity) < 0)
                 {
                     direction = Vector3.back;
                 }
 
 
-                Vector3 lookAt = pos +  (orientation * direction) * 1f;
+                Vector3 lookAt = pos + (orientation * direction) * 1f;
 
                 var currentOrientation = camera.transform.rotation;
                 camera.transform.LookAt(lookAt, Vector3.up);
@@ -162,7 +163,7 @@ namespace FPSCamera
                 {
                     FPSCameraSpeedUI.Instance.lastExchange = "";
                 }
-            } 
+            }
             else
             {
                 FPSCameraSpeedUI.Instance.passengersOrStreet = RaycastRoad(position);
@@ -179,8 +180,9 @@ namespace FPSCamera
 
         public void SetFollowInstance(uint instance)
         {
+            this.enabled = true;
             FPSCamera.instance.SetMode(false);
-            
+
             followInstance = (ushort)instance;
             isReversed = AIUtils.GetReversedStatus(vManager, followInstance);
             if (FPSCamera.instance.config.alwaysFrontVehicle)
@@ -202,13 +204,14 @@ namespace FPSCamera
             cameraRotationOffset = 0;
         }
 
-    public void StopFollowing()
+        public void StopFollowing()
         {
             followInstance = 0;
             following = false;
             FPSCameraSpeedUI.Instance.enabled = false;
             CameraUtils.StopCamera(cameraController, camera);
             FPSCamera.onCameraModeChanged(false);
+            this.enabled = false;
         }
 
         public Vector3 GetOffset(Vector3 position, Vector3 forward, Vector3 up)
@@ -222,7 +225,7 @@ namespace FPSCamera
 
         private String RaycastRoad(Vector3 position)
         {
-        
+
             RaycastOutput output = new RaycastOutput();
             RaycastInput raycastInput = new RaycastInput(Camera.main.ScreenPointToRay(camera.transform.position), Camera.main.farClipPlane);
             raycastInput.m_netService.m_service = ItemClass.Service.Road;
@@ -231,18 +234,17 @@ namespace FPSCamera
             raycastInput.m_ignoreNodeFlags = NetNode.Flags.None;
             raycastInput.m_ignoreTerrain = true;
 
-            ColossalFramework.Math.Segment3 ray = new ColossalFramework.Math.Segment3(position, position + new Vector3(0,-1000, 0));
-            bool blah = NetManager.instance.RayCast(raycastInput.m_buildObject as NetInfo, ray, raycastInput.m_netSnap, raycastInput.m_segmentNameOnly, raycastInput.m_netService.m_service, raycastInput.m_netService2.m_service, raycastInput.m_netService.m_subService, raycastInput.m_netService2.m_subService, raycastInput.m_netService.m_itemLayers, raycastInput.m_netService2.m_itemLayers, raycastInput.m_ignoreNodeFlags, raycastInput.m_ignoreSegmentFlags, out position, out output.m_netNode, out output.m_netSegment);
-            if(blah)
+            ColossalFramework.Math.Segment3 ray = new ColossalFramework.Math.Segment3(position, position + new Vector3(0, -1000, 0));
+            bool success = NetManager.instance.RayCast(raycastInput.m_buildObject as NetInfo, ray, raycastInput.m_netSnap, raycastInput.m_segmentNameOnly, raycastInput.m_netService.m_service, raycastInput.m_netService2.m_service, raycastInput.m_netService.m_subService, raycastInput.m_netService2.m_subService, raycastInput.m_netService.m_itemLayers, raycastInput.m_netService2.m_itemLayers, raycastInput.m_ignoreNodeFlags, raycastInput.m_ignoreSegmentFlags, out position, out output.m_netNode, out output.m_netSegment);
+            if (success)
             {
-               return NetManager.instance.GetSegmentName(output.m_netSegment) ?? "  ";
+                return NetManager.instance.GetSegmentName(output.m_netSegment) ?? "  ";
             }
             else
             {
                 return "  ";
             }
         }
-
 
         private string GetDestination()
         {
@@ -258,7 +260,7 @@ namespace FPSCamera
             {
                 return TransportManager.instance.GetLineName(v.m_transportLine) ?? "  ";
             }
-            else if(info.m_vehicleType == VehicleInfo.VehicleType.Bicycle)
+            else if (info.m_vehicleType == VehicleInfo.VehicleType.Bicycle)
             {
                 uint driverInstance = v.Info.m_vehicleAI.GetOwnerID(firstVehicle, ref v).Citizen;
                 var citizen = CitizenManager.instance.m_citizens.m_buffer[driverInstance];

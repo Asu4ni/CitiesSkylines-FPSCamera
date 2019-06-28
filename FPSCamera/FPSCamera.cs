@@ -32,6 +32,9 @@ namespace FPSCamera
                 instance.vehicleCamera = instance.gameObject.AddComponent<VehicleCamera>();
                 instance.citizenCamera = instance.gameObject.AddComponent<CitizenCamera>();
                 instance.citizenCamera.vehicleCamera = instance.vehicleCamera;
+                instance.vehicleCamera.enabled = false;
+                instance.citizenCamera.enabled = false;
+
                 editorMode = false;
 
                 ipt2Enabled = Util.FindIPT2();
@@ -550,7 +553,7 @@ namespace FPSCamera
             ui.Hide();
         }
 
-        public void Update()
+        public void LateUpdate()
         {
             float time = Time.deltaTime;
             if (time + existingTime <= 0.1)

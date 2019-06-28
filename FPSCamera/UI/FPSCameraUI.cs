@@ -67,7 +67,8 @@ namespace FPSCamera
                     FPSCamera.instance.config.position.y
                 );
             }
-            else{
+            else
+            {
                 UIComponent escbutton = uiView.FindUIComponent("Esc");
 
                 cameraModeButton.relativePosition = new Vector2
@@ -76,9 +77,10 @@ namespace FPSCamera
                     escbutton.relativePosition.y + cameraModeButton.height * 2.0f
                 );
             }
-            
 
-            cameraModeButton.eventClick += (component, param) => {
+
+            cameraModeButton.eventClick += (component, param) =>
+            {
                 panel.relativePosition = new Vector3(cameraModeButton.relativePosition.x - panel.size.x, cameraModeButton.relativePosition.y + 60.0f);
                 panel.isVisible = !panel.isVisible;
             };
@@ -288,9 +290,9 @@ namespace FPSCamera
             MakeCheckbox(panel, "AnimatedTransitions", "Animated transitions", y, FPSCamera.instance.config.animateTransitions,
                value =>
                 {
-                   FPSCamera.instance.config.animateTransitions = value;
-                   FPSCamera.instance.SaveConfig();
-               });
+                    FPSCamera.instance.config.animateTransitions = value;
+                    FPSCamera.instance.SaveConfig();
+                });
 
             y += 28.0f;
 
@@ -334,20 +336,12 @@ namespace FPSCamera
             MakeCheckbox(panel, "DofEnabled", "DOF enabled", y, FPSCamera.instance.config.enableDOF,
                 value =>
                 {
-                   FPSCamera.instance.config.enableDOF = value;
-                   FPSCamera.instance.SaveConfig();
-                });
-
-            y += 28.0f;
-
-            MakeCheckbox(panel, "ShowPassengers", "Show passenger count", y, FPSCamera.instance.config.showPassengerCount,
-                value =>
-                {
-                    FPSCamera.instance.config.showPassengerCount = value;
+                    FPSCamera.instance.config.enableDOF = value;
                     FPSCamera.instance.SaveConfig();
                 });
 
             y += 28.0f;
+
 
             if (!FPSCamera.editorMode)
             {
@@ -368,6 +362,18 @@ namespace FPSCamera
                     });
 
                 y += 28.0f;
+
+                if (FPSCamera.ipt2Enabled)
+                {
+                    MakeCheckbox(panel, "ShowPassengers", "Show passenger count", y, FPSCamera.instance.config.showPassengerCount,
+                    value =>
+                        {
+                            FPSCamera.instance.config.showPassengerCount = value;
+                            FPSCamera.instance.SaveConfig();
+                        });
+
+                    y += 28.0f;
+                }
 
                 MakeCheckbox(panel, "AllowMovementVehicleMode", "Allow movement in vehicle/ citizen mode", y, FPSCamera.instance.config.allowUserOffsetInVehicleCitizenMode,
                    value =>

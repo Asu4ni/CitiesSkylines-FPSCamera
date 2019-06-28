@@ -6,11 +6,11 @@ namespace FPSCamera
     public class FPSCameraSpeedUI : MonoBehaviour
     {
         private readonly Rect windowRect = new Rect(0, 0, Screen.width, 55);
-        private  Rect passengersOrStreetRect = new Rect(20, 5, 200, 50);
-        private  Rect lastExhangeRect = new Rect(20, 30, 200, 50);
-        private  Rect destinationNameRect = new Rect((Screen.width) - 300, 5, 350, 50);
-        private  Rect speedTextRect = new Rect((Screen.width/2) - 100, 5, 200, 50);
-        private  Rect buttonRect = new Rect((Screen.width / 2) - 100, 30, 200, 20);
+        private Rect passengersOrStreetRect = new Rect(20, 5, 200, 50);
+        private Rect lastExhangeRect = new Rect(20, 30, 200, 50);
+        private Rect destinationNameRect = new Rect((Screen.width) - 300, 5, 350, 50);
+        private Rect speedTextRect = new Rect((Screen.width / 2) - 100, 5, 200, 50);
+        private Rect buttonRect = new Rect((Screen.width / 2) - 100, 30, 200, 20);
         private GUIStyle style = new GUIStyle();
 
         public double speed = 0;
@@ -34,7 +34,7 @@ namespace FPSCamera
 
         private void OnGUI()
         {
-            GUI.Box(windowRect,"");
+            GUI.Box(windowRect, "");
 
             style.fontSize = 20;
             style.normal.textColor = Color.white;
@@ -58,7 +58,7 @@ namespace FPSCamera
 
         private void WindowConfig(int id)
         {
-            
+
         }
     }
 }

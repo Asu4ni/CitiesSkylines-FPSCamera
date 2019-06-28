@@ -50,7 +50,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="ImprovedPublicTransport2">
-      <HintPath>..\..\..\..\AppData\Local\Colossal Order\Cities_Skylines\Addons\Mods\ITP2\ImprovedPublicTransport2.dll</HintPath>
+      <HintPath>..\..\AppData\Local\Colossal Order\Cities_Skylines\Addons\Mods\ITP2\ImprovedPublicTransport2.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
@@ -79,9 +79,7 @@
     <Compile Include="Utils\Util.cs" />
     <Compile Include="InstanceCameras\VehicleCamera.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Patches\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>mkdir "%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(SolutionName)"
