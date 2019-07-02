@@ -363,17 +363,14 @@ namespace FPSCamera
 
                 y += 28.0f;
 
-                if (FPSCamera.ipt2Enabled)
-                {
-                    MakeCheckbox(panel, "ShowPassengers", "Show passenger count", y, FPSCamera.instance.config.showPassengerCount,
-                    value =>
-                        {
-                            FPSCamera.instance.config.showPassengerCount = value;
-                            FPSCamera.instance.SaveConfig();
-                        });
+                MakeCheckbox(panel, "ShowPassengers", "Show passenger count", y, FPSCamera.instance.config.showPassengerCount,
+                value =>
+                    {
+                        FPSCamera.instance.config.showPassengerCount = value;
+                        FPSCamera.instance.SaveConfig();
+                    });
 
-                    y += 28.0f;
-                }
+                y += 28.0f;
 
                 MakeCheckbox(panel, "AllowMovementVehicleMode", "Allow movement in vehicle/ citizen mode", y, FPSCamera.instance.config.allowUserOffsetInVehicleCitizenMode,
                    value =>
