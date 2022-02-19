@@ -1,10 +1,7 @@
-using System;
 using ICities;
-using ColossalFramework.PlatformServices;
-using ColossalFramework.Plugins;
-using System.Reflection;
 using UnityEngine;
 using FPSCamera.UI;
+using CitiesHarmony.API;
 
 namespace FPSCamera
 {
@@ -15,12 +12,12 @@ namespace FPSCamera
 
         public string Name
         {
-            get { return "First Person Camera"; }
+            get { return "First Person Camera v2.0"; }
         }
 
         public string Description
         {
-            get { return "See your city from a different perspective"; }
+            get { return "View your city from a different perspective"; }
         }
 
         public void OnSettingsUI(UIHelperBase helper)
@@ -32,14 +29,22 @@ namespace FPSCamera
 
             m_optionsManager.generateSettings(helper);
         }
+        public void OnEnabled()
+        {
+            HarmonyHelper.DoOnHarmonyReady(() => HarmonyPatcher.Patch());
+        }
+        public void OnDisabled()
+        {
+            if (HarmonyHelper.IsHarmonyInstalled) HarmonyPatcher.Unpatch();
+        }
     }
 
     public class ModLoad : LoadingExtensionBase
     {
         public override void OnCreated(ILoading loading)
         {
-            
-         
+
+
         }
 
         public override void OnLevelLoaded(LoadMode mode)

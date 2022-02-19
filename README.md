@@ -1,4 +1,5 @@
-# Skylines-FPSCamera
-FPS camera mod for Cities: Skylines
+# Cities: Skylines - First Person Camera mod v2.0
 
-[IPT2](https://steamcommunity.com/sharedfiles/filedetails/?id=928128676) is required when developing.
+> This is an updated version for "[First Person Camera: Updated](https://steamcommunity.com/sharedfiles/filedetails/?id=650805785)" by tony56a
+
+(TODO)
