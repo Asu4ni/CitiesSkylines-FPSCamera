@@ -19,8 +19,6 @@ namespace FPSCamera
 
         public static bool editorMode = false;
 
-        public static bool ipt2Enabled = false;
-
         public static void Initialize(LoadMode mode)
         {
             var controller = GameObject.FindObjectOfType<CameraController>();
@@ -36,8 +34,6 @@ namespace FPSCamera
                 instance.citizenCamera.enabled = false;
 
                 editorMode = false;
-
-                ipt2Enabled = Util.FindIPT2();
             }
             else
             {

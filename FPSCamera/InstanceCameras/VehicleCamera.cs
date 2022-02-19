@@ -144,39 +144,10 @@ namespace FPSCamera
 
             ushort firstVehicle = vManager.m_vehicles.m_buffer[(int)followInstance].GetFirstVehicle(followInstance);
             VehicleInfo info = vManager.m_vehicles.m_buffer[firstVehicle].Info;
-
-            if (info.GetService() == ItemClass.Service.PublicTransport && FPSCamera.instance.config.showPassengerCount)
-            {
-                FPSCameraSpeedUI.Instance.passengersOrStreet = GetPassengerNumbers();
-                if (info.m_vehicleType != VehicleInfo.VehicleType.CableCar)
-                {
-                    if (FPSCamera.ipt2Enabled)
-                    {
-                        GetLastStopExchange();
-                    }
-                    else
-                    {
-                        FPSCameraSpeedUI.Instance.lastExchange = "";
-                    }
-                }
-                else
-                {
-                    FPSCameraSpeedUI.Instance.lastExchange = "";
-                }
-            }
-            else
-            {
-                FPSCameraSpeedUI.Instance.passengersOrStreet = RaycastRoad(position);
-                FPSCameraSpeedUI.Instance.lastExchange = "";
-            }
-        }
-
-        public void GetLastStopExchange()
-        {
-            ushort firstVehicle = vManager.m_vehicles.m_buffer[(int)followInstance].GetFirstVehicle(followInstance);
-            int lastGone = ImprovedPublicTransport2.CachedVehicleData.m_cachedVehicleData[(int)firstVehicle].LastStopGonePassengers;
-            int lastNew = ImprovedPublicTransport2.CachedVehicleData.m_cachedVehicleData[(int)firstVehicle].LastStopNewPassengers;
-            FPSCameraSpeedUI.Instance.lastExchange = String.Format("Last stop: -{0} | +{1}", lastGone, lastNew);
+            FPSCameraSpeedUI.Instance.passengersOrStreet =
+                    (info.GetService() == ItemClass.Service.PublicTransport &&
+                            FPSCamera.instance.config.showPassengerCount)
+                    ? GetPassengerNumbers() : FPSCameraSpeedUI.Instance.passengersOrStreet = RaycastRoad(position);
         }
 
         public void SetFollowInstance(uint instance)

@@ -7,7 +7,6 @@ namespace FPSCamera
     {
         private readonly Rect windowRect = new Rect(0, 0, Screen.width, 55);
         private Rect passengersOrStreetRect = new Rect(20, 5, 200, 50);
-        private Rect lastExhangeRect = new Rect(20, 30, 200, 50);
         private Rect destinationNameRect = new Rect((Screen.width) - 300, 5, 350, 50);
         private Rect speedTextRect = new Rect((Screen.width / 2) - 100, 5, 200, 50);
         private Rect buttonRect = new Rect((Screen.width / 2) - 100, 30, 200, 20);
@@ -16,7 +15,6 @@ namespace FPSCamera
         public double speed = 0;
         public String destinationName = "?";
         public String passengersOrStreet = "?";
-        public String lastExchange = "";
 
         private static FPSCameraSpeedUI instance;
         public static FPSCameraSpeedUI Instance
@@ -41,7 +39,6 @@ namespace FPSCamera
             style.alignment = TextAnchor.UpperCenter;
 
             GUI.Label(passengersOrStreetRect, passengersOrStreet ?? "?", style);
-            GUI.Label(lastExhangeRect, lastExchange ?? "?", style);
 
             GUI.Label(speedTextRect,
                 String.Format("Speed is: {0} {1}", Math.Round(speed * (FPSCamera.instance.config.isMPH ? 1.044f : 1.67f)), FPSCamera.instance.config.isMPH ? "mph" : "km/h"),
