@@ -23,7 +23,7 @@ namespace FPSCamera
             {
                 if (instance == null)
                 {
-                    instance = FPSCamera.instance.gameObject.AddComponent<FPSCameraSpeedUI>();
+                    instance = FPSCamera.Instance.gameObject.AddComponent<FPSCameraSpeedUI>();
                 }
 
                 return instance;
@@ -41,15 +41,15 @@ namespace FPSCamera
             GUI.Label(passengersOrStreetRect, passengersOrStreet ?? "?", style);
 
             GUI.Label(speedTextRect,
-                String.Format("Speed is: {0} {1}", Math.Round(speed * (FPSCamera.instance.config.isMPH ? 1.044f : 1.67f)), FPSCamera.instance.config.isMPH ? "mph" : "km/h"),
+                String.Format("Speed is: {0} {1}", Math.Round(speed * (Config.Global.isMPH ? 1.044f : 1.67f)), Config.Global.isMPH ? "mph" : "km/h"),
                 style);
 
             GUI.Label(destinationNameRect, destinationName ?? "?", style);
 
             if (GUI.Button(buttonRect, "km/h \\ mph"))
             {
-                FPSCamera.instance.config.isMPH = !FPSCamera.instance.config.isMPH;
-                FPSCamera.instance.SaveConfig();
+                Config.Global.isMPH = !Config.Global.isMPH;
+                FPSCamera.Instance.SaveConfig();
             }
         }
 

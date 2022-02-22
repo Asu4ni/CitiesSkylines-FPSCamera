@@ -24,7 +24,7 @@ namespace FPSCamera.UI
         public static bool misInGame = false;
 
         private static KeyCodeSelectType keyCodeSelctMode = KeyCodeSelectType.none;
-        private Configuration config;
+        private Config config;
 
         private UIButton forwardBtn;
         private UIButton backBtn;
@@ -38,7 +38,7 @@ namespace FPSCamera.UI
             if (keyCodeSelctMode != KeyCodeSelectType.none)
             {
                 KeyCode pressedKey = findKeyPressed();
-                bool cameraAvailable = FPSCamera.instance != null;
+                bool cameraAvailable = FPSCamera.Instance != null;
                 if (pressedKey != KeyCode.None && pressedKey != KeyCode.Mouse0)
                 {
                     switch (keyCodeSelctMode)
@@ -46,56 +46,56 @@ namespace FPSCamera.UI
                         case KeyCodeSelectType.forward:
                             forwardBtn.text = pressedKey.ToString();
                             config.cameraMoveForward = pressedKey;
-                            Configuration.Save(config);
+                            Config.Save(config);
                             if (cameraAvailable)
                             {
-                                FPSCamera.instance.config.cameraMoveForward = pressedKey;
+                                Config.Global.cameraMoveForward = pressedKey;
                             }
 
                             break;
                         case KeyCodeSelectType.back:
                             backBtn.text = pressedKey.ToString();
                             config.cameraMoveBackward = pressedKey;
-                            Configuration.Save(config);
+                            Config.Save(config);
                             if (cameraAvailable)
                             {
-                                FPSCamera.instance.config.cameraMoveBackward = pressedKey;
+                                Config.Global.cameraMoveBackward = pressedKey;
                             }
                             break;
                         case KeyCodeSelectType.left:
                             leftBtn.text = pressedKey.ToString();
                             config.cameraMoveLeft = pressedKey;
-                            Configuration.Save(config);
+                            Config.Save(config);
                             if (cameraAvailable)
                             {
-                                FPSCamera.instance.config.cameraMoveLeft = pressedKey;
+                                Config.Global.cameraMoveLeft = pressedKey;
                             }
                             break;
                         case KeyCodeSelectType.right:
                             rightBtn.text = pressedKey.ToString();
                             config.cameraMoveRight = pressedKey;
-                            Configuration.Save(config);
+                            Config.Save(config);
                             if (cameraAvailable)
                             {
-                                FPSCamera.instance.config.cameraMoveRight = pressedKey;
+                                Config.Global.cameraMoveRight = pressedKey;
                             }
                             break;
                         case KeyCodeSelectType.zoomIn:
                             zoomInBtn.text = pressedKey.ToString();
                             config.cameraZoomCloser = pressedKey;
-                            Configuration.Save(config);
+                            Config.Save(config);
                             if (cameraAvailable)
                             {
-                                FPSCamera.instance.config.cameraZoomCloser = pressedKey;
+                                Config.Global.cameraZoomCloser = pressedKey;
                             }
                             break;
                         case KeyCodeSelectType.zoomOut:
                             zoomOutBtn.text = pressedKey.ToString();
                             config.cameraZoomAway = pressedKey;
-                            Configuration.Save(config);
+                            Config.Save(config);
                             if (cameraAvailable)
                             {
-                                FPSCamera.instance.config.cameraZoomAway = pressedKey;
+                                Config.Global.cameraZoomAway = pressedKey;
                             }
                             break;
                     }
@@ -107,7 +107,7 @@ namespace FPSCamera.UI
 
         public void generateSettings(UIHelperBase helper)
         {
-            config = Configuration.Load() ?? new Configuration();
+            config = Config.Load() ?? new Config();
             UIHelper controlGroup = helper.AddGroup("FPS Camera Control settings") as UIHelper;
             forwardBtn = AddKeymapping(controlGroup, "Forward Button", config.cameraMoveForward, KeyCodeSelectType.forward);
             backBtn = AddKeymapping(controlGroup, "Backward Button", config.cameraMoveBackward, KeyCodeSelectType.back);

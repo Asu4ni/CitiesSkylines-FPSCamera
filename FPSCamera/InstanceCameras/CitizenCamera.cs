@@ -24,15 +24,15 @@ namespace FPSCamera
         public void SetFollowInstance(uint instance)
         {
             this.enabled = true;
-            FPSCamera.instance.SetMode(false);
+            FPSCamera.Instance.SetMode(false);
             followInstance = instance;
             following = true;
             CameraUtils.SetCamera(cameraController, camera);
-            if (FPSCamera.instance.config.displaySpeed)
+            if (Config.Global.displaySpeed)
             {
                 FPSCameraSpeedUI.Instance.enabled = true;
             }
-            FPSCamera.onCameraModeChanged(true);
+            FPSCamera.Instance.onCameraModeChanged(true);
         }
 
         public void StopFollowing()
@@ -40,9 +40,9 @@ namespace FPSCamera
             following = false;
             CameraUtils.StopCamera(cameraController, camera);
             userOffset = Vector3.zero;
-            camera.fieldOfView = FPSCamera.instance.originalFieldOfView;
+            camera.fieldOfView = FPSCamera.Instance.originalFieldOfView;
             FPSCameraSpeedUI.Instance.enabled = false;
-            FPSCamera.onCameraModeChanged(false);
+            FPSCamera.Instance.onCameraModeChanged(false);
             if (!inVehicle)
             {
                 vehicleCamera.StopFollowing();
@@ -187,10 +187,10 @@ namespace FPSCamera
 
                 if (effect)
                 {
-                    effect.enabled = FPSCamera.instance.config.enableDOF;
+                    effect.enabled = Config.Global.enableDOF;
                 }
 
-                if (FPSCamera.instance.config.displaySpeed)
+                if (Config.Global.displaySpeed)
                 {
                     GetInstanceSpeed(camera.transform.position - userOffset);
                 }

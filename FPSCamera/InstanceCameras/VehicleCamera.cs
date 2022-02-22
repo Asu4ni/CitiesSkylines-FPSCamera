@@ -52,7 +52,7 @@ namespace FPSCamera
 
                 bool currentReversedStatus = GameUtils.GetReversedStatus(vManager, followInstance);
 
-                if (FPSCamera.instance.config.alwaysFrontVehicle)
+                if (Config.Global.alwaysFrontVehicle)
                 {
                     if (currentReversedStatus != isReversed)
                     {
@@ -80,9 +80,9 @@ namespace FPSCamera
                 }
 
                 var pos = GetOffset(position, forward, up) + vehicleOffset +
-                          forward * FPSCamera.instance.config.vehicleCameraOffsetX +
-                          up * FPSCamera.instance.config.vehicleCameraOffsetY +
-                          right * FPSCamera.instance.config.vehicleCameraOffsetZ;
+                          forward * Config.Global.vehicleCameraOffsetX +
+                          up * Config.Global.vehicleCameraOffsetY +
+                          right * Config.Global.vehicleCameraOffsetZ;
                 camera.transform.position = pos + this.userOffset;
 
                 Vector3 offset = v.GetSmoothVelocity(followInstance);
@@ -124,9 +124,9 @@ namespace FPSCamera
 
                 if (effect)
                 {
-                    effect.enabled = FPSCamera.instance.config.enableDOF;
+                    effect.enabled = Config.Global.enableDOF;
                 }
-                if (FPSCamera.instance.config.displaySpeed)
+                if (Config.Global.displaySpeed)
                 {
                     GetInstanceSpeed(pos);
                 }
@@ -145,18 +145,18 @@ namespace FPSCamera
             VehicleInfo info = vManager.m_vehicles.m_buffer[firstVehicle].Info;
             FPSCameraSpeedUI.Instance.passengersOrStreet =
                     (info.GetService() == ItemClass.Service.PublicTransport &&
-                            FPSCamera.instance.config.showPassengerCount)
+                            Config.Global.showPassengerCount)
                     ? GetPassengerNumbers() : FPSCameraSpeedUI.Instance.passengersOrStreet = RaycastRoad(position);
         }
 
         public void SetFollowInstance(uint instance)
         {
             this.enabled = true;
-            FPSCamera.instance.SetMode(false);
+            FPSCamera.Instance.SetMode(false);
 
             followInstance = (ushort)instance;
             isReversed = GameUtils.GetReversedStatus(vManager, followInstance);
-            if (FPSCamera.instance.config.alwaysFrontVehicle)
+            if (Config.Global.alwaysFrontVehicle)
             {
                 followInstance = isReversed ?
                     vManager.m_vehicles.m_buffer[followInstance].GetLastVehicle(followInstance) :
@@ -165,11 +165,11 @@ namespace FPSCamera
             following = true;
 
             CameraUtils.SetCamera(cameraController, camera);
-            if (FPSCamera.instance.config.displaySpeed)
+            if (Config.Global.displaySpeed)
             {
                 FPSCameraSpeedUI.Instance.enabled = true;
             }
-            FPSCamera.onCameraModeChanged(true);
+            FPSCamera.Instance.onCameraModeChanged(true);
             userOffset = Vector3.zero;
             vehicleVelocity = Vector3.zero;
             cameraRotationOffset = 0;
@@ -181,7 +181,7 @@ namespace FPSCamera
             following = false;
             FPSCameraSpeedUI.Instance.enabled = false;
             CameraUtils.StopCamera(cameraController, camera);
-            FPSCamera.onCameraModeChanged(false);
+            FPSCamera.Instance.onCameraModeChanged(false);
             this.enabled = false;
         }
 

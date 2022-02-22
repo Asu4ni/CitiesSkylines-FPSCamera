@@ -5,9 +5,10 @@ using UnityEngine;
 
 namespace FPSCamera
 {
-    public class Configuration
+    public class Config
     {
         private const string configPath = "FPSCameraConfig.xml";
+        public static Config Global { get; set; } = new Config();
 
         public float cameraMoveSpeed = 128.0f;
         public float cameraRotationSensitivity = 1.0f;
@@ -48,23 +49,23 @@ namespace FPSCamera
         public KeyCode cameraRotateLeft = KeyCode.LeftShift;
         public KeyCode cameraRotateRight = KeyCode.RightShift;
 
-        public static void Save(Configuration config, string configPath = configPath)
+        public static void Save(Config config, string configPath = configPath)
         {
-            var serializer = new XmlSerializer(typeof(Configuration));
+            var serializer = new XmlSerializer(typeof(Config));
             using (var writer = new StreamWriter(configPath))
             {
                 serializer.Serialize(writer, config);
             }
         }
 
-        public static Configuration Load(string configPath = configPath)
+        public static Config Load(string configPath = configPath)
         {
-            var serializer = new XmlSerializer(typeof(Configuration));
+            var serializer = new XmlSerializer(typeof(Config));
             try
             {
                 using (var reader = new StreamReader(configPath))
                 {
-                    return (Configuration)serializer.Deserialize(reader);                    
+                    return (Config)serializer.Deserialize(reader);                    
                 }
             }
             catch { Log.Err("error while reading configuration"); }

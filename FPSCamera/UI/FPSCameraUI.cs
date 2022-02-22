@@ -16,7 +16,7 @@ namespace FPSCamera
             {
                 if (instance == null)
                 {
-                    instance = FPSCamera.instance.gameObject.AddComponent<FPSCameraUI>();
+                    instance = FPSCamera.Instance.gameObject.AddComponent<FPSCameraUI>();
                 }
 
                 return instance;
@@ -59,12 +59,12 @@ namespace FPSCamera
             cameraModeButton.tooltip = "FPS Camera configuration";
             cameraModeButton.tooltipBox = uiView.defaultTooltipBox;
 
-            if (FPSCamera.instance.config.position != Vector3.zero)
+            if (Config.Global.position != Vector3.zero)
             {
                 cameraModeButton.relativePosition = new Vector2
                 (
-                    FPSCamera.instance.config.position.x,
-                    FPSCamera.instance.config.position.y
+                    Config.Global.position.x,
+                    Config.Global.position.y
                 );
             }
             else
@@ -86,8 +86,8 @@ namespace FPSCamera
             };
             cameraModeButton.eventPositionChanged += (component, param) =>
             {
-                FPSCamera.instance.config.position = cameraModeButton.relativePosition;
-                FPSCamera.instance.SaveConfig();
+                Config.Global.position = cameraModeButton.relativePosition;
+                FPSCamera.Instance.SaveConfig();
             };
 
             var dragObject = new GameObject("buttondragger");
@@ -105,11 +105,11 @@ namespace FPSCamera
             cameraModeLabel.textColor = new Color32(255, 255, 255, 255);
             cameraModeLabel.Hide();
 
-            FPSCamera.onCameraModeChanged += state =>
+            FPSCamera.Instance.onCameraModeChanged += state =>
             {
                 if (state)
                 {
-                    cameraModeLabel.text = String.Format("Press ({0}) to exit first-person mode", FPSCamera.GetToggleUIKey());
+                    cameraModeLabel.text = String.Format("Press ({0}) to exit first-person mode", Config.Global.toggleFPSCameraHotkey);
                     cameraModeLabel.color = new Color32(255, 255, 255, 255);
                     cameraModeLabel.AlignTo(cameraModeButton, UIAlignAnchor.BottomRight);
                     cameraModeLabel.relativePosition += new Vector3(-38.0f, -8.0f);
@@ -121,7 +121,7 @@ namespace FPSCamera
                 }
             };
 
-            FPSCamera.onUpdate = () =>
+            FPSCamera.Instance.onUpdate = () =>
             {
                 if (cameraModeLabel.color.a > 0)
                 {
@@ -146,7 +146,7 @@ namespace FPSCamera
             hotkeyToggleLabel.textScale = 0.8f;
 
             hotkeyToggleButton = MakeButton(panel, "ToggleFirstpersonButton",
-                FPSCamera.instance.config.toggleFPSCameraHotkey.ToString(), y,
+                Config.Global.toggleFPSCameraHotkey.ToString(), y,
                 () =>
                 {
                     if (!waitingForChangeCameraHotkey)
@@ -167,7 +167,7 @@ namespace FPSCamera
             hotkeyShowMouseLabel.textScale = 0.8f;
 
             hotkeyShowMouseButton = MakeButton(panel, "ShowMouseButton",
-                FPSCamera.instance.config.showMouseHotkey.ToString(), y,
+                Config.Global.showMouseHotkey.ToString(), y,
                 () =>
                 {
                     if (!waitingForChangeCameraHotkey)
@@ -188,7 +188,7 @@ namespace FPSCamera
             hotkeyGoFasterLabel.textScale = 0.8f;
 
             hotkeyGoFasterButton = MakeButton(panel, "GoFasterButton",
-                FPSCamera.instance.config.goFasterHotKey.ToString(), y,
+                Config.Global.goFasterHotKey.ToString(), y,
                 () =>
                 {
                     if (!waitingForGoFasterHotkey)
@@ -203,199 +203,199 @@ namespace FPSCamera
             y += 28.0f;
 
             MakeSlider(panel, "GoFasterMultiplier", "\"Go faster\" speed multiplier", y,
-                FPSCamera.instance.config.goFasterSpeedMultiplier, 2.0f, 20.0f,
+                Config.Global.goFasterSpeedMultiplier, 2.0f, 20.0f,
                 value =>
                 {
-                    FPSCamera.instance.config.goFasterSpeedMultiplier = value;
-                    FPSCamera.instance.SaveConfig();
+                    Config.Global.goFasterSpeedMultiplier = value;
+                    FPSCamera.Instance.SaveConfig();
                 });
 
             y += 28.0f;
 
-            MakeCheckbox(panel, "HideUI", "Hide UI", y, FPSCamera.instance.config.integrateHideUI,
+            MakeCheckbox(panel, "HideUI", "Hide UI", y, Config.Global.integrateHideUI,
                  value =>
                  {
-                     FPSCamera.instance.config.integrateHideUI = value;
-                     FPSCamera.instance.SaveConfig();
+                     Config.Global.integrateHideUI = value;
+                     FPSCamera.Instance.SaveConfig();
                  });
 
             y += 28.0f;
 
             MakeSlider(panel, "FieldOfView", "Field of view", y,
-                FPSCamera.instance.config.fieldOfView, 5.0f, 120.0f,
+                Config.Global.fieldOfView, 5.0f, 120.0f,
                 value =>
                 {
-                    FPSCamera.instance.SetFieldOfView(value);
+                    FPSCamera.Instance.SetFieldOfView(value);
                 });
 
             y += 28.0f;
 
             MakeSlider(panel, "MovementSpeed", "Movement speed", y,
-                FPSCamera.instance.config.cameraMoveSpeed, 0, 128.0f,
+                Config.Global.cameraMoveSpeed, 0, 128.0f,
                 value =>
                 {
-                    FPSCamera.instance.config.cameraMoveSpeed = value;
-                    FPSCamera.instance.SaveConfig();
+                    Config.Global.cameraMoveSpeed = value;
+                    FPSCamera.Instance.SaveConfig();
                 });
 
             y += 28.0f;
 
             MakeSlider(panel, "Sensitivity", "Sensitivity", y,
-                FPSCamera.instance.config.cameraRotationSensitivity, 0.25f, 3.0f,
+                Config.Global.cameraRotationSensitivity, 0.25f, 3.0f,
                 value =>
                 {
-                    FPSCamera.instance.config.cameraRotationSensitivity = value;
-                    FPSCamera.instance.SaveConfig();
+                    Config.Global.cameraRotationSensitivity = value;
+                    FPSCamera.Instance.SaveConfig();
                 });
 
             y += 28.0f;
 
-            MakeCheckbox(panel, "InvertYAxis", "Invert Y-Axis", y, FPSCamera.instance.config.invertYAxis,
+            MakeCheckbox(panel, "InvertYAxis", "Invert Y-Axis", y, Config.Global.invertYAxis,
                 value =>
                 {
-                    FPSCamera.instance.config.invertYAxis = value;
-                    FPSCamera.instance.SaveConfig();
+                    Config.Global.invertYAxis = value;
+                    FPSCamera.Instance.SaveConfig();
                 });
 
             y += 28.0f;
 
-            MakeCheckbox(panel, "SnapToGround", "Snap to ground", y, FPSCamera.instance.config.snapToGround,
+            MakeCheckbox(panel, "SnapToGround", "Snap to ground", y, Config.Global.snapToGround,
                value =>
                {
-                   FPSCamera.instance.config.snapToGround = value;
-                   FPSCamera.instance.SaveConfig();
+                   Config.Global.snapToGround = value;
+                   FPSCamera.Instance.SaveConfig();
                });
 
             y += 28.0f;
 
             MakeSlider(panel, "GroundDistance", "Ground distance", y,
-                FPSCamera.instance.config.groundOffset, 0.25f, 32.0f,
+                Config.Global.groundOffset, 0.25f, 32.0f,
                 value =>
                 {
-                    FPSCamera.instance.config.groundOffset = value;
-                    FPSCamera.instance.SaveConfig();
+                    Config.Global.groundOffset = value;
+                    FPSCamera.Instance.SaveConfig();
                 });
 
             y += 28.0f;
 
-            MakeCheckbox(panel, "PreventGroundClipping", "Prevent ground clipping", y, FPSCamera.instance.config.preventClipGround,
+            MakeCheckbox(panel, "PreventGroundClipping", "Prevent ground clipping", y, Config.Global.preventClipGround,
                value =>
                {
-                   FPSCamera.instance.config.preventClipGround = value;
-                   FPSCamera.instance.SaveConfig();
+                   Config.Global.preventClipGround = value;
+                   FPSCamera.Instance.SaveConfig();
                });
 
             y += 28.0f;
 
-            MakeCheckbox(panel, "AnimatedTransitions", "Animated transitions", y, FPSCamera.instance.config.animateTransitions,
+            MakeCheckbox(panel, "AnimatedTransitions", "Animated transitions", y, Config.Global.animateTransitions,
                value =>
                 {
-                    FPSCamera.instance.config.animateTransitions = value;
-                    FPSCamera.instance.SaveConfig();
+                    Config.Global.animateTransitions = value;
+                    FPSCamera.Instance.SaveConfig();
                 });
 
             y += 28.0f;
 
             MakeSlider(panel, "TransitionSpeed", "Transition speed", y,
-                FPSCamera.instance.config.animationSpeed, 0.1f, 4.0f,
+                Config.Global.animationSpeed, 0.1f, 4.0f,
                 value =>
                 {
-                    FPSCamera.instance.config.animationSpeed = value;
-                    FPSCamera.instance.SaveConfig();
+                    Config.Global.animationSpeed = value;
+                    FPSCamera.Instance.SaveConfig();
                 });
 
             y += 28.0f;
 
-            MakeSlider(panel, "VehicleXOffset", "Vehicle camera X offset", y, FPSCamera.instance.config.vehicleCameraOffsetX, -10f, 10.0f,
+            MakeSlider(panel, "VehicleXOffset", "Vehicle camera X offset", y, Config.Global.vehicleCameraOffsetX, -10f, 10.0f,
                 value =>
                 {
-                    FPSCamera.instance.config.vehicleCameraOffsetX = value;
-                    FPSCamera.instance.SaveConfig();
+                    Config.Global.vehicleCameraOffsetX = value;
+                    FPSCamera.Instance.SaveConfig();
                 });
 
             y += 28.0f;
 
-            MakeSlider(panel, "VehicleYOffset", "Vehicle camera Y offset", y, FPSCamera.instance.config.vehicleCameraOffsetY, -2f, 10.0f,
+            MakeSlider(panel, "VehicleYOffset", "Vehicle camera Y offset", y, Config.Global.vehicleCameraOffsetY, -2f, 10.0f,
                 value =>
                 {
-                    FPSCamera.instance.config.vehicleCameraOffsetY = value;
-                    FPSCamera.instance.SaveConfig();
+                    Config.Global.vehicleCameraOffsetY = value;
+                    FPSCamera.Instance.SaveConfig();
                 });
 
             y += 28.0f;
 
-            MakeSlider(panel, "VehicleZOffset", "Vehicle camera Z offset", y, FPSCamera.instance.config.vehicleCameraOffsetZ, -10f, 10.0f,
+            MakeSlider(panel, "VehicleZOffset", "Vehicle camera Z offset", y, Config.Global.vehicleCameraOffsetZ, -10f, 10.0f,
                 value =>
                 {
-                    FPSCamera.instance.config.vehicleCameraOffsetZ = value;
-                    FPSCamera.instance.SaveConfig();
+                    Config.Global.vehicleCameraOffsetZ = value;
+                    FPSCamera.Instance.SaveConfig();
                 });
 
             y += 28.0f;
 
-            MakeCheckbox(panel, "DofEnabled", "DOF enabled", y, FPSCamera.instance.config.enableDOF,
+            MakeCheckbox(panel, "DofEnabled", "DOF enabled", y, Config.Global.enableDOF,
                 value =>
                 {
-                    FPSCamera.instance.config.enableDOF = value;
-                    FPSCamera.instance.SaveConfig();
+                    Config.Global.enableDOF = value;
+                    FPSCamera.Instance.SaveConfig();
                 });
 
             y += 28.0f;
 
 
-            if (!FPSCamera.editorMode)
+            if (FPSCamera.Instance.IsGameMode)
             {
-                MakeCheckbox(panel, "AlwaysFrontVehicle", "Always go into front vehicle", y, FPSCamera.instance.config.alwaysFrontVehicle,
+                MakeCheckbox(panel, "AlwaysFrontVehicle", "Always go into front vehicle", y, Config.Global.alwaysFrontVehicle,
                 value =>
                     {
-                        FPSCamera.instance.config.alwaysFrontVehicle = value;
-                        FPSCamera.instance.SaveConfig();
+                        Config.Global.alwaysFrontVehicle = value;
+                        FPSCamera.Instance.SaveConfig();
                     });
 
                 y += 28.0f;
 
-                MakeCheckbox(panel, "SpeedDisplay", "Speed Display in vehicle/citizen mode", y, FPSCamera.instance.config.displaySpeed,
+                MakeCheckbox(panel, "SpeedDisplay", "Speed Display in vehicle/citizen mode", y, Config.Global.displaySpeed,
                 value =>
                     {
-                        FPSCamera.instance.config.displaySpeed = value;
-                        FPSCamera.instance.SaveConfig();
+                        Config.Global.displaySpeed = value;
+                        FPSCamera.Instance.SaveConfig();
                     });
 
                 y += 28.0f;
 
-                MakeCheckbox(panel, "ShowPassengers", "Show passenger count", y, FPSCamera.instance.config.showPassengerCount,
+                MakeCheckbox(panel, "ShowPassengers", "Show passenger count", y, Config.Global.showPassengerCount,
                 value =>
                     {
-                        FPSCamera.instance.config.showPassengerCount = value;
-                        FPSCamera.instance.SaveConfig();
+                        Config.Global.showPassengerCount = value;
+                        FPSCamera.Instance.SaveConfig();
                     });
 
                 y += 28.0f;
 
-                MakeCheckbox(panel, "AllowMovementVehicleMode", "Allow movement in vehicle/ citizen mode", y, FPSCamera.instance.config.allowUserOffsetInVehicleCitizenMode,
+                MakeCheckbox(panel, "AllowMovementVehicleMode", "Allow movement in vehicle/ citizen mode", y, Config.Global.allowUserOffsetInVehicleCitizenMode,
                    value =>
                    {
-                       FPSCamera.instance.config.allowUserOffsetInVehicleCitizenMode = value;
-                       FPSCamera.instance.SaveConfig();
+                       Config.Global.allowUserOffsetInVehicleCitizenMode = value;
+                       FPSCamera.Instance.SaveConfig();
                    });
 
                 y += 28.0f;
 
-                MakeCheckbox(panel, "ManualWalkthrough", "Manual switching in walkthrough- mode", y, FPSCamera.instance.config.walkthroughModeManual,
+                MakeCheckbox(panel, "ManualWalkthrough", "Manual switching in walkthrough- mode", y, Config.Global.walkthroughModeManual,
                    value =>
                    {
-                       FPSCamera.instance.config.walkthroughModeManual = value;
-                       FPSCamera.instance.SaveConfig();
+                       Config.Global.walkthroughModeManual = value;
+                       FPSCamera.Instance.SaveConfig();
                    });
 
                 y += 28.0f;
 
                 MakeSlider(panel, "StayDuration", "Walkthrough stay duration", y,
-                    FPSCamera.instance.config.walkthroughModeTimer, 10.0f, 60.0f,
+                    Config.Global.walkthroughModeTimer, 10.0f, 60.0f,
                     value =>
                     {
-                        FPSCamera.instance.config.walkthroughModeTimer = value;
-                        FPSCamera.instance.SaveConfig();
+                        Config.Global.walkthroughModeTimer = value;
+                        FPSCamera.Instance.SaveConfig();
                     });
 
                 y += 28.0f;
@@ -403,7 +403,7 @@ namespace FPSCamera
                 var walkthroughModeButton = MakeButton(panel, "WalkthroughModeButton", "Enter walkthrough mode", y,
                     () =>
                     {
-                        FPSCamera.instance.EnterWalkthroughMode();
+                        FPSCamera.Instance.EnterWalkthroughMode();
                     });
                 walkthroughModeButton.relativePosition = new Vector3(2.0f, y - 6.0f);
                 walkthroughModeButton.size = new Vector2(200.0f, 24.0f);
@@ -414,7 +414,7 @@ namespace FPSCamera
             var resetConfig = MakeButton(panel, "ResetConfigButton", "Reset configuration", y,
                     () =>
                     {
-                        FPSCamera.instance.ResetConfig();
+                        FPSCamera.Instance.ResetConfig();
                     });
 
             resetConfig.relativePosition = new Vector3(2.0f, y);
@@ -558,25 +558,25 @@ namespace FPSCamera
                 {
                     waitingForChangeCameraHotkey = false;
                     var keycode = Event.current.keyCode;
-                    FPSCamera.instance.config.toggleFPSCameraHotkey = keycode;
+                    Config.Global.toggleFPSCameraHotkey = keycode;
                     hotkeyToggleButton.text = keycode.ToString();
-                    FPSCamera.instance.SaveConfig();
+                    FPSCamera.Instance.SaveConfig();
                 }
                 else if (waitingForShowMouseHotkey)
                 {
                     waitingForShowMouseHotkey = false;
                     var keycode = Event.current.keyCode;
-                    FPSCamera.instance.config.showMouseHotkey = keycode;
+                    Config.Global.showMouseHotkey = keycode;
                     hotkeyShowMouseButton.text = keycode.ToString();
-                    FPSCamera.instance.SaveConfig();
+                    FPSCamera.Instance.SaveConfig();
                 }
                 else if (waitingForGoFasterHotkey)
                 {
                     waitingForGoFasterHotkey = false;
                     var keycode = Event.current.keyCode;
-                    FPSCamera.instance.config.goFasterHotKey = keycode;
+                    Config.Global.goFasterHotKey = keycode;
                     hotkeyGoFasterButton.text = keycode.ToString();
-                    FPSCamera.instance.SaveConfig();
+                    FPSCamera.Instance.SaveConfig();
                 }
             }
 
