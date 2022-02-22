@@ -1,14 +1,15 @@
 using ColossalFramework;
+using System;
 using System.IO;
 using System.Xml.Serialization;
 using UnityEngine;
 
 namespace FPSCamera
 {
-
-    public class Configuration
+    public class Config
     {
-        public static readonly string configPath = "FPSCameraUpdatedConfig.xml";
+        private const string configPath = "FPSCameraConfig.xml";
+        public static Config Global { get; set; } = new Config();
 
         public float cameraMoveSpeed = 128.0f;
         public float cameraRotationSensitivity = 1.0f;
@@ -29,10 +30,11 @@ namespace FPSCamera
         public float walkthroughModeTimer = 25.0f;
         public bool walkthroughModeManual = false;
         public bool allowUserOffsetInVehicleCitizenMode = false;
+        // TODO:rename to forward/up/right
         public float vehicleCameraOffsetX = 0f;
         public float vehicleCameraOffsetY = 0f;
         public float vehicleCameraOffsetZ = 0f;
-        
+
         public bool enableDOF = false;
         public bool alwaysFrontVehicle = true;
         public Vector3 position = Vector3.zero;
@@ -40,6 +42,7 @@ namespace FPSCamera
         public bool isMPH = false;
         public bool showPassengerCount = true;
 
+        // TODO: reorganize
         public KeyCode cameraMoveLeft = (KeyCode)(new SavedInputKey(Settings.cameraMoveLeft, Settings.gameSettingsFile, DefaultSettings.cameraMoveLeft, true).value & 268435455);
         public KeyCode cameraMoveRight = (KeyCode)(new SavedInputKey(Settings.cameraMoveRight, Settings.gameSettingsFile, DefaultSettings.cameraMoveRight, true).value & 268435455);
         public KeyCode cameraMoveForward = (KeyCode)(new SavedInputKey(Settings.cameraMoveForward, Settings.gameSettingsFile, DefaultSettings.cameraMoveForward, true).value & 268435455);
@@ -49,39 +52,30 @@ namespace FPSCamera
         public KeyCode cameraRotateLeft = KeyCode.LeftShift;
         public KeyCode cameraRotateRight = KeyCode.RightShift;
 
-        public void OnPreSerialize()
+        public static void Save(Config config, string configPath = configPath)
         {
-        }
-
-        public void OnPostDeserialize()
-        {
-        }
-
-        public static void Serialize(string filename, Configuration config)
-        {
-            var serializer = new XmlSerializer(typeof(Configuration));
-
-            using (var writer = new StreamWriter(filename))
+            var serializer = new XmlSerializer(typeof(Config));
+            using (var writer = new StreamWriter(configPath))
             {
-                config.OnPreSerialize();
                 serializer.Serialize(writer, config);
             }
         }
 
-        public static Configuration Deserialize(string filename)
+        public static Config Load(string configPath = configPath)
         {
-            var serializer = new XmlSerializer(typeof(Configuration));
-
+            var serializer = new XmlSerializer(typeof(Config));
             try
             {
-                using (var reader = new StreamReader(filename))
+                using (var reader = new StreamReader(configPath))
                 {
-                    var config = (Configuration)serializer.Deserialize(reader);
-                    config.OnPostDeserialize();
-                    return config;
+                    // TODO: handle of config members update
+                    return (Config)serializer.Deserialize(reader);
                 }
             }
-            catch { }
+            catch (Exception e)
+            {
+                Log.Err("error while reading configuration: " + e.ToString());
+            }
 
             return null;
         }

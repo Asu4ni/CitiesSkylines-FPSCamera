@@ -5,20 +5,13 @@ using CitiesHarmony.API;
 
 namespace FPSCamera
 {
-
     public class Mod : IUserMod
     {
         private FPSCameraControlsOptionsUI m_optionsManager = null;
 
-        public string Name
-        {
-            get { return "First Person Camera v2.0"; }
-        }
-
-        public string Description
-        {
-            get { return "View your city from a different perspective"; }
-        }
+        public static string name = "First Person Camera v2.0";
+        public string Name => name;
+        public string Description => "View your city from a different perspective";
 
         public void OnSettingsUI(UIHelperBase helper)
         {
@@ -41,15 +34,9 @@ namespace FPSCamera
 
     public class ModLoad : LoadingExtensionBase
     {
-        public override void OnCreated(ILoading loading)
-        {
-
-
-        }
-
         public override void OnLevelLoaded(LoadMode mode)
         {
-            Log.Message("initializing in: " + mode.ToString());
+            Log.Msg("initializing in: " + mode.ToString());
             FPSCamera.Initialize(mode);
         }
 
@@ -57,7 +44,5 @@ namespace FPSCamera
         {
             FPSCamera.Deinitialize();
         }
-
     }
-
 }

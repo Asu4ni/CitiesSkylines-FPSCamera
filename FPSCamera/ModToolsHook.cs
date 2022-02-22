@@ -12,7 +12,7 @@ namespace FPSCamera
 
         public void OnModUnloaded()
         {
-            modLoad.OnLevelUnloading();           
+            modLoad.OnLevelUnloading();
         }
     }
 }
