@@ -201,8 +201,8 @@ namespace FPSCamera
         public Vector3 GetOffset(Vector3 position, Vector3 forward, Vector3 up)
         {
             Vector3 retVal = position +
-                          forward * CameraUtils.CAMERAOFFSETFORWARD +
-                          up * CameraUtils.CAMERAOFFSETUP;
+                          forward * CameraUtils.CameraOffsetForward +
+                          up * CameraUtils.CameraOffsetUp;
             return retVal;
         }
 
