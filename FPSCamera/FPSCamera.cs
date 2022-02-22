@@ -95,7 +95,7 @@ namespace FPSCamera
             effect = controller.GetComponent<DepthOfField>();
             legacyEffect = controller.GetComponent<TiltShiftEffect>();
 
-            config = Configuration.Deserialize(Configuration.configPath) ?? new Configuration();
+            config = Configuration.Load() ?? new Configuration();
 
             SaveConfig();
 
@@ -114,7 +114,7 @@ namespace FPSCamera
 
         public void SaveConfig()
         {
-            Configuration.Serialize(Configuration.configPath, config);
+            Configuration.Save(config);
         }
 
         public void SetFieldOfView(float fov)
