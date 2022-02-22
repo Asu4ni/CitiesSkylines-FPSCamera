@@ -51,7 +51,7 @@ namespace FPSCamera
                     return;
                 }
 
-                bool currentReversedStatus = AIUtils.GetReversedStatus(vManager, followInstance);
+                bool currentReversedStatus = GameUtils.GetReversedStatus(vManager, followInstance);
 
                 if (FPSCamera.instance.config.alwaysFrontVehicle)
                 {
@@ -156,7 +156,7 @@ namespace FPSCamera
             FPSCamera.instance.SetMode(false);
 
             followInstance = (ushort)instance;
-            isReversed = AIUtils.GetReversedStatus(vManager, followInstance);
+            isReversed = GameUtils.GetReversedStatus(vManager, followInstance);
             if (FPSCamera.instance.config.alwaysFrontVehicle)
             {
                 followInstance = isReversed ?

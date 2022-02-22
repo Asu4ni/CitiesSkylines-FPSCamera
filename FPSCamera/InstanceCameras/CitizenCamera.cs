@@ -154,7 +154,7 @@ namespace FPSCamera
                         ushort vehicleId = citizen.m_vehicle;
                         if ((VehicleManager.instance.m_vehicles.m_buffer[vehicleId].Info.GetService() == ItemClass.Service.PublicTransport))
                         {
-                            bool isReversed = AIUtils.GetReversedStatus(VehicleManager.instance, vehicleId);
+                            bool isReversed = GameUtils.GetReversedStatus(VehicleManager.instance, vehicleId);
                             vehicleId = isReversed ?
                                 VehicleManager.instance.m_vehicles.m_buffer[vehicleId].GetLastVehicle(vehicleId) :
                                 VehicleManager.instance.m_vehicles.m_buffer[vehicleId].GetFirstVehicle(vehicleId);

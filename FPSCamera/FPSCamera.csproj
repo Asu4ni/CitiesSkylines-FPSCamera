@@ -67,7 +67,7 @@
     <Compile Include="HarmonyPatcher.cs" />
     <Compile Include="UI\FPSCameraControlsOptionsUI.cs" />
     <Compile Include="UI\FPSCameraSpeedUI.cs" />
-    <Compile Include="Utils\AIUtils.cs" />
+    <Compile Include="Utils\GameUtils.cs" />
     <Compile Include="Utils\CameraUtils.cs" />
     <Compile Include="InstanceCameras\CitizenCamera.cs" />
     <Compile Include="Config.cs" />
