@@ -65,7 +65,7 @@ namespace FPSCamera
                         {
                             UIHider.Hide();
                         }
-                        InstanceID instance = Util.ReadPrivate<CitizenVehicleWorldInfoPanel, InstanceID>(citizenVehicleInfoPanel, "m_InstanceID");
+                        InstanceID instance = Utils.ReadPrivate<CitizenVehicleWorldInfoPanel, InstanceID>(citizenVehicleInfoPanel, "m_InstanceID");
                         resetCamera();
                         FPSCamera.instance.vehicleCamera.SetFollowInstance(instance.Vehicle);
 
@@ -87,7 +87,7 @@ namespace FPSCamera
                         {
                             UIHider.Hide();
                         }
-                        InstanceID instance = Util.ReadPrivate<CityServiceVehicleWorldInfoPanel, InstanceID>(cityServiceVehicleInfoPanel, "m_InstanceID");
+                        InstanceID instance = Utils.ReadPrivate<CityServiceVehicleWorldInfoPanel, InstanceID>(cityServiceVehicleInfoPanel, "m_InstanceID");
                         resetCamera();
                         FPSCamera.instance.vehicleCamera.SetFollowInstance(instance.Vehicle);
 
@@ -108,7 +108,7 @@ namespace FPSCamera
                         {
                             UIHider.Hide();
                         }
-                        InstanceID instance = Util.ReadPrivate<PublicTransportVehicleWorldInfoPanel, InstanceID>(publicTransportVehicleInfoPanel, "m_InstanceID");
+                        InstanceID instance = Utils.ReadPrivate<PublicTransportVehicleWorldInfoPanel, InstanceID>(publicTransportVehicleInfoPanel, "m_InstanceID");
                         resetCamera();
                         FPSCamera.instance.vehicleCamera.SetFollowInstance(instance.Vehicle);
                         
@@ -130,7 +130,7 @@ namespace FPSCamera
                         {
                             UIHider.Hide();
                         }
-                        InstanceID instance = Util.ReadPrivate<CitizenWorldInfoPanel, InstanceID>(citizenInfoPanel, "m_InstanceID");
+                        InstanceID instance = Utils.ReadPrivate<CitizenWorldInfoPanel, InstanceID>(citizenInfoPanel, "m_InstanceID");
                         resetCamera();
                         FPSCamera.instance.citizenCamera.SetFollowInstance(instance.Citizen);
                         
@@ -151,7 +151,7 @@ namespace FPSCamera
                         {
                             UIHider.Hide();
                         }
-                        InstanceID instance = Util.ReadPrivate<TouristWorldInfoPanel, InstanceID>(touristCitizenInfoPanel, "m_InstanceID");
+                        InstanceID instance = Utils.ReadPrivate<TouristWorldInfoPanel, InstanceID>(touristCitizenInfoPanel, "m_InstanceID");
                         resetCamera();
                         FPSCamera.instance.citizenCamera.SetFollowInstance(instance.Citizen);
 

@@ -1,4 +1,3 @@
-using FPSCamera.Utils;
 using System;
 using UnityEngine;
 using UnityStandardAssets.ImageEffects;

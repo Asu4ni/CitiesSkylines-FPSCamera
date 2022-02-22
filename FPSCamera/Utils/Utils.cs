@@ -1,10 +1,8 @@
-using ColossalFramework.Plugins;
-using System.Linq;
 using System.Reflection;
 
 namespace FPSCamera
 {
-    public static class Util
+    public static class Utils
     {
         public static Q ReadPrivate<T, Q>(T o, string fieldName)
         {

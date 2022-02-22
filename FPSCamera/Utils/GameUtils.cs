@@ -1,4 +1,4 @@
-﻿namespace FPSCamera.Utils
+﻿namespace FPSCamera
 {
     public class GameUtils
     {

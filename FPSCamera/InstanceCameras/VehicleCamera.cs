@@ -2,7 +2,6 @@ using System;
 using ColossalFramework;
 using UnityEngine;
 using UnityStandardAssets.ImageEffects;
-using FPSCamera.Utils;
 using static ToolBase;
 
 namespace FPSCamera
