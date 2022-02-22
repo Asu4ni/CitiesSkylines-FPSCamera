@@ -5,19 +5,21 @@ namespace FPSCamera
 {
     public static class Log
     {
-        private static readonly string PREPEND_TAG = Assembly.GetExecutingAssembly().GetName().Name + ": ";
-        public static void Message(string s)
+        private static readonly string LogTag = "[" + Assembly.GetExecutingAssembly().GetName().Name + "] ";
+
+        public static void Msg(string msg)
         {
-            Debug.Log(PREPEND_TAG + s);
+            Debug.Log(LogTag + msg);
         }
 
-        public static void Error(string s)
+        public static void Err(string msg)
         {
-            Debug.LogError(PREPEND_TAG + s);
+            Debug.LogError(LogTag + msg);
         }
-        public static void Warning(string s)
+
+        public static void Warn(string msg)
         {
-            Debug.LogWarning(PREPEND_TAG + s);
+            Debug.LogWarning(LogTag + msg);
         }
     }
 }

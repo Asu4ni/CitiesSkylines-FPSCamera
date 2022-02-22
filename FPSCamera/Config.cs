@@ -67,7 +67,7 @@ namespace FPSCamera
                     return (Configuration)serializer.Deserialize(reader);                    
                 }
             }
-            catch { Log.Error("error while reading configuration"); }
+            catch { Log.Err("error while reading configuration"); }
 
             return null;
         }

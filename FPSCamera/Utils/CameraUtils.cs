@@ -11,7 +11,7 @@ namespace FPSCamera
         // set up the camera: disable FOV if needed and hide the UI
         public static void SetCamera(CameraController controller, Camera camera)
         {
-            Log.Message("setting camera");
+            Log.Msg("setting camera");
             DepthOfField effect = controller.GetComponent<DepthOfField>();
             TiltShiftEffect legacyEffect = controller.GetComponent<TiltShiftEffect>();
 
@@ -41,7 +41,7 @@ namespace FPSCamera
         // return the camera back to the game controller
         public static void StopCamera(CameraController controller, Camera camera)
         {
-            Log.Message("stopping camera");
+            Log.Msg("stopping camera");
             if (FPSCamera.instance.config.integrateHideUI)
             {
                 UIHider.Show();

@@ -13,7 +13,7 @@ namespace FPSCamera
         {
             if (!isPatched)
             {
-                Log.Message("Harmony: patching...");
+                Log.Msg("Harmony: patching...");
              
                 var harmony = new Harmony(HarmonyId);
                 harmony.PatchAll();
@@ -25,7 +25,7 @@ namespace FPSCamera
         {
             if (isPatched)
             {
-                Log.Message("Harmony: unpatching...");
+                Log.Msg("Harmony: unpatching...");
 
                 var harmony = new Harmony(HarmonyId);
                 harmony.UnpatchAll();

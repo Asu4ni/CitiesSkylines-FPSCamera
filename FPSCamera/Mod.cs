@@ -49,7 +49,7 @@ namespace FPSCamera
 
         public override void OnLevelLoaded(LoadMode mode)
         {
-            Log.Message("initializing in: " + mode.ToString());
+            Log.Msg("initializing in: " + mode.ToString());
             FPSCamera.Initialize(mode);
         }
 
