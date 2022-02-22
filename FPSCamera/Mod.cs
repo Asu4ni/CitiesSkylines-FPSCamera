@@ -1,6 +1,7 @@
 using ICities;
 using UnityEngine;
 using FPSCamera.UI;
+using CitiesHarmony.API;
 
 namespace FPSCamera
 {
@@ -27,6 +28,14 @@ namespace FPSCamera
             }
 
             m_optionsManager.generateSettings(helper);
+        }
+        public void OnEnabled()
+        {
+            HarmonyHelper.DoOnHarmonyReady(() => HarmonyPatcher.Patch());
+        }
+        public void OnDisabled()
+        {
+            if (HarmonyHelper.IsHarmonyInstalled) HarmonyPatcher.Unpatch();
         }
     }
 
