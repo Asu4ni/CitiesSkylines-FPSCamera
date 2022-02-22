@@ -31,8 +31,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="0Harmony, Version=2.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\Lib.Harmony.2.2.0\lib\net35\0Harmony.dll</HintPath>
+    <Reference Include="CitiesHarmony.API, Version=2.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\CitiesHarmony.API.2.1.0\lib\net35\CitiesHarmony.API.dll</HintPath>
+    </Reference>
+    <Reference Include="CitiesHarmony.Harmony, Version=2.0.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\CitiesHarmony.Harmony.2.2.0\lib\net35\CitiesHarmony.Harmony.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp">
       <HintPath>..\..\..\..\..\SteamLibrary\steamapps\common\Cities_Skylines\Cities_Data\Managed\Assembly-CSharp.dll</HintPath>
@@ -61,6 +64,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="HarmonyPatcher.cs" />
     <Compile Include="UI\FPSCameraControlsOptionsUI.cs" />
     <Compile Include="UI\FPSCameraSpeedUI.cs" />
     <Compile Include="Utils\AIUtils.cs" />
