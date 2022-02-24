@@ -51,7 +51,6 @@ namespace FPSCamera
             {
                 UIHider.Show();
             }
-            FPSCamera.Instance.UI.Hide();
             camera.transform.position = Vector3.zero;
             camera.transform.rotation = Quaternion.identity;
 

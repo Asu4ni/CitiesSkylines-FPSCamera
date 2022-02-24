@@ -14,11 +14,6 @@ namespace FPSCamera
         public DepthOfField depthOfField;
         public Vector3 userOffset = Vector3.zero;   // TODO: move to FPSCamera
 
-        protected BaseCamera(GameObject parentObject)
-        {
-            parentObject.AddComponent(GetType());
-        }
-
         public void Awake()
         {
             enabled = false;
@@ -27,6 +22,7 @@ namespace FPSCamera
             if (!cameraController) Log.Err("missing component: CameraController");
             if (!camera) Log.Err("missing component: Camera");
             depthOfField = cameraController.GetComponent<DepthOfField>();
+            Log.Msg("Camera SetUp");
         }
 
         public void SetInstanceToFollow(UUID followed)
@@ -67,6 +63,11 @@ namespace FPSCamera
         // TODO: change to return (position, lookAt)
         public void LateUpdate()
         {
+            if (!enabled)
+            {
+                Log.Err("Camera updates while disabled");
+                return;
+            }
             if (UpdateCam())
             {
                 cameraController.m_targetPosition = transform.position;

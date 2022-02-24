@@ -11,14 +11,10 @@ namespace FPSCamera
         public bool inVehicle = false;
         public VehicleCamera vehicleCamera;
 
-        public CitizenCamera(GameObject parentObject, VehicleCamera vCamera) : base(parentObject)
-        {
-            vehicleCamera = vCamera;
-        }
-
         protected override void SetInstanceToFollowPost()
         {
             citizenID = followedID.Citizen;
+            Log.Msg("start following citizen | ID: " + citizenID.ID.ToString());
             inVehicle = false;
         }
 
@@ -47,6 +43,7 @@ namespace FPSCamera
             {
                 if (!citizen.RiddenVehicleID().Exists())
                 {
+                    Log.Msg("citizen leaving the vehicle | ID: " + citizenID.ID.ToString());
                     inVehicle = false;
                     vehicleCamera.StopFollowing();
                     SetInstanceToFollow(followedID);
@@ -55,6 +52,7 @@ namespace FPSCamera
             }
             else if (!citizen.Exists())
             {
+                Log.Msg("citizen disappears | ID: " + citizenID.ID.ToString());
                 StopFollowing();
                 return false;
             }
@@ -63,6 +61,7 @@ namespace FPSCamera
                 var vehicleID = citizen.RiddenVehicleID();
                 if (vehicleID.Exists())
                 {
+                    Log.Msg("citizen entering a vehicle | ID: " + citizenID.ID.ToString());
                     var vehicle = FPSVehicle.Of(vehicleID);
                     // TODO: consider allowing to follow all kinds
                     if (vehicle.IsOfService(Service.PublicTransport))
@@ -70,7 +69,8 @@ namespace FPSCamera
                 }
                 else
                 {
-                    Log.Warn("vehicle not found while the citizen entering it");
+                    Log.Warn("vehicle not found while the citizen entering it | ID: "
+                                    + citizenID.ID.ToString());
                     StopFollowing();
                 }
                 return false;

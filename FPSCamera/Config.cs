@@ -1,4 +1,5 @@
 using ColossalFramework;
+using System;
 using System.IO;
 using System.Xml.Serialization;
 using UnityEngine;
@@ -71,7 +72,10 @@ namespace FPSCamera
                     return (Config)serializer.Deserialize(reader);
                 }
             }
-            catch { Log.Err("error while reading configuration"); }
+            catch (Exception e)
+            {
+                Log.Err("error while reading configuration: " + e.ToString());
+            }
 
             return null;
         }

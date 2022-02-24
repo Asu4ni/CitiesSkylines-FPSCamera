@@ -4,7 +4,7 @@ namespace FPSCamera
 {
     public class FPSCitizen
     {
-        private static readonly CitizenManager citizenM = CitizenManager.instance;
+        private readonly static CitizenManager citizenM = CitizenManager.instance;
         public FPSCitizen(CitizenID id)
         {
             citizen = citizenM.m_citizens.m_buffer[id.ID];

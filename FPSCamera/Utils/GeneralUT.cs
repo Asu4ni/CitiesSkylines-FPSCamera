@@ -5,15 +5,18 @@ namespace FPSCamera
     public struct UUID
     {
         public CitizenID Citizen { get => (CitizenID)id.Citizen; set => id.Citizen = value.ID; }
-        public static implicit operator UUID(CitizenID id) { UUID uid = default; uid.Citizen = id; return id; }
+        public static implicit operator UUID(CitizenID id)
+        { UUID uid = default; uid.Citizen = id; return uid; }
         public VehicleID Vehicle { get => (VehicleID)id.Vehicle; set => id.Vehicle = value.ID; }
-        public static implicit operator UUID(VehicleID id) { UUID uid = default; uid.Vehicle = id; return id; }
+        public static implicit operator UUID(VehicleID id)
+        { UUID uid = default; uid.Vehicle = id; return uid; }
         public BuildingID Building
         {
             get => (BuildingID)id.Building;
             set => id.Building = value.ID;
         }
-        public static implicit operator UUID(BuildingID id) { UUID uid = default; uid.Building = id; return id; }
+        public static implicit operator UUID(BuildingID id)
+        { UUID uid = default; uid.Building = id; return uid; }
 
         private InstanceID id;
         private UUID(InstanceID id) { this.id = id; }
@@ -23,18 +26,27 @@ namespace FPSCamera
 
     public class BaseID<T> where T : System.IComparable<T>
     {
-        public BaseID() { }
         public T ID { get => id; }
-        public static explicit operator BaseID<T>(T id) => new BaseID<T>(id);
         public bool Exists() => id.CompareTo(default) != 0;
 
         private T id;
-        private BaseID(T id) { this.id = id; }
+        protected BaseID(T id) { this.id = id; }
     }
-    public class CitizenID : BaseID<uint> { }
-    public class CitizenInstanceID : BaseID<ushort> { }
-    public class VehicleID : BaseID<ushort> { }
-    public class BuildingID : BaseID<ushort> { }
+    public class CitizenID : BaseID<uint>
+    {
+        private CitizenID(uint id) : base(id) { }
+        public static explicit operator CitizenID(uint id) => new CitizenID(id);
+    }
+    public class VehicleID : BaseID<ushort>
+    {
+        private VehicleID(ushort id) : base(id) { }
+        public static explicit operator VehicleID(ushort id) => new VehicleID(id);
+    }
+    public class BuildingID : BaseID<ushort>
+    {
+        private BuildingID(ushort id) : base(id) { }
+        public static explicit operator BuildingID(ushort id) => new BuildingID(id);
+    }
 
     public static class GeneralUT
     {

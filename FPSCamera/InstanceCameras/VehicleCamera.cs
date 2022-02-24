@@ -9,11 +9,10 @@ namespace FPSCamera
         private bool wasReversed;
         public float cameraRotationOffset = 0u; // TODO: remove
 
-        public VehicleCamera(GameObject parentObject) : base(parentObject) { }
-
         protected override void SetInstanceToFollowPost()
         {
             vehicleID = followedID.Vehicle;
+            Log.Msg("start following vehicle | ID: " + vehicleID.ID.ToString());
             wasReversed = FPSVehicle.Of(vehicleID).IsReversed();
         }
         protected override UUID GetIntentedInstance(UUID id)
@@ -66,11 +65,13 @@ namespace FPSCamera
             var vehicle = FPSVehicle.Of(vehicleID);
             if (!(vehicle.Exists() && vehicle.Spawned()))
             {
+                Log.Msg("vehicle disappears | ID: " + vehicleID.ID.ToString());
                 StopFollowing();
                 return false;
             }
             else if (Config.Global.alwaysFrontVehicle && vehicle.IsReversed() != wasReversed)
             {
+                Log.Msg("vehicle changes direction | ID: " + vehicleID.ID.ToString());
                 SetInstanceToFollow(vehicle.FrontVehicleID());
                 return false;
             }

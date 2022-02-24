@@ -61,9 +61,10 @@ namespace FPSCamera
                 if (Instance.IsGameMode)
                 {
                     Instance.gameObject.AddComponent<GamePanelExtender>();
-                    Instance.vehicleCamera = new VehicleCamera(Instance.gameObject);
-                    Instance.citizenCamera = new CitizenCamera(Instance.gameObject,
-                                                               Instance.vehicleCamera);
+                    Instance.vehicleCamera = Instance.gameObject.AddComponent<VehicleCamera>();
+                    Instance.citizenCamera = Instance.gameObject.AddComponent<CitizenCamera>();
+                    // TODO: correct this poor practice
+                    Instance.citizenCamera.vehicleCamera = Instance.vehicleCamera;
                 }
             }
         }

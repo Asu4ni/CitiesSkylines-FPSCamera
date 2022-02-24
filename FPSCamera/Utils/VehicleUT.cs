@@ -19,7 +19,7 @@ namespace FPSCamera
 
     public class FPSVehicle
     {
-        private static readonly VehicleManager vehicleM = VehicleManager.instance;
+        private readonly static VehicleManager vehicleM = VehicleManager.instance;
         public FPSVehicle(VehicleID id)
         {
             this.id = id;
