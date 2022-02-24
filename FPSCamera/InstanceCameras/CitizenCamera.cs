@@ -23,7 +23,7 @@ namespace FPSCamera
         }
 
         protected override Vector3 GetVelocity() => FPSCitizen.Of(citizenID).Velocity();
-        
+
         protected override string GetDestinationStr()
         {
             var citizen = FPSCitizen.Of(citizenID);
@@ -32,11 +32,11 @@ namespace FPSCamera
                    ?? unknownStr;
         }
         protected override string GetDisplayInfoStr()
-            => GeneralUT.RaycastRoad(FPSCitizen.Of(citizenID).Position()) ?? unknownStr;        
+            => GeneralUT.RaycastRoad(FPSCitizen.Of(citizenID).Position()) ?? unknownStr;
 
         protected override void StopFollowingPre()
         {
-            if (inVehicle) vehicleCamera.StopFollowing();            
+            if (inVehicle) vehicleCamera.StopFollowing();
         }
 
         protected override bool UpdateCam()
@@ -49,7 +49,7 @@ namespace FPSCamera
                 {
                     inVehicle = false;
                     vehicleCamera.StopFollowing();
-                    SetInstanceToFollow(followedID);                    
+                    SetInstanceToFollow(followedID);
                 }
                 return false;
             }

@@ -57,7 +57,7 @@ namespace FPSCamera
             {
                 vehicle.GetPassengerSizeCapacity(out int size, out int capacity);
                 return String.Format("Passengers: {0}/{1}", size, capacity);
-            }              
+            }
             else return GeneralUT.RaycastRoad(vehicle.Position()) ?? unknownStr;
         }
 
@@ -108,7 +108,7 @@ namespace FPSCamera
                 cameraController.m_targetPosition = camera.transform.position;
 
                 return true;
-            }      
+            }
         }
     }
 

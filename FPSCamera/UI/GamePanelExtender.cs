@@ -61,13 +61,13 @@ namespace FPSCamera
                     citizenVehicleInfoPanel.component,
                     (component, param) =>
                     {
-                        if( Config.Global.integrateHideUI)
+                        if (Config.Global.integrateHideUI)
                         {
                             UIHider.Hide();
                         }
                         InstanceID instance = Utils.ReadPrivate<CitizenVehicleWorldInfoPanel, InstanceID>(citizenVehicleInfoPanel, "m_InstanceID");
                         resetCamera();
-                        FPSCamera.Instance.vehicleCamera.SetInstanceToFollow((UUID) instance);
+                        FPSCamera.Instance.vehicleCamera.SetInstanceToFollow((UUID)instance);
                     }
                 );
 
@@ -87,7 +87,7 @@ namespace FPSCamera
                         }
                         InstanceID instance = Utils.ReadPrivate<CityServiceVehicleWorldInfoPanel, InstanceID>(cityServiceVehicleInfoPanel, "m_InstanceID");
                         resetCamera();
-                        FPSCamera.Instance.vehicleCamera.SetInstanceToFollow((UUID) instance);
+                        FPSCamera.Instance.vehicleCamera.SetInstanceToFollow((UUID)instance);
 
                     }
                 );
@@ -108,7 +108,7 @@ namespace FPSCamera
                         }
                         InstanceID instance = Utils.ReadPrivate<PublicTransportVehicleWorldInfoPanel, InstanceID>(publicTransportVehicleInfoPanel, "m_InstanceID");
                         resetCamera();
-                        FPSCamera.Instance.vehicleCamera.SetInstanceToFollow((UUID) instance);
+                        FPSCamera.Instance.vehicleCamera.SetInstanceToFollow((UUID)instance);
 
                     }
                 );

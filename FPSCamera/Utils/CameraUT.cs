@@ -32,15 +32,15 @@ namespace FPSCamera
             camera.fieldOfView = Config.Global.fieldOfView;
             camera.transform.position = Vector3.zero;
             camera.transform.rotation = Quaternion.identity;
-            
+
             if (effect != null)
             {
-                effect.enabled = Config.Global.enableDOF;                
+                effect.enabled = Config.Global.enableDOF;
                 effect.focalLength = 10f;   // set to 1/4 minimum vanilla value (ground level)                
                 effect.focalSize = 0.8f;    // a bit bigger, to reduce blur some more
                 effect.nearBlur = false;
             }
-            if (legacyEffect != null) legacyEffect.enabled = false;            
+            if (legacyEffect != null) legacyEffect.enabled = false;
         }
 
         // return the camera back to the game controller
@@ -54,7 +54,7 @@ namespace FPSCamera
             FPSCamera.Instance.UI.Hide();
             camera.transform.position = Vector3.zero;
             camera.transform.rotation = Quaternion.identity;
-        
+
             controller.enabled = true;
             camera.nearClipPlane = 1.0f;
             controller.m_maxDistance = 4000f;

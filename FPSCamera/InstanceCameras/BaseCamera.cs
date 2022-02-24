@@ -36,7 +36,7 @@ namespace FPSCamera
             FPSCamera.Instance.SetMode(false);
             userOffset = Vector3.zero;
             CameraUT.SetCamera(cameraController, camera);
-            FPSCameraSpeedUI.Instance.enabled = Config.Global.displaySpeed;            
+            FPSCameraSpeedUI.Instance.enabled = Config.Global.displaySpeed;
             FPSCamera.Instance.onCameraModeChanged(true);
             SetInstanceToFollowPost();
         }

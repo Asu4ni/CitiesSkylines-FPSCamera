@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 namespace FPSCamera
-{    
+{
     public struct Service
     {
         public static readonly Service PublicTransport = new Service(ItemClass.Service.PublicTransport);
@@ -15,7 +15,7 @@ namespace FPSCamera
 
         public VehicleInfo.VehicleType type;
         private VehicleType(VehicleInfo.VehicleType type) { this.type = type; }
-    }    
+    }
 
     public class FPSVehicle
     {
@@ -48,9 +48,9 @@ namespace FPSCamera
         public float AttachOffsetFront() => vehicle.Info.m_attachOffsetFront;
         public VehicleID FrontVehicleID()
             => (VehicleID)(IsReversed() ? vehicle.GetLastVehicle(id.ID)
-                                      : vehicle.GetFirstVehicle(id.ID));        
-        public UUID OwnerID() => (UUID) vehicle.Info.m_vehicleAI.GetOwnerID(id.ID, ref vehicle);
-        public UUID TargetID() => (UUID) vehicle.Info.m_vehicleAI.GetTargetID(id.ID, ref vehicle);
+                                      : vehicle.GetFirstVehicle(id.ID));
+        public UUID OwnerID() => (UUID)vehicle.Info.m_vehicleAI.GetOwnerID(id.ID, ref vehicle);
+        public UUID TargetID() => (UUID)vehicle.Info.m_vehicleAI.GetTargetID(id.ID, ref vehicle);
 
         public string TransportLineName()
             => TransportManager.instance.GetLineName(vehicle.m_transportLine);

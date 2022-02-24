@@ -33,7 +33,7 @@ namespace FPSCamera
         public float vehicleCameraOffsetX = 0f;
         public float vehicleCameraOffsetY = 0f;
         public float vehicleCameraOffsetZ = 0f;
-        
+
         public bool enableDOF = false;
         public bool alwaysFrontVehicle = true;
         public Vector3 position = Vector3.zero;
@@ -68,7 +68,7 @@ namespace FPSCamera
                 using (var reader = new StreamReader(configPath))
                 {
                     // TODO: handle of config members update
-                    return (Config)serializer.Deserialize(reader);                    
+                    return (Config)serializer.Deserialize(reader);
                 }
             }
             catch { Log.Err("error while reading configuration"); }

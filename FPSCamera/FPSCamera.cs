@@ -62,7 +62,7 @@ namespace FPSCamera
                 {
                     Instance.gameObject.AddComponent<GamePanelExtender>();
                     Instance.vehicleCamera = new VehicleCamera(Instance.gameObject);
-                    Instance.citizenCamera = new CitizenCamera(Instance.gameObject, 
+                    Instance.citizenCamera = new CitizenCamera(Instance.gameObject,
                                                                Instance.vehicleCamera);
                 }
             }
@@ -95,9 +95,9 @@ namespace FPSCamera
             UI = FPSCameraUI.Instance;
             speedUi = FPSCameraSpeedUI.Instance;
             speedUi.enabled = false;
-            
+
         }
-        
+
         public void SaveConfig()
         {
             Config.Save(Config.Global);
@@ -118,7 +118,7 @@ namespace FPSCamera
             cityWalkthroughMode = true;
             cityWalkthroughNextChangeTimer = Config.Global.walkthroughModeTimer;
 
-            if ( Config.Global.integrateHideUI)
+            if (Config.Global.integrateHideUI)
             {
                 UIHider.Hide();
             }
@@ -162,13 +162,13 @@ namespace FPSCamera
 
                 Instance.controller.m_maxDistance = 50f;
                 Instance.controller.m_currentSize = 5;
-                Instance.controller.m_currentHeight =2f;
+                Instance.controller.m_currentHeight = 2f;
                 Instance.controller.enabled = false;
                 if (effect)
                 {
                     effect.enabled = Config.Global.enableDOF;
                 }
-                if( legacyEffect)
+                if (legacyEffect)
                 {
                     legacyEffect.enabled = false;
                 }
@@ -189,7 +189,7 @@ namespace FPSCamera
                 Cursor.visible = true;
                 effect.nearBlur = true;
             }
-            
+
             onCameraModeChanged?.Invoke(fpsMode);
         }
 
@@ -215,7 +215,7 @@ namespace FPSCamera
                     continue;
                 }
 
-                if(skip > 0)
+                if (skip > 0)
                 {
                     skip--;
                     continue;
@@ -242,7 +242,7 @@ namespace FPSCamera
 
             return 0;
         }
-        
+
         public uint GetRandomCitizenInstance()
         {
             var cmanager = CitizenManager.instance;
@@ -290,7 +290,7 @@ namespace FPSCamera
                 var vehicle = GetRandomVehicle();
                 if (vehicle != 0)
                 {
-                    vehicleCamera.SetInstanceToFollow((VehicleID) vehicle);
+                    vehicleCamera.SetInstanceToFollow((VehicleID)vehicle);
                 }
             }
             else
@@ -303,7 +303,7 @@ namespace FPSCamera
                 var citizen = GetRandomCitizenInstance();
                 if (citizen != 0)
                 {
-                    citizenCamera.SetInstanceToFollow((CitizenID) citizen);
+                    citizenCamera.SetInstanceToFollow((CitizenID)citizen);
                 }
             }
         }
@@ -359,15 +359,15 @@ namespace FPSCamera
                     vehicleCamera.userOffset += gameObject.transform.up * Config.Global.cameraMoveSpeed * 0.25f * Time.deltaTime;
                 }
 
-                if(Input.GetKeyDown(Config.Global.cameraRotateLeft))
+                if (Input.GetKeyDown(Config.Global.cameraRotateLeft))
                 {
                     vehicleCamera.cameraRotationOffset -= 45;
-                    if(vehicleCamera.cameraRotationOffset <= -360)
+                    if (vehicleCamera.cameraRotationOffset <= -360)
                     {
                         vehicleCamera.cameraRotationOffset = 0;
                     }
                 }
-                else if(Input.GetKeyDown(Config.Global.cameraRotateRight))
+                else if (Input.GetKeyDown(Config.Global.cameraRotateRight))
                 {
                     vehicleCamera.cameraRotationOffset += 45;
                     if (vehicleCamera.cameraRotationOffset >= 360)
@@ -415,7 +415,7 @@ namespace FPSCamera
             {
 
                 cityWalkthroughMode = false;
-                if(Config.Global.integrateHideUI)
+                if (Config.Global.integrateHideUI)
                 {
                     UIHider.Hide();
                 }
@@ -429,7 +429,7 @@ namespace FPSCamera
                 {
                     citizenCamera.StopFollowing();
                 }
-                
+
             }
             else
             {
@@ -472,7 +472,7 @@ namespace FPSCamera
                     SetMode(!fpsModeEnabled);
                 }
             }
-            
+
             UI.Hide();
         }
 
@@ -535,7 +535,7 @@ namespace FPSCamera
             float time = Time.deltaTime;
             if (time + existingTime <= 0.1)
             {
-                existingTime+= time;
+                existingTime += time;
             }
             existingTime = 0.0f;
 
@@ -545,7 +545,7 @@ namespace FPSCamera
             UpdateCityWalkthrough();
 
             UpdateCameras();
-            
+
             if (Input.GetKeyDown(KeyCode.Escape))
             {
                 OnEscapePressed();

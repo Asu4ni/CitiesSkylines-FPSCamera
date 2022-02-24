@@ -119,7 +119,7 @@ namespace FPSCamera.UI
 
         private KeyCode findKeyPressed()
         {
-            foreach( KeyCode code in Enum.GetValues(typeof(KeyCode)))
+            foreach (KeyCode code in Enum.GetValues(typeof(KeyCode)))
             {
                 if (Input.GetKeyDown(code))
                 {
@@ -133,7 +133,7 @@ namespace FPSCamera.UI
         {
             UIPanel parentPanel = parent.self as UIPanel;
             UIPanel uIPanel = parentPanel.AttachUIComponent(UITemplateManager.GetAsGameObject("KeyBindingTemplate")) as UIPanel;
-           
+
             UILabel uILabel = uIPanel.Find<UILabel>("Name");
             UIButton uIButton = uIPanel.Find<UIButton>("Binding");
             uIButton.eventKeyDown += (component, eventParam) =>
@@ -157,6 +157,6 @@ namespace FPSCamera.UI
             keyCodeSelctMode = selectType;
             button.text = "???";
         }
-        
+
     }
 }

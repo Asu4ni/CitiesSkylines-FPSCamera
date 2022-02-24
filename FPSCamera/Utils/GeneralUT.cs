@@ -8,8 +8,11 @@ namespace FPSCamera
         public static implicit operator UUID(CitizenID id) { UUID uid = default; uid.Citizen = id; return id; }
         public VehicleID Vehicle { get => (VehicleID)id.Vehicle; set => id.Vehicle = value.ID; }
         public static implicit operator UUID(VehicleID id) { UUID uid = default; uid.Vehicle = id; return id; }
-        public BuildingID Building { get => (BuildingID)id.Building; 
-                                     set => id.Building = value.ID; }
+        public BuildingID Building
+        {
+            get => (BuildingID)id.Building;
+            set => id.Building = value.ID;
+        }
         public static implicit operator UUID(BuildingID id) { UUID uid = default; uid.Building = id; return id; }
 
         private InstanceID id;
@@ -28,7 +31,7 @@ namespace FPSCamera
         private T id;
         private BaseID(T id) { this.id = id; }
     }
-    public class CitizenID : BaseID<uint> {}
+    public class CitizenID : BaseID<uint> { }
     public class CitizenInstanceID : BaseID<ushort> { }
     public class VehicleID : BaseID<ushort> { }
     public class BuildingID : BaseID<ushort> { }

@@ -21,12 +21,12 @@ namespace FPSCamera
             => instance.GetLastFrameData().m_velocity;
 
         public Vector3 Position() => instance.GetSmoothPosition(citizen.m_instance);
-        public void PositionRotation(out Vector3 position, out Quaternion rotation) 
+        public void PositionRotation(out Vector3 position, out Quaternion rotation)
         {
-            instance.GetSmoothPosition(citizen.m_instance, out position, out rotation); 
+            instance.GetSmoothPosition(citizen.m_instance, out position, out rotation);
         }
-        public VehicleID RiddenVehicleID() => (VehicleID) citizen.m_vehicle;
-        public BuildingID TargetBuildingID() => (BuildingID) instance.m_targetBuilding;
+        public VehicleID RiddenVehicleID() => (VehicleID)citizen.m_vehicle;
+        public BuildingID TargetBuildingID() => (BuildingID)instance.m_targetBuilding;
         public UUID TargetID()
         {
             instance.Info.m_citizenAI.GetLocalizedStatus(citizen.m_instance, ref instance,
