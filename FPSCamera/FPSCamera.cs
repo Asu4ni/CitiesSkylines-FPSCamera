@@ -61,11 +61,9 @@ namespace FPSCamera
                 if (Instance.IsGameMode)
                 {
                     Instance.gameObject.AddComponent<GamePanelExtender>();
-                    Instance.vehicleCamera = Instance.gameObject.AddComponent<VehicleCamera>();
-                    Instance.citizenCamera = Instance.gameObject.AddComponent<CitizenCamera>();
-                    Instance.citizenCamera.vehicleCamera = Instance.vehicleCamera;
-                    Instance.vehicleCamera.enabled = false;
-                    Instance.citizenCamera.enabled = false;
+                    Instance.vehicleCamera = new VehicleCamera(Instance.gameObject);
+                    Instance.citizenCamera = new CitizenCamera(Instance.gameObject, 
+                                                               Instance.vehicleCamera);
                 }
             }
         }
@@ -284,7 +282,7 @@ namespace FPSCamera
             bool vehicleOrCitizen = Random.Range(0, 3) == 0;
             if (!vehicleOrCitizen)
             {
-                if (citizenCamera.following)
+                if (citizenCamera.enabled)
                 {
                     citizenCamera.StopFollowing();
                 }
@@ -292,12 +290,12 @@ namespace FPSCamera
                 var vehicle = GetRandomVehicle();
                 if (vehicle != 0)
                 {
-                    vehicleCamera.SetFollowInstance(vehicle);
+                    vehicleCamera.SetInstanceToFollow((VehicleID) vehicle);
                 }
             }
             else
             {
-                if (vehicleCamera.following)
+                if (vehicleCamera.enabled)
                 {
                     vehicleCamera.StopFollowing();
                 }
@@ -305,7 +303,7 @@ namespace FPSCamera
                 var citizen = GetRandomCitizenInstance();
                 if (citizen != 0)
                 {
-                    citizenCamera.SetFollowInstance(citizen);
+                    citizenCamera.SetInstanceToFollow((CitizenID) citizen);
                 }
             }
         }
@@ -315,7 +313,7 @@ namespace FPSCamera
             if (cityWalkthroughMode && !Config.Global.walkthroughModeManual)
             {
                 cityWalkthroughNextChangeTimer -= Time.deltaTime;
-                if (cityWalkthroughNextChangeTimer <= 0.0f || !(citizenCamera.following || vehicleCamera.following))
+                if (cityWalkthroughNextChangeTimer <= 0.0f || !(citizenCamera.enabled || vehicleCamera.enabled))
                 {
                     cityWalkthroughNextChangeTimer = Config.Global.walkthroughModeTimer;
                     WalkthroughModeSwitchTarget();
@@ -332,7 +330,7 @@ namespace FPSCamera
 
         void UpdateCameras()
         {
-            if (vehicleCamera != null && vehicleCamera.following && Config.Global.allowUserOffsetInVehicleCitizenMode)
+            if (vehicleCamera != null && vehicleCamera.enabled && Config.Global.allowUserOffsetInVehicleCitizenMode)
             {
                 if (Input.GetKey(Config.Global.cameraMoveForward))
                 {
@@ -379,7 +377,7 @@ namespace FPSCamera
                 }
             }
 
-            if (citizenCamera != null && citizenCamera.following && Config.Global.allowUserOffsetInVehicleCitizenMode)
+            if (citizenCamera != null && citizenCamera.enabled && Config.Global.allowUserOffsetInVehicleCitizenMode)
             {
                 if (Input.GetKey(Config.Global.cameraMoveForward))
                 {
@@ -422,12 +420,12 @@ namespace FPSCamera
                     UIHider.Hide();
                 }
 
-                if (vehicleCamera != null && vehicleCamera.following)
+                if (vehicleCamera != null && vehicleCamera.enabled)
                 {
                     vehicleCamera.StopFollowing();
                 }
 
-                if (citizenCamera != null && citizenCamera.following)
+                if (citizenCamera != null && citizenCamera.enabled)
                 {
                     citizenCamera.StopFollowing();
                 }
@@ -435,7 +433,7 @@ namespace FPSCamera
             }
             else
             {
-                if (vehicleCamera != null && vehicleCamera.following)
+                if (vehicleCamera != null && vehicleCamera.enabled)
                 {
                     if (Config.Global.integrateHideUI)
                     {
@@ -443,7 +441,7 @@ namespace FPSCamera
                     }
                     vehicleCamera.StopFollowing();
                 }
-                if (citizenCamera != null && citizenCamera.following)
+                if (citizenCamera != null && citizenCamera.enabled)
                 {
                     if (Config.Global.integrateHideUI)
                     {
@@ -488,22 +486,22 @@ namespace FPSCamera
                 }
 
                 cityWalkthroughMode = false;
-                if (vehicleCamera.following)
+                if (vehicleCamera.enabled)
                 {
                     vehicleCamera.StopFollowing();
                 }
-                if (citizenCamera.following)
+                if (citizenCamera.enabled)
                 {
                     citizenCamera.StopFollowing();
                 }
 
 
             }
-            else if (vehicleCamera != null && vehicleCamera.following)
+            else if (vehicleCamera != null && vehicleCamera.enabled)
             {
                 vehicleCamera.StopFollowing();
             }
-            else if (citizenCamera != null && citizenCamera.following)
+            else if (citizenCamera != null && citizenCamera.enabled)
             {
                 citizenCamera.StopFollowing();
             }

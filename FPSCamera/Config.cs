@@ -29,6 +29,7 @@ namespace FPSCamera
         public float walkthroughModeTimer = 25.0f;
         public bool walkthroughModeManual = false;
         public bool allowUserOffsetInVehicleCitizenMode = false;
+        // TODO:rename to forward/up/right
         public float vehicleCameraOffsetX = 0f;
         public float vehicleCameraOffsetY = 0f;
         public float vehicleCameraOffsetZ = 0f;
@@ -40,6 +41,7 @@ namespace FPSCamera
         public bool isMPH = false;
         public bool showPassengerCount = true;
 
+        // TODO: reorganize
         public KeyCode cameraMoveLeft = (KeyCode)(new SavedInputKey(Settings.cameraMoveLeft, Settings.gameSettingsFile, DefaultSettings.cameraMoveLeft, true).value & 268435455);
         public KeyCode cameraMoveRight = (KeyCode)(new SavedInputKey(Settings.cameraMoveRight, Settings.gameSettingsFile, DefaultSettings.cameraMoveRight, true).value & 268435455);
         public KeyCode cameraMoveForward = (KeyCode)(new SavedInputKey(Settings.cameraMoveForward, Settings.gameSettingsFile, DefaultSettings.cameraMoveForward, true).value & 268435455);
@@ -65,6 +67,7 @@ namespace FPSCamera
             {
                 using (var reader = new StreamReader(configPath))
                 {
+                    // TODO: handle of config members update
                     return (Config)serializer.Deserialize(reader);                    
                 }
             }

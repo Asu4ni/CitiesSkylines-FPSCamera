@@ -67,9 +67,7 @@ namespace FPSCamera
                         }
                         InstanceID instance = Utils.ReadPrivate<CitizenVehicleWorldInfoPanel, InstanceID>(citizenVehicleInfoPanel, "m_InstanceID");
                         resetCamera();
-                        FPSCamera.Instance.vehicleCamera.SetFollowInstance(instance.Vehicle);
-
-                       
+                        FPSCamera.Instance.vehicleCamera.SetInstanceToFollow((UUID) instance);
                     }
                 );
 
@@ -89,7 +87,7 @@ namespace FPSCamera
                         }
                         InstanceID instance = Utils.ReadPrivate<CityServiceVehicleWorldInfoPanel, InstanceID>(cityServiceVehicleInfoPanel, "m_InstanceID");
                         resetCamera();
-                        FPSCamera.Instance.vehicleCamera.SetFollowInstance(instance.Vehicle);
+                        FPSCamera.Instance.vehicleCamera.SetInstanceToFollow((UUID) instance);
 
                     }
                 );
@@ -110,8 +108,8 @@ namespace FPSCamera
                         }
                         InstanceID instance = Utils.ReadPrivate<PublicTransportVehicleWorldInfoPanel, InstanceID>(publicTransportVehicleInfoPanel, "m_InstanceID");
                         resetCamera();
-                        FPSCamera.Instance.vehicleCamera.SetFollowInstance(instance.Vehicle);
-                        
+                        FPSCamera.Instance.vehicleCamera.SetInstanceToFollow((UUID) instance);
+
                     }
                 );
 
@@ -132,8 +130,8 @@ namespace FPSCamera
                         }
                         InstanceID instance = Utils.ReadPrivate<CitizenWorldInfoPanel, InstanceID>(citizenInfoPanel, "m_InstanceID");
                         resetCamera();
-                        FPSCamera.Instance.citizenCamera.SetFollowInstance(instance.Citizen);
-                        
+                        FPSCamera.Instance.citizenCamera.SetInstanceToFollow((UUID)instance);
+
                     }
                 );
 
@@ -153,7 +151,7 @@ namespace FPSCamera
                         }
                         InstanceID instance = Utils.ReadPrivate<TouristWorldInfoPanel, InstanceID>(touristCitizenInfoPanel, "m_InstanceID");
                         resetCamera();
-                        FPSCamera.Instance.citizenCamera.SetFollowInstance(instance.Citizen);
+                        FPSCamera.Instance.citizenCamera.SetInstanceToFollow((UUID)instance);
 
                     }
                 );

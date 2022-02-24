@@ -1,299 +1,115 @@
 using System;
-using ColossalFramework;
 using UnityEngine;
-using UnityStandardAssets.ImageEffects;
-using static ToolBase;
 
 namespace FPSCamera
 {
-
-    public class VehicleCamera : MonoBehaviour, InstanceCamera
+    public class VehicleCamera : BaseCamera
     {
-        private ushort followInstance;
+        private VehicleID vehicleID;
+        private bool wasReversed;
+        public float cameraRotationOffset = 0u; // TODO: remove
 
-        public bool following = false;
+        public VehicleCamera(GameObject parentObject) : base(parentObject) { }
 
-        private CameraController cameraController;
-        public Camera camera;
-        public DepthOfField effect;
-
-        private VehicleManager vManager;
-        private bool isReversed;
-        public Vector3 userOffset = Vector3.zero;
-
-        private Vector3 vehicleVelocity = Vector3.zero;
-
-        public int cameraRotationOffset = 0;
-
-        void Awake()
+        protected override void SetInstanceToFollowPost()
         {
-            cameraController = GetComponent<CameraController>();
-            camera = GetComponent<Camera>();
-            effect = cameraController.GetComponent<DepthOfField>();
-            vManager = VehicleManager.instance;
+            vehicleID = followedID.Vehicle;
+            wasReversed = FPSVehicle.Of(vehicleID).IsReversed();
+        }
+        protected override UUID GetIntentedInstance(UUID id)
+        {
+            if (Config.Global.alwaysFrontVehicle)
+                id.Vehicle = FPSVehicle.Of(id.Vehicle).FrontVehicleID();
+            return id;
         }
 
-        void LateUpdate()
+        protected override Vector3 GetVelocity() => FPSVehicle.Of(vehicleID).Velocity();
+
+        protected override string GetDestinationStr()
         {
-            if (following)
+            // TODO: ensure that using firstVehicle is necessary
+            var vehicle = FPSVehicle.Of(FPSVehicle.Of(vehicleID).FrontVehicleID());
+            if (vehicle.IsOfService(Service.PublicTransport))
             {
+                return vehicle.TransportLineName() ?? unknownStr;
+            }
+            else if (vehicle.IsOfType(VehicleType.Bicycle))
+            {
+                // TODO: ensure if alternatives are necessary
+                var biker = FPSCitizen.Of(vehicle.OwnerID().Citizen);
+                return GeneralUT.GetBuildingName(vehicle.TargetID().Building)
+                       ?? GeneralUT.GetBuildingName(biker.TargetBuildingID())
+                       ?? GeneralUT.GetBuildingName(biker.TargetID().Building)
+                       ?? unknownStr;
+            }
+            else
+            {
+                return GeneralUT.GetBuildingName(vehicle.TargetID().Building)
+                       ?? GeneralUT.GetBuildingName(vehicle.OwnerID().Building)
+                       ?? unknownStr;
+            }
+        }
+        protected override string GetDisplayInfoStr()
+        {
+            // TODO: ensure if using firstVehicle is necessary
+            var vehicle = FPSVehicle.Of(vehicleID);
+            if (Config.Global.showPassengerCount && vehicle.IsOfService(Service.PublicTransport))
+            {
+                vehicle.GetPassengerSizeCapacity(out int size, out int capacity);
+                return String.Format("Passengers: {0}/{1}", size, capacity);
+            }              
+            else return GeneralUT.RaycastRoad(vehicle.Position()) ?? unknownStr;
+        }
 
-                if ((vManager.m_vehicles.m_buffer[followInstance].m_flags & (Vehicle.Flags.Created | Vehicle.Flags.Deleted)) != Vehicle.Flags.Created)
-                {
-                    StopFollowing();
-                    return;
-                }
+        protected override bool UpdateCam()
+        {
+            var vehicle = FPSVehicle.Of(vehicleID);
+            if (!(vehicle.Exists() && vehicle.Spawned()))
+            {
+                StopFollowing();
+                return false;
+            }
+            else if (Config.Global.alwaysFrontVehicle && vehicle.IsReversed() != wasReversed)
+            {
+                SetInstanceToFollow(vehicle.FrontVehicleID());
+                return false;
+            }
+            else
+            {
+                vehicle.PositionRotation(out Vector3 position, out Quaternion rotation);
 
-                if ((vManager.m_vehicles.m_buffer[followInstance].m_flags & Vehicle.Flags.Spawned) == 0)
-                {
-                    StopFollowing();
-                    return;
-                }
+                var forward = rotation * Vector3.forward;
+                var up = rotation * Vector3.up;
+                var right = rotation * Vector3.right;
 
-                bool currentReversedStatus = GameUtils.GetReversedStatus(vManager, followInstance);
+                var transform = camera.transform;
 
-                if (Config.Global.alwaysFrontVehicle)
-                {
-                    if (currentReversedStatus != isReversed)
-                    {
-                        followInstance = currentReversedStatus ?
-                            vManager.m_vehicles.m_buffer[followInstance].GetLastVehicle(followInstance) :
-                            vManager.m_vehicles.m_buffer[followInstance].GetFirstVehicle(followInstance);
-                    }
-                    isReversed = currentReversedStatus;
-                }
-
-                Vehicle v = vManager.m_vehicles.m_buffer[followInstance];
-
-                Vector3 position = Vector3.zero;
-                Quaternion orientation = Quaternion.identity;
-                v.GetSmoothPosition((ushort)followInstance, out position, out orientation);
-                Vector3 forward = orientation * Vector3.forward;
-                Vector3 up = orientation * Vector3.up;
-                Vector3 right = orientation * Vector3.right;
-
-                Vector3 vehicleOffset = forward * v.Info.m_attachOffsetFront;
-                if (v.m_leadingVehicle != 0 && v.m_trailingVehicle != 0)
+                // TODO: necessary?
+                var vehicleOffset = forward * vehicle.AttachOffsetFront();
+                if (!vehicle.IsLeading() && !vehicle.IsTrailing())
                 {
                     vehicleOffset += up * 3.0f;
                     vehicleOffset -= forward * 2.0f;
                 }
 
-                var pos = GetOffset(position, forward, up) + vehicleOffset +
-                          forward * Config.Global.vehicleCameraOffsetX +
-                          up * Config.Global.vehicleCameraOffsetY +
-                          right * Config.Global.vehicleCameraOffsetZ;
-                camera.transform.position = pos + this.userOffset;
+                // TODO: always look toward moving direction, hot key to change direction
 
-                Vector3 offset = v.GetSmoothVelocity(followInstance);
-                Vector3 direction = Vector3.forward;
-
-                if ((v.Info.m_vehicleType == VehicleInfo.VehicleType.Tram ||
-                    v.Info.m_vehicleType == VehicleInfo.VehicleType.Metro ||
-                    v.Info.m_vehicleType == VehicleInfo.VehicleType.Train ||
-                    v.Info.m_vehicleType == VehicleInfo.VehicleType.Monorail))
-                {
-                    bool isLastCarInTrain = (currentReversedStatus && v.m_trailingVehicle != 0 && v.m_leadingVehicle == 0) ||
-                        (!currentReversedStatus && v.m_trailingVehicle == 0 && v.m_leadingVehicle != 0);
-                    if (isLastCarInTrain)
-                    {
-                        offset *= -1;
-                    }
-                }
-                if (offset.magnitude > 1)
-                {
-                    vehicleVelocity = offset;
-                }
-
-                if (Vector3.Dot(orientation * Vector3.forward, vehicleVelocity) < 0)
-                {
-                    direction = Vector3.back;
-                }
-
-
-                Vector3 lookAt = pos + (orientation * direction) * 1f;
-
-                var currentOrientation = camera.transform.rotation;
-                camera.transform.LookAt(lookAt, Vector3.up);
-                camera.transform.Rotate(new Vector3(0, cameraRotationOffset));
-                camera.transform.rotation = Quaternion.Slerp(currentOrientation, camera.transform.rotation,
-                    Time.deltaTime * 1.5f);
+                transform.position = CameraUT.CamPosition(position, forward, up)
+                                     + vehicleOffset + userOffset
+                                     + forward * Config.Global.vehicleCameraOffsetX
+                                     + up * Config.Global.vehicleCameraOffsetY
+                                     + right * Config.Global.vehicleCameraOffsetZ;
+                var oldRotation = transform.rotation;
+                transform.LookAt(transform.position + rotation * Vector3.forward, Vector3.up);
+                transform.rotation = Quaternion.Slerp(oldRotation, transform.rotation,
+                                                      Time.deltaTime); // TODO: original code: deltaTime * 1.5f
 
                 float height = camera.transform.position.y - TerrainManager.instance.SampleDetailHeight(camera.transform.position);
                 cameraController.m_targetPosition = camera.transform.position;
 
-                if (effect)
-                {
-                    effect.enabled = Config.Global.enableDOF;
-                }
-                if (Config.Global.displaySpeed)
-                {
-                    GetInstanceSpeed(pos);
-                }
-            }
+                return true;
+            }      
         }
-
-        public void GetInstanceSpeed(Vector3 position)
-        {
-
-            Vehicle v = vManager.m_vehicles.m_buffer[followInstance];
-            Vector3 velocity = v.GetSmoothVelocity(followInstance);
-            FPSCameraSpeedUI.Instance.speed = velocity.magnitude;
-            FPSCameraSpeedUI.Instance.destinationName = GetDestination();
-
-            ushort firstVehicle = vManager.m_vehicles.m_buffer[(int)followInstance].GetFirstVehicle(followInstance);
-            VehicleInfo info = vManager.m_vehicles.m_buffer[firstVehicle].Info;
-            FPSCameraSpeedUI.Instance.passengersOrStreet =
-                    (info.GetService() == ItemClass.Service.PublicTransport &&
-                            Config.Global.showPassengerCount)
-                    ? GetPassengerNumbers() : FPSCameraSpeedUI.Instance.passengersOrStreet = RaycastRoad(position);
-        }
-
-        public void SetFollowInstance(uint instance)
-        {
-            this.enabled = true;
-            FPSCamera.Instance.SetMode(false);
-
-            followInstance = (ushort)instance;
-            isReversed = GameUtils.GetReversedStatus(vManager, followInstance);
-            if (Config.Global.alwaysFrontVehicle)
-            {
-                followInstance = isReversed ?
-                    vManager.m_vehicles.m_buffer[followInstance].GetLastVehicle(followInstance) :
-                    vManager.m_vehicles.m_buffer[followInstance].GetFirstVehicle(followInstance);
-            }
-            following = true;
-
-            CameraUtils.SetCamera(cameraController, camera);
-            if (Config.Global.displaySpeed)
-            {
-                FPSCameraSpeedUI.Instance.enabled = true;
-            }
-            FPSCamera.Instance.onCameraModeChanged(true);
-            userOffset = Vector3.zero;
-            vehicleVelocity = Vector3.zero;
-            cameraRotationOffset = 0;
-        }
-
-        public void StopFollowing()
-        {
-            followInstance = 0;
-            following = false;
-            FPSCameraSpeedUI.Instance.enabled = false;
-            CameraUtils.StopCamera(cameraController, camera);
-            FPSCamera.Instance.onCameraModeChanged(false);
-            this.enabled = false;
-        }
-
-        public Vector3 GetOffset(Vector3 position, Vector3 forward, Vector3 up)
-        {
-            Vector3 retVal = position +
-                            forward * CameraUtils.CameraOffsetForward +
-                            up * CameraUtils.CameraOffsetUp;
-
-            return retVal;
-        }
-
-        private String RaycastRoad(Vector3 position)
-        {
-
-            RaycastOutput output = new RaycastOutput();
-            RaycastInput raycastInput = new RaycastInput(Camera.main.ScreenPointToRay(camera.transform.position), Camera.main.farClipPlane);
-            raycastInput.m_netService.m_service = ItemClass.Service.Road;
-            raycastInput.m_netService.m_itemLayers = ItemClass.Layer.Default | ItemClass.Layer.MetroTunnels;
-            raycastInput.m_ignoreSegmentFlags = NetSegment.Flags.None;
-            raycastInput.m_ignoreNodeFlags = NetNode.Flags.None;
-            raycastInput.m_ignoreTerrain = true;
-
-            ColossalFramework.Math.Segment3 ray = new ColossalFramework.Math.Segment3(position, position + new Vector3(0, -1000, 0));
-            bool success = NetManager.instance.RayCast(raycastInput.m_buildObject as NetInfo, ray, raycastInput.m_netSnap, raycastInput.m_segmentNameOnly, raycastInput.m_netService.m_service, raycastInput.m_netService2.m_service, raycastInput.m_netService.m_subService, raycastInput.m_netService2.m_subService, raycastInput.m_netService.m_itemLayers, raycastInput.m_netService2.m_itemLayers, raycastInput.m_ignoreNodeFlags, raycastInput.m_ignoreSegmentFlags, out position, out output.m_netNode, out output.m_netSegment);
-            if (success)
-            {
-                return NetManager.instance.GetSegmentName(output.m_netSegment) ?? "  ";
-            }
-            else
-            {
-                return "  ";
-            }
-        }
-
-        private string GetDestination()
-        {
-            Vehicle v = vManager.m_vehicles.m_buffer[followInstance];
-            ushort firstVehicle = vManager.m_vehicles.m_buffer[(int)followInstance].GetFirstVehicle(followInstance);
-            v = vManager.m_vehicles.m_buffer[firstVehicle];
-            InstanceID instanceID2 = default(InstanceID);
-
-            VehicleInfo info = vManager.m_vehicles.m_buffer[firstVehicle].Info;
-
-            info.m_vehicleAI.GetLocalizedStatus(firstVehicle, ref vManager.m_vehicles.m_buffer[firstVehicle], out instanceID2);
-            if (info.GetService() == ItemClass.Service.PublicTransport)
-            {
-                return TransportManager.instance.GetLineName(v.m_transportLine) ?? "  ";
-            }
-            else if (info.m_vehicleType == VehicleInfo.VehicleType.Bicycle)
-            {
-                uint driverInstance = v.Info.m_vehicleAI.GetOwnerID(firstVehicle, ref v).Citizen;
-                var citizen = CitizenManager.instance.m_citizens.m_buffer[driverInstance];
-                CitizenInstance citizenInstance = CitizenManager.instance.m_instances.m_buffer[citizen.m_instance];
-                CitizenInfo citizenInfo = citizenInstance.Info;
-                InstanceID citizenInstanceId = default(InstanceID);
-
-                citizenInfo.m_citizenAI.GetLocalizedStatus(driverInstance, ref citizen, out citizenInstanceId);
-                String buildingName = BuildingManager.instance.GetBuildingName(citizenInstance.m_targetBuilding, default(InstanceID)) ?? "?";
-                String altBuildingName = BuildingManager.instance.GetBuildingName(citizenInstanceId.Building, default(InstanceID)) ?? "?";
-
-                if (buildingName != null)
-                {
-                    return buildingName;
-                }
-                else if (altBuildingName != null)
-                {
-                    return altBuildingName;
-                }
-                else
-                {
-                    return "?";
-                }
-            }
-            else
-            {
-                info.m_vehicleAI.GetLocalizedStatus(firstVehicle, ref vManager.m_vehicles.m_buffer[firstVehicle], out instanceID2);
-                String targetBuilding = BuildingManager.instance.GetBuildingName(instanceID2.Building, default(InstanceID));
-                InstanceID ownerID = info.m_vehicleAI.GetOwnerID(firstVehicle, ref vManager.m_vehicles.m_buffer[firstVehicle]);
-                String ownerBuilding = BuildingManager.instance.GetBuildingName(ownerID.Building, default(InstanceID));
-
-                if (targetBuilding != null)
-                {
-                    return targetBuilding;
-                }
-                else if (ownerBuilding != null)
-                {
-                    return ownerBuilding;
-                }
-                else
-                {
-                    return "?";
-                }
-
-            }
-        }
-
-        private string GetPassengerNumbers()
-        {
-            Vehicle v = vManager.m_vehicles.m_buffer[followInstance];
-            ushort firstVehicle = vManager.m_vehicles.m_buffer[(int)followInstance].GetFirstVehicle(followInstance);
-            v = vManager.m_vehicles.m_buffer[firstVehicle];
-            VehicleInfo info = vManager.m_vehicles.m_buffer[firstVehicle].Info;
-
-            int fill = 0;
-            int cap = 0;
-
-            info.m_vehicleAI.GetBufferStatus(firstVehicle, ref v, out string text, out fill, out cap);
-
-            return String.Format("Passengers: {0}/{1}", fill, cap);
-        }
-
     }
 
 }

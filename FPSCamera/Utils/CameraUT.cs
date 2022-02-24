@@ -3,11 +3,16 @@ using UnityStandardAssets.ImageEffects;
 
 namespace FPSCamera
 {
-    class CameraUtils
+    public static class CameraUT
     {
+        // TODO: move to config
         public const float CameraOffsetForward = 2.75f;
         public const float CameraOffsetUp = 1.5f;
-        
+
+        public static Vector3 CamPosition(Vector3 position, Vector3 forward, Vector3 up)
+            => position + forward * CameraUT.CameraOffsetForward +
+                          up * CameraUT.CameraOffsetUp;
+
         // set up the camera: disable FOV if needed and hide the UI
         public static void SetCamera(CameraController controller, Camera camera)
         {
