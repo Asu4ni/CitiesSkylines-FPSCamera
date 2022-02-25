@@ -1,0 +1,8 @@
+[h1] Cities: Skylines - First Person Camera mod v2.0 [/h1]
+[h3] View your city from a different perspective [/h3]
+
+[quote] This is an updated version for [url=https://steamcommunity.com/sharedfiles/filedetails/?id=650805785]First Person Camera: Updated[/url] by tony56a [/quote]
+
+Source code can be found on [url=https://github.com/Asu4ni/CitiesSkylines-FPSCamera]GitHub[/url].
+
+(TODO)
