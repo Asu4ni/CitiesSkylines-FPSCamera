@@ -1,41 +1,40 @@
 ﻿using UnityEngine;
 
-namespace FPSCamera
+namespace FPSCamMod
 {
     public class FPSCitizen
     {
         private readonly static CitizenManager citizenM = CitizenManager.instance;
         public FPSCitizen(CitizenID id)
         {
-            citizen = citizenM.m_citizens.m_buffer[id.ID];
-            instance = citizenM.m_instances.m_buffer[citizen.m_instance];
+            _citizen = citizenM.m_citizens.m_buffer[id._id];
+            _instance = citizenM.m_instances.m_buffer[_citizen.m_instance];
         }
         public static FPSCitizen Of(CitizenID id) => new FPSCitizen(id);
 
-        public bool Exists()
-            => CitizenInstance.Flags.Created == (instance.m_flags
+        public bool exists
+            => CitizenInstance.Flags.Created == (_instance.m_flags
                & (CitizenInstance.Flags.Created | CitizenInstance.Flags.Deleted));
-        public bool IsEnteringVehicle()
-            => (instance.m_flags & CitizenInstance.Flags.EnteringVehicle) != 0;
-        public Vector3 Velocity() // TODO: improvement
-            => instance.GetLastFrameData().m_velocity;
+        public bool isEnteringVehicle
+            => (_instance.m_flags & CitizenInstance.Flags.EnteringVehicle) != 0;
+        public VehicleID riddenVehicleID => (VehicleID) _citizen.m_vehicle;
+        public BuildingID targetBuildingID => (BuildingID) _instance.m_targetBuilding;
 
-        public Vector3 Position() => instance.GetSmoothPosition(citizen.m_instance);
+        public Vector3 Position() => _instance.GetSmoothPosition(_citizen.m_instance);
         public void PositionRotation(out Vector3 position, out Quaternion rotation)
         {
-            instance.GetSmoothPosition(citizen.m_instance, out position, out rotation);
+            _instance.GetSmoothPosition(_citizen.m_instance, out position, out rotation);
         }
-        public VehicleID RiddenVehicleID() => (VehicleID)citizen.m_vehicle;
-        public BuildingID TargetBuildingID() => (BuildingID)instance.m_targetBuilding;
+        public Vector3 Velocity() // TODO: improvement
+            => _instance.GetLastFrameData().m_velocity;
         public UUID TargetID()
         {
-            instance.Info.m_citizenAI.GetLocalizedStatus(citizen.m_instance, ref instance,
+            _instance.Info.m_citizenAI.GetLocalizedStatus(_citizen.m_instance, ref _instance,
                 out InstanceID targetID);
-            return (UUID)targetID;
+            return (UUID) targetID;
         }
 
-
-        private Citizen citizen;
-        protected CitizenInstance instance;
+        private Citizen _citizen;
+        protected CitizenInstance _instance;
     }
 }

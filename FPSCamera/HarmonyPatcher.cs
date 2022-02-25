@@ -1,9 +1,8 @@
 ﻿using HarmonyLib;
-using CitiesHarmony.API;
-using System.Reflection;
 
-namespace FPSCamera
+namespace FPSCamMod
 {
+    // TODO: integrate ... or not? use pathcing instead of Unity system?
     internal static class HarmonyPatcher
     {
         private const string HarmonyId = "v2.FPSCamera";
@@ -14,10 +13,13 @@ namespace FPSCamera
             if (!isPatched)
             {
                 Log.Msg("Harmony: patching...");
-
-                var harmony = new Harmony(HarmonyId);
-                harmony.PatchAll();
-                isPatched = true;
+                try
+                {
+                    var harmony = new Harmony(HarmonyId);
+                    harmony.PatchAll();
+                    isPatched = true;
+                } catch (System.Exception e)
+                { Dialog.ShowErr("Harmony patching fails: " + e.ToString()); }
             }
         }
 
@@ -26,11 +28,13 @@ namespace FPSCamera
             if (isPatched)
             {
                 Log.Msg("Harmony: unpatching...");
-
-                var harmony = new Harmony(HarmonyId);
-                harmony.UnpatchAll();
-
-                isPatched = false;
+                try
+                {
+                    var harmony = new Harmony(HarmonyId);
+                    harmony.UnpatchAll();
+                    isPatched = false;
+                } catch (System.Exception e)
+                { Dialog.ShowErr("Harmony unpatching fails: " + e.ToString()); }
             }
         }
     }

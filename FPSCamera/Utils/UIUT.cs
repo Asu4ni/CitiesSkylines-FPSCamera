@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace FPSCamera
+namespace FPSCamMod
 {
-    static class UIHider
+    internal static class UIUT
     {
-        public static void Hide()
+        // TODO: investigate
+        public static void HideUI()
         {
             var cameraController = GameObject.FindObjectOfType<CameraController>();
             var camera = cameraController.gameObject.GetComponent<Camera>();
@@ -25,13 +22,12 @@ namespace FPSCamera
             }
             camera.rect = new Rect(0.0f, 0.0f, 1f, 1f);
 
-            //TODO: For some reason, the cameracontroller's not picking this up before it's disabled...
+            // For some reason, the cameracontroller's not picking this up before it's disabled...
             cameraController.enabled = true;
             cameraController.m_freeCamera = true;
             cameraController.enabled = cachedEnabled;
         }
-
-        public static void Show()
+        public static void ShowUI()
         {
             var cameraController = GameObject.FindObjectOfType<CameraController>();
             var camera = cameraController.gameObject.GetComponent<Camera>();
@@ -48,13 +44,12 @@ namespace FPSCamera
                 }
             }
 
-            //TODO: For some reason, the cameracontroller's not picking this up before it's disabled...
+            // For some reason, the cameracontroller's not picking this up before it's disabled...
             cameraController.enabled = true;
             cameraController.m_freeCamera = false;
             cameraController.enabled = cachedEnabled;
 
             camera.rect = new Rect(0.0f, 0.105f, 1f, 0.895f);
-
         }
     }
 }
