@@ -1,6 +1,4 @@
 ﻿using HarmonyLib;
-using CitiesHarmony.API;
-using System.Reflection;
 
 namespace FPSCamera
 {
@@ -14,10 +12,14 @@ namespace FPSCamera
             if (!isPatched)
             {
                 Log.Msg("Harmony: patching...");
-
-                var harmony = new Harmony(HarmonyId);
-                harmony.PatchAll();
-                isPatched = true;
+                try
+                {
+                    var harmony = new Harmony(HarmonyId);
+                    harmony.PatchAll();
+                    isPatched = true;
+                }
+                catch (System.Exception e)
+                { MsgDialog.ShowErr("Harmony patching fails: " + e.ToString()); }
             }
         }
 
@@ -26,11 +28,14 @@ namespace FPSCamera
             if (isPatched)
             {
                 Log.Msg("Harmony: unpatching...");
-
-                var harmony = new Harmony(HarmonyId);
-                harmony.UnpatchAll();
-
-                isPatched = false;
+                try
+                {
+                    var harmony = new Harmony(HarmonyId);
+                    harmony.UnpatchAll();
+                    isPatched = false;
+                }
+                catch (System.Exception e)
+                { MsgDialog.ShowErr("Harmony unpatching fails: " + e.ToString()); }
             }
         }
     }

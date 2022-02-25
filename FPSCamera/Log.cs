@@ -1,3 +1,4 @@
+using ColossalFramework.UI;
 using System.IO;
 using System.Reflection;
 using UnityEngine;
@@ -40,5 +41,17 @@ namespace FPSCamera
                 writer.WriteLine(str);
             }
         }
+    }
+
+    public static class MsgDialog
+    {
+        private static readonly string msgTag = Assembly.GetExecutingAssembly().GetName().Name;
+        public static void ShowMsg(string msg, bool isError = false)
+        {
+            Panel.SetMessage(msgTag, msg, isError);
+        }
+        public static void ShowErr(string msg) { ShowMsg(msg, true); }
+
+        private static ExceptionPanel Panel => UIView.library.ShowModal<ExceptionPanel>("ExceptionPanel");
     }
 }
