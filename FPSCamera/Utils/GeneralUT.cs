@@ -27,7 +27,7 @@ namespace FPSCamera
     public class BaseID<T> where T : System.IComparable<T>
     {
         public T ID { get => id; }
-        public bool Exists() => id.CompareTo(default) != 0;
+        public bool exists => id.CompareTo(default) != 0;
 
         private T id;
         protected BaseID(T id) { this.id = id; }

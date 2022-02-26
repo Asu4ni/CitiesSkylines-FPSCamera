@@ -13,7 +13,7 @@ namespace FPSCamera
         {
             vehicleID = followedID.Vehicle;
             Log.Msg("start following vehicle | ID: " + vehicleID.ID.ToString());
-            wasReversed = FPSVehicle.Of(vehicleID).IsReversed();
+            wasReversed = FPSVehicle.Of(vehicleID).isReversed;
         }
         protected override UUID GetIntentedInstance(UUID id)
         {
@@ -37,7 +37,7 @@ namespace FPSCamera
                 // TODO: ensure if alternatives are necessary
                 var biker = FPSCitizen.Of(vehicle.OwnerID().Citizen);
                 return GeneralUT.GetBuildingName(vehicle.TargetID().Building)
-                       ?? GeneralUT.GetBuildingName(biker.TargetBuildingID())
+                       ?? GeneralUT.GetBuildingName(biker.targetBuildingID)
                        ?? GeneralUT.GetBuildingName(biker.TargetID().Building)
                        ?? unknownStr;
             }
@@ -63,13 +63,13 @@ namespace FPSCamera
         protected override bool UpdateCam()
         {
             var vehicle = FPSVehicle.Of(vehicleID);
-            if (!(vehicle.Exists() && vehicle.Spawned()))
+            if (!(vehicle.exists && vehicle.spawned))
             {
                 Log.Msg("vehicle disappears | ID: " + vehicleID.ID.ToString());
                 StopFollowing();
                 return false;
             }
-            else if (Config.Global.alwaysFrontVehicle && vehicle.IsReversed() != wasReversed)
+            else if (Config.Global.alwaysFrontVehicle && vehicle.isReversed != wasReversed)
             {
                 Log.Msg("vehicle changes direction | ID: " + vehicleID.ID.ToString());
                 SetInstanceToFollow(vehicle.FrontVehicleID());
@@ -87,7 +87,7 @@ namespace FPSCamera
 
                 // TODO: necessary?
                 var vehicleOffset = forward * vehicle.AttachOffsetFront();
-                if (!vehicle.IsLeading() && !vehicle.IsTrailing())
+                if (!vehicle.isLeading && !vehicle.isTrailing)
                 {
                     vehicleOffset += up * 3.0f;
                     vehicleOffset -= forward * 2.0f;

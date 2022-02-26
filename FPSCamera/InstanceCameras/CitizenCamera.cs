@@ -23,7 +23,7 @@ namespace FPSCamera
         protected override string GetDestinationStr()
         {
             var citizen = FPSCitizen.Of(citizenID);
-            return GeneralUT.GetBuildingName(citizen.TargetBuildingID())
+            return GeneralUT.GetBuildingName(citizen.targetBuildingID)
                    ?? GeneralUT.GetBuildingName(citizen.TargetID().Building)
                    ?? unknownStr;
         }
@@ -41,7 +41,7 @@ namespace FPSCamera
 
             if (inVehicle)
             {
-                if (!citizen.RiddenVehicleID().Exists())
+                if (!citizen.riddenVehicleID.exists)
                 {
                     Log.Msg("citizen leaving the vehicle | ID: " + citizenID.ID.ToString());
                     inVehicle = false;
@@ -50,16 +50,16 @@ namespace FPSCamera
                 }
                 return false;
             }
-            else if (!citizen.Exists())
+            else if (!citizen.exists)
             {
                 Log.Msg("citizen disappears | ID: " + citizenID.ID.ToString());
                 StopFollowing();
                 return false;
             }
-            else if (citizen.IsEnteringVehicle())
+            else if (citizen.isEnteringVehicle)
             {
-                var vehicleID = citizen.RiddenVehicleID();
-                if (vehicleID.Exists())
+                var vehicleID = citizen.riddenVehicleID;
+                if (vehicleID.exists)
                 {
                     Log.Msg("citizen entering a vehicle | ID: " + citizenID.ID.ToString());
                     var vehicle = FPSVehicle.Of(vehicleID);
