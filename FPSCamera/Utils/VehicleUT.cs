@@ -1,20 +1,20 @@
 ﻿using UnityEngine;
 
-namespace FPSCamera
+namespace FPSCamMod
 {
     public struct Service
     {
         public static readonly Service PublicTransport = new Service(ItemClass.Service.PublicTransport);
 
-        public ItemClass.Service service { get; private set; }
-        private Service(ItemClass.Service service) { this.service = service; }
+        public ItemClass.Service _service { get; private set; }
+        private Service(ItemClass.Service service) { this._service = service; }
     }
     public struct VehicleType
     {
         public static readonly VehicleType Bicycle = new VehicleType(VehicleInfo.VehicleType.Bicycle);
 
-        public VehicleInfo.VehicleType type;
-        private VehicleType(VehicleInfo.VehicleType type) { this.type = type; }
+        public VehicleInfo.VehicleType _type;
+        private VehicleType(VehicleInfo.VehicleType type) { this._type = type; }
     }
 
     public class FPSVehicle
@@ -23,44 +23,44 @@ namespace FPSCamera
         public FPSVehicle(VehicleID id)
         {
             this.id = id;
-            vehicle = vehicleM.m_vehicles.m_buffer[id.ID];
+            _vehicle = vehicleM.m_vehicles.m_buffer[id._id];
         }
         public static FPSVehicle Of(VehicleID id) => new FPSVehicle(id);
 
-        public bool exists => Vehicle.Flags.Created == (vehicle.m_flags
+        public bool exists => Vehicle.Flags.Created == (_vehicle.m_flags
                                     & (Vehicle.Flags.Created | Vehicle.Flags.Deleted));
-        public bool spawned => (vehicle.m_flags & Vehicle.Flags.Spawned) != 0;
+        public bool spawned => (_vehicle.m_flags & Vehicle.Flags.Spawned) != 0;
         public bool isReversed
-            => (vehicle.m_flags & Vehicle.Flags.Reversed) != 0;
-        public bool isLeading => vehicle.m_leadingVehicle == 0;
-        public bool isTrailing => vehicle.m_trailingVehicle == 0;
+            => (_vehicle.m_flags & Vehicle.Flags.Reversed) != 0;
+        public bool isLeading => _vehicle.m_leadingVehicle == 0;
+        public bool isTrailing => _vehicle.m_trailingVehicle == 0;
         public bool IsOfType(VehicleType type)
-            => vehicle.Info.m_vehicleType == type.type;
+            => _vehicle.Info.m_vehicleType == type._type;
         public bool IsOfService(Service service)
-            => vehicle.Info.GetService() == service.service;
+            => _vehicle.Info.GetService() == service._service;
 
-        public Vector3 Position() => vehicle.GetSmoothPosition(id.ID);
+        public Vector3 Position() => _vehicle.GetSmoothPosition(id._id);
         public void PositionRotation(out Vector3 position, out Quaternion rotation)
         {
-            vehicle.GetSmoothPosition(id.ID, out position, out rotation);
+            _vehicle.GetSmoothPosition(id._id, out position, out rotation);
         }
-        public Vector3 Velocity() => vehicle.GetSmoothVelocity(id.ID);
-        public float AttachOffsetFront() => vehicle.Info.m_attachOffsetFront;
+        public Vector3 Velocity() => _vehicle.GetSmoothVelocity(id._id);
+        public float AttachOffsetFront() => _vehicle.Info.m_attachOffsetFront;
         public VehicleID FrontVehicleID()
-            => (VehicleID)(isReversed ? vehicle.GetLastVehicle(id.ID)
-                                      : vehicle.GetFirstVehicle(id.ID));
-        public UUID OwnerID() => (UUID)vehicle.Info.m_vehicleAI.GetOwnerID(id.ID, ref vehicle);
-        public UUID TargetID() => (UUID)vehicle.Info.m_vehicleAI.GetTargetID(id.ID, ref vehicle);
+            => (VehicleID) (isReversed ? _vehicle.GetLastVehicle(id._id)
+                                      : _vehicle.GetFirstVehicle(id._id));
+        public UUID OwnerID() => (UUID) _vehicle.Info.m_vehicleAI.GetOwnerID(id._id, ref _vehicle);
+        public UUID TargetID() => (UUID) _vehicle.Info.m_vehicleAI.GetTargetID(id._id, ref _vehicle);
 
         public string TransportLineName()
-            => TransportManager.instance.GetLineName(vehicle.m_transportLine);
+            => TransportManager.instance.GetLineName(_vehicle.m_transportLine);
         public void GetPassengerSizeCapacity(out int size, out int capacity)
         {
-            vehicle.Info.m_vehicleAI.GetBufferStatus(id.ID, ref vehicle, out _,
+            _vehicle.Info.m_vehicleAI.GetBufferStatus(id._id, ref _vehicle, out _,
                     out size, out capacity);
         }
 
         private VehicleID id;
-        private Vehicle vehicle;
+        private Vehicle _vehicle;
     }
 }

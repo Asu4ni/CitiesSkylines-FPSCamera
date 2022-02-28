@@ -1,6 +1,6 @@
 ﻿using HarmonyLib;
 
-namespace FPSCamera
+namespace FPSCamMod
 {
     internal static class HarmonyPatcher
     {
@@ -17,9 +17,8 @@ namespace FPSCamera
                     var harmony = new Harmony(HarmonyId);
                     harmony.PatchAll();
                     isPatched = true;
-                }
-                catch (System.Exception e)
-                { MsgDialog.ShowErr("Harmony patching fails: " + e.ToString()); }
+                } catch (System.Exception e)
+                { Dialog.ShowErr("Harmony patching fails: " + e.ToString()); }
             }
         }
 
@@ -33,9 +32,8 @@ namespace FPSCamera
                     var harmony = new Harmony(HarmonyId);
                     harmony.UnpatchAll();
                     isPatched = false;
-                }
-                catch (System.Exception e)
-                { MsgDialog.ShowErr("Harmony unpatching fails: " + e.ToString()); }
+                } catch (System.Exception e)
+                { Dialog.ShowErr("Harmony unpatching fails: " + e.ToString()); }
             }
         }
     }

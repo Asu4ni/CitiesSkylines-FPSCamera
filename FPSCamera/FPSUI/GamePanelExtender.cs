@@ -1,12 +1,10 @@
-using System;
 using ColossalFramework.UI;
 using UnityEngine;
 
-namespace FPSCamera
+namespace FPSCamMod
 {
     public class GamePanelExtender : MonoBehaviour
     {
-
         private bool initialized = false;
         private CitizenVehicleWorldInfoPanel citizenVehicleInfoPanel;
         private UIButton citizenVehicleCameraButton;
@@ -28,6 +26,21 @@ namespace FPSCamera
         private Vector3 cameraButtonOffset = new Vector3(-8.0f, 36.0f, 0.0f);
         private int cameraButtonSize = 24;
 
+        private System.Action<UUID> _followCallBack;
+        private System.Action<UUID> followCallBack
+        {
+            get
+            {
+                if (_followCallBack is null)
+                    Log.Err("followCallBack from GamePanelExtender has not been registered");
+                return _followCallBack;
+            }
+            set => _followCallBack = value;
+        }
+
+        internal void registerFollowCallBack(System.Action<UUID> callBackAction)
+        { followCallBack = callBackAction; }
+
         void Awake()
         {
             uiView = FindObjectOfType<UIView>();
@@ -41,13 +54,8 @@ namespace FPSCamera
             Destroy(citizenCameraButton);
             Destroy(touristCitizenInfoPanel);
         }
-
-        void resetCamera()
-        {
-            FPSCamera.Instance.vehicleCamera.StopFollowing();
-            FPSCamera.Instance.citizenCamera.StopFollowing();
-        }
-
+        // TODO: move to other place (should not be Update)
+        // TODO: disable while not idle
         void Update()
         {
             if (!initialized)
@@ -66,8 +74,7 @@ namespace FPSCamera
                             UIHider.Hide();
                         }
                         InstanceID instance = Utils.ReadPrivate<CitizenVehicleWorldInfoPanel, InstanceID>(citizenVehicleInfoPanel, "m_InstanceID");
-                        resetCamera();
-                        FPSCamera.Instance.vehicleCamera.SetInstanceToFollow((UUID)instance);
+                        followCallBack((UUID) instance);
                     }
                 );
 
@@ -86,9 +93,7 @@ namespace FPSCamera
                             UIHider.Hide();
                         }
                         InstanceID instance = Utils.ReadPrivate<CityServiceVehicleWorldInfoPanel, InstanceID>(cityServiceVehicleInfoPanel, "m_InstanceID");
-                        resetCamera();
-                        FPSCamera.Instance.vehicleCamera.SetInstanceToFollow((UUID)instance);
-
+                        followCallBack((UUID) instance);
                     }
                 );
 
@@ -107,9 +112,7 @@ namespace FPSCamera
                             UIHider.Hide();
                         }
                         InstanceID instance = Utils.ReadPrivate<PublicTransportVehicleWorldInfoPanel, InstanceID>(publicTransportVehicleInfoPanel, "m_InstanceID");
-                        resetCamera();
-                        FPSCamera.Instance.vehicleCamera.SetInstanceToFollow((UUID)instance);
-
+                        followCallBack((UUID) instance);
                     }
                 );
 
@@ -129,9 +132,7 @@ namespace FPSCamera
                             UIHider.Hide();
                         }
                         InstanceID instance = Utils.ReadPrivate<CitizenWorldInfoPanel, InstanceID>(citizenInfoPanel, "m_InstanceID");
-                        resetCamera();
-                        FPSCamera.Instance.citizenCamera.SetInstanceToFollow((UUID)instance);
-
+                        followCallBack((UUID) instance);
                     }
                 );
 
@@ -150,13 +151,9 @@ namespace FPSCamera
                             UIHider.Hide();
                         }
                         InstanceID instance = Utils.ReadPrivate<TouristWorldInfoPanel, InstanceID>(touristCitizenInfoPanel, "m_InstanceID");
-                        resetCamera();
-                        FPSCamera.Instance.citizenCamera.SetInstanceToFollow((UUID)instance);
-
+                        followCallBack((UUID) instance);
                     }
                 );
-
-                //
 
                 initialized = true;
             }

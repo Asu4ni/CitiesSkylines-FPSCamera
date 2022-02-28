@@ -3,36 +3,48 @@ using System.IO;
 using System.Reflection;
 using UnityEngine;
 
-namespace FPSCamera
+namespace FPSCamMod
 {
-    public static class Log
+    internal static class Log
     {
-        private static bool useUnityLogger = false;
+        private static FileLog silentLogger = new FileLog();
+#if DEBUG
+        private static DialogLog logger = new DialogLog();
+#else
+        private static ILog logger;
+        static Log() { logger = silentLogger; }
+#endif
+        public static void Msg(string msg) { silentLogger.Msg(msg); }
+        public static void Warn(string msg) { logger.Warn(msg); }
+        public static void Err(string msg) { logger.Err(msg); }
+
+        public static void Assert(bool condition, string errMsg)
+        {
+#if DEBUG
+            if (!condition) Err(errMsg);
+#endif
+        }
+    }
+
+    internal interface ILog
+    {
+        void Msg(string msg);
+        void Warn(string msg);
+        void Err(string msg);
+    }
+
+    public class FileLog : ILog
+    {
         private const string logPath = "FPSCamera.log";
-        private static readonly string LogTag = "[" + Assembly.GetExecutingAssembly().GetName().Name + "] ";
 
-        static Log()
+        public FileLog()
         {
-            if (!useUnityLogger) using (File.Create(logPath)) ;
+            using (File.Create(logPath)) { }
         }
 
-        public static void Msg(string msg)
-        {
-            if (useUnityLogger) Debug.Log(LogTag + msg);
-            else output("[info] " + msg);
-        }
-
-        public static void Err(string msg)
-        {
-            if (useUnityLogger) Debug.LogError(LogTag + msg);
-            else output("[err!] " + msg);
-        }
-
-        public static void Warn(string msg)
-        {
-            if (useUnityLogger) Debug.LogWarning(LogTag + msg);
-            else output("[warn] " + msg);
-        }
+        public void Msg(string msg) { output("[info] " + msg); }
+        public void Warn(string msg) { output("[warn] " + msg); }
+        public void Err(string msg) { output("[err!] " + msg); }
 
         private static void output(string str)
         {
@@ -43,15 +55,33 @@ namespace FPSCamera
         }
     }
 
-    public static class MsgDialog
+    internal class UnityLog : ILog
     {
-        private static readonly string msgTag = Assembly.GetExecutingAssembly().GetName().Name;
-        public static void ShowMsg(string msg, bool isError = false)
-        {
-            Panel.SetMessage(msgTag, msg, isError);
-        }
-        public static void ShowErr(string msg) { ShowMsg(msg, true); }
+        private static readonly string logTag
+                = $"[{Assembly.GetExecutingAssembly().GetName().Name}] ";
 
-        private static ExceptionPanel Panel => UIView.library.ShowModal<ExceptionPanel>("ExceptionPanel");
+        public void Msg(string msg) { Debug.Log(logTag + msg); }
+        public void Warn(string msg) { Debug.LogWarning(logTag + msg); }
+        public void Err(string msg) { Debug.LogError(logTag + msg); }
+    }
+
+    internal class DialogLog : ILog
+    {
+        private static readonly string msgTag
+                = $"[{Assembly.GetExecutingAssembly().GetName().Name}] ";
+
+        public void Msg(string msg) { Panel.SetMessage(msgTag, msg, false); }
+        public void Warn(string msg) { Msg(msg); }
+        public void Err(string msg) { Panel.SetMessage(msgTag, msg, true); }
+
+        private static ExceptionPanel Panel
+            => UIView.library.ShowModal<ExceptionPanel>("ExceptionPanel");
+    }
+
+    internal static class Dialog
+    {
+        private static readonly DialogLog logger = new DialogLog();
+        public static void ShowMsg(string msg) { logger.Msg(msg); }
+        public static void ShowErr(string msg) { logger.Err(msg); }
     }
 }

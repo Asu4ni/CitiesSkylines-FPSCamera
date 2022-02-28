@@ -1,28 +1,12 @@
-﻿using System;
-using ColossalFramework.UI;
+﻿using ColossalFramework.UI;
+using System;
 using UnityEngine;
 
-namespace FPSCamera
+namespace FPSCamMod
 {
-
-    public class FPSCameraUI : MonoBehaviour
+    // TODO: incorporate UnifiedUI
+    public class FPSCamUI : MonoBehaviour
     {
-
-        public static FPSCameraUI instance;
-
-        public static FPSCameraUI Instance
-        {
-            get
-            {
-                if (instance == null)
-                {
-                    instance = FPSCamera.Instance.gameObject.AddComponent<FPSCameraUI>();
-                }
-
-                return instance;
-            }
-        }
-
         private UIPanel panel;
         private UIButton cameraModeButton;
         private UILabel cameraModeLabel;
@@ -35,7 +19,22 @@ namespace FPSCamera
         private bool waitingForShowMouseHotkey = false;
         private bool waitingForGoFasterHotkey = false;
 
-        private FPSCameraUI()
+        private System.Action _walkThruCallBack;
+        private System.Action walkThruCallBack
+        {
+            get
+            {
+                if (_walkThruCallBack is null)
+                    Log.Err("walkThruCallBack from FPSCamUI has not been registered");
+                return _walkThruCallBack;
+            }
+            set => _walkThruCallBack = value;
+        }
+
+        internal void registerWalkThruCallBack(System.Action callBackAction)
+        { walkThruCallBack = callBackAction; }
+
+        private FPSCamUI()
         {
             var uiView = FindObjectOfType<UIView>();
             var fullscreenContainer = uiView.FindUIComponent("FullScreenContainer");
@@ -81,13 +80,14 @@ namespace FPSCamera
 
             cameraModeButton.eventClick += (component, param) =>
             {
-                panel.relativePosition = new Vector3(cameraModeButton.relativePosition.x - panel.size.x, cameraModeButton.relativePosition.y + 60.0f);
+                panel.relativePosition = new Vector3(cameraModeButton.relativePosition.x - panel.size.x,
+                                                     cameraModeButton.relativePosition.y + 60.0f);
                 panel.isVisible = !panel.isVisible;
             };
             cameraModeButton.eventPositionChanged += (component, param) =>
             {
                 Config.Global.position = cameraModeButton.relativePosition;
-                FPSCamera.Instance.SaveConfig();
+                Config.Global.Save();
             };
 
             var dragObject = new GameObject("buttondragger");
@@ -105,36 +105,11 @@ namespace FPSCamera
             cameraModeLabel.textColor = new Color32(255, 255, 255, 255);
             cameraModeLabel.Hide();
 
-            FPSCamera.Instance.onCameraModeChanged += state =>
-            {
-                if (state)
-                {
-                    cameraModeLabel.text = String.Format("Press ({0}) to exit first-person mode", Config.Global.toggleFPSCameraHotkey);
-                    cameraModeLabel.color = new Color32(255, 255, 255, 255);
-                    cameraModeLabel.AlignTo(cameraModeButton, UIAlignAnchor.BottomRight);
-                    cameraModeLabel.relativePosition += new Vector3(-38.0f, -8.0f);
-                    cameraModeLabel.Show();
-                }
-                else
-                {
-                    cameraModeLabel.Hide();
-                }
-            };
-
-            FPSCamera.Instance.onUpdate = () =>
-            {
-                if (cameraModeLabel.color.a > 0)
-                {
-                    var c = cameraModeLabel.color;
-                    cameraModeLabel.color = new Color32(c.r, c.g, c.b, (byte)(c.a - 1));
-                }
-            };
-
             panel = fullscreenContainer.AddUIComponent<UIPanel>();
             panel.size = new Vector2(400, 756);
             panel.isVisible = false;
             panel.backgroundSprite = "SubcategoriesPanel";
-            panel.relativePosition = new Vector3(cameraModeButton.relativePosition.x - panel.size.x, cameraModeButton.relativePosition.y + 60.0f);
+            panel.relativePosition = new Vector3(cameraModeButton.relativePosition.x - panel.size.x, cameraModeButton.relativePosition.y + 30.0f);
             panel.name = "FPSCameraConfigPanel";
 
             float y = 4.0f;
@@ -146,7 +121,7 @@ namespace FPSCamera
             hotkeyToggleLabel.textScale = 0.8f;
 
             hotkeyToggleButton = MakeButton(panel, "ToggleFirstpersonButton",
-                Config.Global.toggleFPSCameraHotkey.ToString(), y,
+                Config.Global.keyToggleFPSCam.ToString(), y,
                 () =>
                 {
                     if (!waitingForChangeCameraHotkey)
@@ -167,7 +142,7 @@ namespace FPSCamera
             hotkeyShowMouseLabel.textScale = 0.8f;
 
             hotkeyShowMouseButton = MakeButton(panel, "ShowMouseButton",
-                Config.Global.showMouseHotkey.ToString(), y,
+                Config.Global.keySwitchCursorMode.ToString(), y,
                 () =>
                 {
                     if (!waitingForChangeCameraHotkey)
@@ -188,7 +163,7 @@ namespace FPSCamera
             hotkeyGoFasterLabel.textScale = 0.8f;
 
             hotkeyGoFasterButton = MakeButton(panel, "GoFasterButton",
-                Config.Global.goFasterHotKey.ToString(), y,
+                Config.Global.keyIncreaseSpeed.ToString(), y,
                 () =>
                 {
                     if (!waitingForGoFasterHotkey)
@@ -204,231 +179,158 @@ namespace FPSCamera
 
             MakeSlider(panel, "GoFasterMultiplier", "\"Go faster\" speed multiplier", y,
                 Config.Global.goFasterSpeedMultiplier, 2.0f, 20.0f,
-                value =>
-                {
-                    Config.Global.goFasterSpeedMultiplier = value;
-                    FPSCamera.Instance.SaveConfig();
-                });
+                value => Config.Global.Save(Config.Global.goFasterSpeedMultiplier = value));
 
             y += 28.0f;
 
             MakeCheckbox(panel, "HideUI", "Hide UI", y, Config.Global.integrateHideUI,
-                 value =>
-                 {
-                     Config.Global.integrateHideUI = value;
-                     FPSCamera.Instance.SaveConfig();
-                 });
+                 value => Config.Global.Save(Config.Global.integrateHideUI = value));
 
             y += 28.0f;
 
             MakeSlider(panel, "FieldOfView", "Field of view", y,
                 Config.Global.fieldOfView, 5.0f, 120.0f,
-                value =>
-                {
-                    FPSCamera.Instance.SetFieldOfView(value);
-                });
+                value => Config.Global.Save(Config.Global.fieldOfView = value));
 
             y += 28.0f;
 
             MakeSlider(panel, "MovementSpeed", "Movement speed", y,
-                Config.Global.cameraMoveSpeed, 0, 128.0f,
-                value =>
-                {
-                    Config.Global.cameraMoveSpeed = value;
-                    FPSCamera.Instance.SaveConfig();
-                });
+                Config.Global.cameraMoveSpeed, 1f, 64f,
+                value => Config.Global.Save(Config.Global.cameraMoveSpeed = value));
 
             y += 28.0f;
 
             MakeSlider(panel, "Sensitivity", "Sensitivity", y,
                 Config.Global.cameraRotationSensitivity, 0.25f, 3.0f,
-                value =>
-                {
-                    Config.Global.cameraRotationSensitivity = value;
-                    FPSCamera.Instance.SaveConfig();
-                });
+                value => Config.Global.Save(Config.Global.cameraRotationSensitivity = value));
 
             y += 28.0f;
 
-            MakeCheckbox(panel, "InvertYAxis", "Invert Y-Axis", y, Config.Global.invertYAxis,
-                value =>
-                {
-                    Config.Global.invertYAxis = value;
-                    FPSCamera.Instance.SaveConfig();
-                });
+            MakeCheckbox(panel, "invertRotateHorizontal", "Invert Horizontal Rotation", y,
+                         Config.Global.invertRotateHorizontal,
+                value => Config.Global.Save(Config.Global.invertRotateHorizontal = value));
+
+            y += 28.0f;
+            MakeCheckbox(panel, "invertRotateVertical", "Invert Vertical Rotation", y,
+                         Config.Global.invertRotateVertical,
+                value => Config.Global.Save(Config.Global.invertRotateVertical = value));
 
             y += 28.0f;
 
             MakeCheckbox(panel, "SnapToGround", "Snap to ground", y, Config.Global.snapToGround,
-               value =>
-               {
-                   Config.Global.snapToGround = value;
-                   FPSCamera.Instance.SaveConfig();
-               });
+                value => Config.Global.Save(Config.Global.snapToGround = value));
 
             y += 28.0f;
-
             MakeSlider(panel, "GroundDistance", "Ground distance", y,
-                Config.Global.groundOffset, 0.25f, 32.0f,
-                value =>
-                {
-                    Config.Global.groundOffset = value;
-                    FPSCamera.Instance.SaveConfig();
-                });
+                Config.Global.groundOffset, 1f, 10.0f,
+                value => Config.Global.Save(Config.Global.groundOffset = value));
 
             y += 28.0f;
-
-            MakeCheckbox(panel, "PreventGroundClipping", "Prevent ground clipping", y, Config.Global.preventClipGround,
-               value =>
-               {
-                   Config.Global.preventClipGround = value;
-                   FPSCamera.Instance.SaveConfig();
-               });
+            MakeCheckbox(panel, "PreventGroundClipping", "Prevent ground clipping", y,
+                Config.Global.preventClipGround,
+                value => Config.Global.Save(Config.Global.preventClipGround = value));
 
             y += 28.0f;
-
             MakeCheckbox(panel, "AnimatedTransitions", "Animated transitions", y, Config.Global.animateTransitions,
-               value =>
-                {
-                    Config.Global.animateTransitions = value;
-                    FPSCamera.Instance.SaveConfig();
-                });
+                value => Config.Global.Save(Config.Global.animateTransitions = value));
 
             y += 28.0f;
-
             MakeSlider(panel, "TransitionSpeed", "Transition speed", y,
                 Config.Global.animationSpeed, 0.1f, 4.0f,
-                value =>
-                {
-                    Config.Global.animationSpeed = value;
-                    FPSCamera.Instance.SaveConfig();
-                });
+                value => Config.Global.Save(Config.Global.animationSpeed = value));
 
             y += 28.0f;
-
             MakeSlider(panel, "VehicleXOffset", "Vehicle camera X offset", y, Config.Global.vehicleCameraOffsetX, -10f, 10.0f,
-                value =>
-                {
-                    Config.Global.vehicleCameraOffsetX = value;
-                    FPSCamera.Instance.SaveConfig();
-                });
+                value => Config.Global.Save(Config.Global.vehicleCameraOffsetX = value));
 
             y += 28.0f;
-
             MakeSlider(panel, "VehicleYOffset", "Vehicle camera Y offset", y, Config.Global.vehicleCameraOffsetY, -2f, 10.0f,
-                value =>
-                {
-                    Config.Global.vehicleCameraOffsetY = value;
-                    FPSCamera.Instance.SaveConfig();
-                });
-
+                value => Config.Global.Save(Config.Global.vehicleCameraOffsetY = value));
             y += 28.0f;
 
             MakeSlider(panel, "VehicleZOffset", "Vehicle camera Z offset", y, Config.Global.vehicleCameraOffsetZ, -10f, 10.0f,
-                value =>
-                {
-                    Config.Global.vehicleCameraOffsetZ = value;
-                    FPSCamera.Instance.SaveConfig();
-                });
-
+                value => Config.Global.Save(Config.Global.vehicleCameraOffsetZ = value));
             y += 28.0f;
 
             MakeCheckbox(panel, "DofEnabled", "DOF enabled", y, Config.Global.enableDOF,
-                value =>
-                {
-                    Config.Global.enableDOF = value;
-                    FPSCamera.Instance.SaveConfig();
-                });
-
+                value => Config.Global.Save(Config.Global.enableDOF = value));
             y += 28.0f;
 
 
-            if (FPSCamera.Instance.IsGameMode)
+            if (ModLoad.IsInGameMode)
             {
                 MakeCheckbox(panel, "AlwaysFrontVehicle", "Always go into front vehicle", y, Config.Global.alwaysFrontVehicle,
-                value =>
-                    {
-                        Config.Global.alwaysFrontVehicle = value;
-                        FPSCamera.Instance.SaveConfig();
-                    });
+                value => Config.Global.Save(Config.Global.alwaysFrontVehicle = value));
 
                 y += 28.0f;
 
                 MakeCheckbox(panel, "SpeedDisplay", "Speed Display in vehicle/citizen mode", y, Config.Global.displaySpeed,
-                value =>
-                    {
-                        Config.Global.displaySpeed = value;
-                        FPSCamera.Instance.SaveConfig();
-                    });
+                value => Config.Global.Save(Config.Global.displaySpeed = value));
 
                 y += 28.0f;
 
                 MakeCheckbox(panel, "ShowPassengers", "Show passenger count", y, Config.Global.showPassengerCount,
-                value =>
-                    {
-                        Config.Global.showPassengerCount = value;
-                        FPSCamera.Instance.SaveConfig();
-                    });
+                value => Config.Global.Save(Config.Global.showPassengerCount = value));
 
                 y += 28.0f;
 
                 MakeCheckbox(panel, "AllowMovementVehicleMode", "Allow movement in vehicle/ citizen mode", y, Config.Global.allowUserOffsetInVehicleCitizenMode,
-                   value =>
-                   {
-                       Config.Global.allowUserOffsetInVehicleCitizenMode = value;
-                       FPSCamera.Instance.SaveConfig();
-                   });
+                   value => Config.Global.Save(Config.Global.allowUserOffsetInVehicleCitizenMode = value));
 
                 y += 28.0f;
 
-                MakeCheckbox(panel, "ManualWalkthrough", "Manual switching in walkthrough- mode", y, Config.Global.walkthroughModeManual,
-                   value =>
-                   {
-                       Config.Global.walkthroughModeManual = value;
-                       FPSCamera.Instance.SaveConfig();
-                   });
+                MakeCheckbox(panel, "ManualWalkthrough", "Manual switching in walkthrough- mode", y, Config.Global.walkThruManualSwitch,
+                   value => Config.Global.Save(Config.Global.walkThruManualSwitch = value));
 
                 y += 28.0f;
-
+                // TODO: non-linear slider
                 MakeSlider(panel, "StayDuration", "Walkthrough stay duration", y,
                     Config.Global.walkthroughModeTimer, 10.0f, 60.0f,
-                    value =>
-                    {
-                        Config.Global.walkthroughModeTimer = value;
-                        FPSCamera.Instance.SaveConfig();
-                    });
+                    value => Config.Global.Save(Config.Global.walkthroughModeTimer = value));
 
                 y += 28.0f;
 
                 var walkthroughModeButton = MakeButton(panel, "WalkthroughModeButton", "Enter walkthrough mode", y,
-                    () =>
-                    {
-                        FPSCamera.Instance.EnterWalkthroughMode();
-                    });
+                    () => walkThruCallBack());
+
                 walkthroughModeButton.relativePosition = new Vector3(2.0f, y - 6.0f);
                 walkthroughModeButton.size = new Vector2(200.0f, 24.0f);
 
                 y += 28.0f;
             }
-
+            /* TODO: move to option menu
             var resetConfig = MakeButton(panel, "ResetConfigButton", "Reset configuration", y,
                     () =>
                     {
-                        FPSCamera.Instance.ResetConfig();
+                        Config.Global = new Config();
+                        Config.Global.Save();
+                        Reset();
+                        Show();
                     });
+            
 
             resetConfig.relativePosition = new Vector3(2.0f, y);
             resetConfig.size = new Vector2(200.0f, 24.0f);
+            */
         }
 
-        public void Show()
+        // TODO: check behavior
+        public void Activate()
         {
-            panel.isVisible = true;
+            cameraModeButton.Show();
+            cameraModeLabel.Hide();
         }
-
-        public void Hide()
+        public void Deactivate()
         {
+            cameraModeButton.Hide();
             panel.isVisible = false;
+
+            cameraModeLabel.text = String.Format(
+                    $"Press [{Config.Global.keyToggleFPSCam}] to switch off");
+            cameraModeLabel.color = new Color32(255, 255, 255, 255);
+            cameraModeLabel.AlignTo(cameraModeButton, UIAlignAnchor.BottomRight);
+            cameraModeLabel.relativePosition += new Vector3(-38.0f, -8.0f);
+            cameraModeLabel.Show();
         }
 
         private delegate void ButtonClicked();
@@ -539,9 +441,9 @@ namespace FPSCamera
             return slider;
         }
 
-        void OnDestroy()
+        private void OnDestroy()
         {
-            if (panel != null)
+            if (panel is object)
             {
                 Destroy(cameraModeButton.gameObject);
                 Destroy(cameraModeLabel.gameObject);
@@ -551,33 +453,40 @@ namespace FPSCamera
 
         private void OnGUI()
         {
-
             if (Event.current.type == EventType.KeyDown)
             {
                 if (waitingForChangeCameraHotkey)
                 {
                     waitingForChangeCameraHotkey = false;
                     var keycode = Event.current.keyCode;
-                    Config.Global.toggleFPSCameraHotkey = keycode;
+                    Config.Global.keyToggleFPSCam = keycode;
                     hotkeyToggleButton.text = keycode.ToString();
-                    FPSCamera.Instance.SaveConfig();
+                    Config.Global.Save();
                 }
                 else if (waitingForShowMouseHotkey)
                 {
                     waitingForShowMouseHotkey = false;
                     var keycode = Event.current.keyCode;
-                    Config.Global.showMouseHotkey = keycode;
+                    Config.Global.keySwitchCursorMode = keycode;
                     hotkeyShowMouseButton.text = keycode.ToString();
-                    FPSCamera.Instance.SaveConfig();
+                    Config.Global.Save();
                 }
                 else if (waitingForGoFasterHotkey)
                 {
                     waitingForGoFasterHotkey = false;
                     var keycode = Event.current.keyCode;
-                    Config.Global.goFasterHotKey = keycode;
+                    Config.Global.keyIncreaseSpeed = keycode;
                     hotkeyGoFasterButton.text = keycode.ToString();
-                    FPSCamera.Instance.SaveConfig();
+                    Config.Global.Save();
                 }
+            }
+
+            // fadeOut Label        
+            var color = cameraModeLabel.color;
+            if (color.a > 0)
+            {
+                --color.a;
+                cameraModeLabel.color = color;
             }
 
         }

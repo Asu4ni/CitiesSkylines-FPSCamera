@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-namespace FPSCamera
+namespace FPSCamMod
 {
-    static class UIHider
+    internal static class UIHider
     {
         public static void Hide()
         {

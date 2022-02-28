@@ -65,23 +65,25 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="HarmonyPatcher.cs" />
-    <Compile Include="UI\FPSCameraControlsOptionsUI.cs" />
-    <Compile Include="UI\FPSCameraSpeedUI.cs" />
+    <Compile Include="FPSUI\FPSCamOptionsUI.cs" />
+    <Compile Include="FPSUI\FPSCamInfoUI.cs" />
     <Compile Include="Utils\CitizenUT.cs" />
+    <Compile Include="Utils\ControlUT.cs" />
     <Compile Include="Utils\GeneralUT.cs" />
-    <Compile Include="Utils\CameraUT.cs" />
-    <Compile Include="InstanceCameras\CitizenCamera.cs" />
+    <Compile Include="Utils\CamUT.cs" />
+    <Compile Include="FPSCam\CitizenCam.cs" />
     <Compile Include="Config.cs" />
-    <Compile Include="FPSCamera.cs" />
-    <Compile Include="UI\FPSCameraUI.cs" />
-    <Compile Include="UI\GamePanelExtender.cs" />
-    <Compile Include="InstanceCameras\BaseCamera.cs" />
+    <Compile Include="FPSController.cs" />
+    <Compile Include="FPSUI\FPSCamUI.cs" />
+    <Compile Include="FPSUI\GamePanelExtender.cs" />
+    <Compile Include="FPSCam\FPSCam.cs" />
     <Compile Include="Log.cs" />
     <Compile Include="Mod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UI\UIHider.cs" />
+    <Compile Include="FPSUI\UIHider.cs" />
+    <Compile Include="Utils\IdUT.cs" />
     <Compile Include="Utils\Utils.cs" />
-    <Compile Include="InstanceCameras\VehicleCamera.cs" />
+    <Compile Include="FPSCam\VehicleCam.cs" />
     <Compile Include="Utils\VehicleUT.cs" />
   </ItemGroup>
   <ItemGroup>
