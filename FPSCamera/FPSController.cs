@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 using UnityStandardAssets.ImageEffects;
 
@@ -374,7 +373,6 @@ namespace FPSCamMod
             var speed = (isFreeCam ? Config.Global.cameraMoveSpeed : 1f) *
                         (ControlUT.KeyFaster ? Config.Global.goFasterSpeedMultiplier : 1f);
 
-            // TODO: add reset key for offset
             if (ControlUT.KeyForward) controlOffset.deltaPos += Vector3.forward;
             if (ControlUT.KeyBackward) controlOffset.deltaPos += Vector3.back;
             if (ControlUT.KeyLeft) controlOffset.deltaPos += Vector3.left;
@@ -421,7 +419,7 @@ namespace FPSCamMod
                     Utils.GetNextValueOfSmoothTransition(
                         camUnity.fieldOfView, targetFOV, Time.deltaTime, 1 / 3f, .5f, 5f)
                     : targetFOV;
-            // TODO: smooth transition
+            // TODO: smooth transition for all situation
             switch (state)
             {
             case State.freeCam:
@@ -465,6 +463,7 @@ namespace FPSCamMod
         private State state = State.idle;
 
         // state: exitFreeCam
+        // TODO: config to switch on/off
         private CamSetting transitionTarget;
 
         // state: follow

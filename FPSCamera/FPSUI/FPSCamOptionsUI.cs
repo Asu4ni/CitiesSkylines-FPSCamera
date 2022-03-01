@@ -10,65 +10,46 @@ namespace FPSCamMod
     {
         enum KeyCodeSelectType
         {
-            none,
-            forward,
-            back,
-            left,
-            right,
-            zoomIn,
-            zoomOut
+            none, forward, back, left, right, up, down
         }
-
-        public static bool misInGame = false;
-
-        private static KeyCodeSelectType keyCodeSelctMode = KeyCodeSelectType.none;
-
-        private UIButton forwardBtn;
-        private UIButton backBtn;
-        private UIButton leftBtn;
-        private UIButton rightBtn;
-        private UIButton zoomInBtn;
-        private UIButton zoomOutBtn;
 
         public void Update()
         {
-            if (keyCodeSelctMode != KeyCodeSelectType.none)
+            if (keyCodeSelctMode == KeyCodeSelectType.none) return;
+            KeyCode pressedKey = FindKeyPressed();
+            if (pressedKey != KeyCode.None && pressedKey != KeyCode.Mouse0)
             {
-                KeyCode pressedKey = FindKeyPressed();
-                if (pressedKey != KeyCode.None && pressedKey != KeyCode.Mouse0)
+                switch (keyCodeSelctMode)
                 {
-                    // TODO: organize
-                    switch (keyCodeSelctMode)
-                    {
-                    case KeyCodeSelectType.forward:
-                        forwardBtn.text = pressedKey.ToString();
-                        Config.Global.cameraMoveForward = pressedKey;
-                        break;
-                    case KeyCodeSelectType.back:
-                        backBtn.text = pressedKey.ToString();
-                        Config.Global.cameraMoveBackward = pressedKey;
-                        break;
-                    case KeyCodeSelectType.left:
-                        leftBtn.text = pressedKey.ToString();
-                        Config.Global.cameraMoveLeft = pressedKey;
-                        break;
-                    case KeyCodeSelectType.right:
-                        rightBtn.text = pressedKey.ToString();
-                        Config.Global.cameraMoveRight = pressedKey;
-                        break;
-                    case KeyCodeSelectType.zoomIn:
-                        zoomInBtn.text = pressedKey.ToString();
-                        Config.Global.cameraMoveUp = pressedKey;
-                        break;
-                    case KeyCodeSelectType.zoomOut:
-                        zoomOutBtn.text = pressedKey.ToString();
-                        Config.Global.cameraMoveDown = pressedKey;
-                        break;
-                    }
-                    Config.Global.Save();
+                case KeyCodeSelectType.forward:
+                    forwardBtn.text = pressedKey.ToString();
+                    Config.Global.cameraMoveForward = pressedKey;
+                    break;
+                case KeyCodeSelectType.back:
+                    backBtn.text = pressedKey.ToString();
+                    Config.Global.cameraMoveBackward = pressedKey;
+                    break;
+                case KeyCodeSelectType.left:
+                    leftBtn.text = pressedKey.ToString();
+                    Config.Global.cameraMoveLeft = pressedKey;
+                    break;
+                case KeyCodeSelectType.right:
+                    rightBtn.text = pressedKey.ToString();
+                    Config.Global.cameraMoveRight = pressedKey;
+                    break;
+                case KeyCodeSelectType.up:
+                    upBtn.text = pressedKey.ToString();
+                    Config.Global.cameraMoveUp = pressedKey;
+                    break;
+                case KeyCodeSelectType.down:
+                    downBtn.text = pressedKey.ToString();
+                    Config.Global.cameraMoveDown = pressedKey;
+                    break;
                 }
-                keyCodeSelctMode = KeyCodeSelectType.none;
+                Config.Global.Save();
             }
+            keyCodeSelctMode = KeyCodeSelectType.none;
+
         }
 
         public void GenerateSettings(UIHelperBase helper)
@@ -78,8 +59,8 @@ namespace FPSCamMod
             backBtn = AddKeymapping(controlGroup, "Backward Button", Config.Global.cameraMoveBackward, KeyCodeSelectType.back);
             leftBtn = AddKeymapping(controlGroup, "Left Button", Config.Global.cameraMoveLeft, KeyCodeSelectType.left);
             rightBtn = AddKeymapping(controlGroup, "Right Button", Config.Global.cameraMoveRight, KeyCodeSelectType.right);
-            zoomInBtn = AddKeymapping(controlGroup, "Zoom In Button", Config.Global.cameraMoveUp, KeyCodeSelectType.zoomIn);
-            zoomOutBtn = AddKeymapping(controlGroup, "Zoom Out Button", Config.Global.cameraMoveDown, KeyCodeSelectType.zoomOut);
+            upBtn = AddKeymapping(controlGroup, "Up Button", Config.Global.cameraMoveUp, KeyCodeSelectType.up);
+            downBtn = AddKeymapping(controlGroup, "Down Button", Config.Global.cameraMoveDown, KeyCodeSelectType.down);
         }
 
         private KeyCode FindKeyPressed()
@@ -122,5 +103,13 @@ namespace FPSCamMod
             button.text = "???";
         }
 
+        private KeyCodeSelectType keyCodeSelctMode = KeyCodeSelectType.none;
+
+        private UIButton forwardBtn;
+        private UIButton backBtn;
+        private UIButton leftBtn;
+        private UIButton rightBtn;
+        private UIButton upBtn;
+        private UIButton downBtn;
     }
 }

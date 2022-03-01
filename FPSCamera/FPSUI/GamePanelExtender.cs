@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace FPSCamMod
 {
+    //TODO: disable if not idle
     public class GamePanelExtender : MonoBehaviour
     {
         private bool initialized = false;
