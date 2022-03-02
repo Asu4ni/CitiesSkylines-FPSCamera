@@ -5,4 +5,5 @@
 
 Source code can be found on [url=https://github.com/Asu4ni/CitiesSkylines-FPSCamera]GitHub[/url].
 
-(TODO)
+I'd recommend that anyone with any bugs encountered, feature requests or techinical (code-related) questions posts them on GitHub as issues or discussions.
+The comment section below would be suitable for simple questions/problems, such as the way to use certain features or general feedbacks.
