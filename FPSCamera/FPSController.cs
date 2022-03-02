@@ -23,12 +23,6 @@ namespace FPSCamMod
             SwitchState(State.walkThru);
         }
 
-        private void StopFollowing()
-        {
-            camToFollow = null;
-            if (Config.Global.displaySpeed) camInfoUI.enabled = false;
-        }
-
         protected void Start()
         {
             camController = FindObjectOfType<CameraController>();
@@ -36,19 +30,7 @@ namespace FPSCamMod
             camDOF = camController.GetComponent<DepthOfField>();
             camTiltEffect = camController.GetComponent<TiltShiftEffect>();
 
-            // TODO: introduce UI Manager
-            mainUI = gameObject.AddComponent<FPSCamUI>();
-            mainUI.registerWalkThruCallBack(StartWalkThruMode);
-            camInfoUI = gameObject.AddComponent<FPSCamInfoUI>();
-            Log.Assert(camInfoUI is object, "adding FPSCamInfoUI failed");
-            if (ModLoad.IsInGameMode)
-            {
-                panelUI = gameObject.AddComponent<GamePanelExtender>();
-                Log.Assert(panelUI is object, "adding panelUI failed");
-                panelUI.registerFollowCallBack(StartFollow);
-            }
-
-            oFieldOfView = camUnity.fieldOfView;
+            oFieldOfView = camFOV;
             oMaxDistance = camController.m_maxDistance;
             if (camDOF is null) { Log.Msg("component Camera not found"); }
             else oDOFEnabled = camDOF.enabled;
@@ -57,6 +39,7 @@ namespace FPSCamMod
             camUnity.nearClipPlane = 1.0f;  // TODO: need restore while turn off?
 
             state = State.idle;
+            ResetUI();
         }
 
         private bool isIdle => state == State.idle;
@@ -85,12 +68,12 @@ namespace FPSCamMod
             {
             case State.idle: EnableFPSCam(); break;
             case State.freeCam:
-                if (Config.Global.animateTransitions && newState == State.idle)
+                if (Config.G.SmoothTransition && newState == State.idle)
                     newState = State.exitFreeCam;
                 break;
             case State.follow:
             case State.walkThru:
-                if (Config.Global.animateTransitions && newState == State.idle)
+                if (Config.G.SmoothTransition && newState == State.idle)
                     newState = State.exitFreeCam;
                 StopFollowing(); break;
             case State.exitFreeCam: break;
@@ -106,31 +89,38 @@ namespace FPSCamMod
             state = newState;
         }
 
+        private void StopFollowing()
+        {
+            camToFollow = null;
+            if (Config.G.ShowInfoPanel4Follow) followCamUI.enabled = false;
+        }
+
         private void EnableFPSCam()
         {
             Log.Msg("start FPS camera");
 
             transitionTarget = (CamSetting) camUnity.transform;
-            mainUI.Deactivate();
-            if (Config.Global.integrateHideUI) UIHider.Hide();
+            configPanelUI.OnCamActivate();
+            infoPanelUI.OnCamActivate();
+            if (Config.G.HideUIwhenActivate) UIUT.HideUI();
 
-            targetFOV = Config.Global.fieldOfView;
-
+            ResetCamLocal();
             camController.m_maxDistance = 50f;  // TODO: consider to remove
             camController.enabled = false;
 
-            if (camDOF) camDOF.enabled = Config.Global.enableDOF;
+            if (camDOF) camDOF.enabled = Config.G.EnableDOF;
             if (camTiltEffect) camTiltEffect.enabled = false;
         }
         private void DisableFPSCam()
         {
             Log.Msg("stop FPS camera");
 
-            mainUI.Activate();
-            if (Config.Global.integrateHideUI) UIHider.Show();
+            configPanelUI.OnCamDeactivate();
+            infoPanelUI.OnCamDeactivate();
+            if (Config.G.HideUIwhenActivate) UIUT.ShowUI();
 
             camController.enabled = true;
-            camUnity.fieldOfView = oFieldOfView;
+            camFOV = oFieldOfView;
             camController.m_maxDistance = oMaxDistance;
 
             if (camDOF) camDOF.enabled = oDOFEnabled;
@@ -154,7 +144,7 @@ namespace FPSCamMod
                 return;
             }
             ResetCamLocal();
-            if (Config.Global.displaySpeed) camInfoUI.SetAssociatedCam(camToFollow);
+            if (Config.G.ShowInfoPanel4Follow) followCamUI.SetAssociatedCam(camToFollow);
             Log.Msg($"start following UUID:{idToFollow}");
         }
         private void PrepareWalkThru() { SwitchTarget4WalkThru(); }
@@ -167,12 +157,12 @@ namespace FPSCamMod
         void ResetCamLocal()
         {
             userOffset = CamOffset.Identity;
-            targetFOV = Config.Global.fieldOfView;
+            targetFOV = Config.G.CamFieldOfView;
         }
 
         private bool SwitchTarget4WalkThru()    // return whether succeed
         {
-            walkThruTimer = Config.Global.walkthroughModeTimer;
+            walkThruTimer = Config.G.Period4WalkThru;
             idToFollow = GetWalkThruTarget();
             if (idToFollow.exists) PrepareFollowing();
             return idToFollow.exists;
@@ -193,6 +183,7 @@ namespace FPSCamMod
             return UUID.Empty;
         }
 
+        private float camFOV { get => camUnity.fieldOfView; set => camUnity.fieldOfView = value; }
         private Vector3 camPosition
         {
             get => camUnity.transform.position;
@@ -292,8 +283,8 @@ namespace FPSCamMod
             Log.Assert(state == State.walkThru,
                        "FPSController.UpdateWalkThru called at incorrect state.");
 
-            if (!Config.Global.walkThruManualSwitch) walkThruTimer -= Time.deltaTime;
-            if (camToFollow is null || (Config.Global.walkThruManualSwitch ?
+            if (!Config.G.ClickToSwitch4WalkThru) walkThruTimer -= Time.deltaTime;
+            if (camToFollow is null || (Config.G.ClickToSwitch4WalkThru ?
                                         ControlUT.MousePrimary : walkThruTimer <= 0.0f))
             {
                 Log.Msg("UpdateWalkThru: switching target");
@@ -305,10 +296,9 @@ namespace FPSCamMod
             }
         }
 
-        private CamSetting GetTargetSettingAfterUpdateFollowCam(CamOffset controlOffset)
+        private void UpdateFollowCam(CamOffset controlOffset)
         {
             const float heightMovementFactor = .1f;
-            const float fovX = 30f, fovY = 45f;
 
             if (camToFollow is object)
             {
@@ -316,52 +306,48 @@ namespace FPSCamMod
                 var setting = camToFollow.GetNextCamSetting();
                 if (camToFollow.isRunning)
                 {
+                    targetSetting = setting;
                     userOffset.deltaPos += CamUT.GetRotation(userOffset.deltaEulerXY)
                                            * controlOffset.deltaPos;
                     userOffset.deltaEulerXY += controlOffset.deltaEulerXY;
-                    userOffset.deltaEulerXY.x =
-                        Utils.ModulusClamp(userOffset.deltaEulerXY.x, -fovX, fovX, 360, -180);
-                    userOffset.deltaEulerXY.y =
-                        Utils.ModulusClamp(userOffset.deltaEulerXY.y, -fovY, fovY, 360, -180);
+                    userOffset.deltaEulerXY.x = Utils.ModulusClamp(userOffset.deltaEulerXY.x,
+                        -Config.G.MaxVertRotate4Follow, Config.G.MaxVertRotate4Follow, 360, -180);
+                    userOffset.deltaEulerXY.y = Utils.ModulusClamp(userOffset.deltaEulerXY.y,
+                        -Config.G.MaxHoriRotate4Follow, Config.G.MaxHoriRotate4Follow, 360, -180);
 
-                    setting.position += setting.rotation * userOffset.deltaPos;
-                    var euler = setting.rotation.eulerAngles;
-                    setting.rotation.eulerAngles =
+                    targetSetting.position += targetSetting.rotation * userOffset.deltaPos;
+                    var euler = targetSetting.rotation.eulerAngles;
+                    targetSetting.rotation.eulerAngles =
                         new Vector3(euler.x + userOffset.deltaEulerXY.x,
                                     euler.y + userOffset.deltaEulerXY.y, euler.z);
-                    return setting;
                 }
-                camToFollow = null;
+                else camToFollow = null;
             }
-            if (state != State.walkThru) SwitchState(State.idle);
-            return camSetting;  // remain the same
+            else if (state != State.walkThru) SwitchState(State.idle);
         }
-        private CamSetting GetTargetSettingAfterUpdateFreeCam(CamOffset controlOffset)
+        private void UpdateFreeCam(CamOffset controlOffset)
         {
-            const float fovX = 70f;
-
-            CamSetting setting = camSetting;
-            setting.position += setting.rotation * controlOffset.deltaPos;
-            var euler = setting.rotation.eulerAngles;
+            targetSetting.position += camSetting.rotation * controlOffset.deltaPos;
+            var euler = targetSetting.rotation.eulerAngles;
             euler.x = Utils.ModulusClamp(euler.x + controlOffset.deltaEulerXY.x,
-                                                -fovX, fovX, 360f, -180f);
+                            -Config.G.MaxVertRotate, Config.G.MaxVertRotate, 360f, -180f);
             euler.y += controlOffset.deltaEulerXY.y;
             euler.z = 0;
-            setting.rotation.eulerAngles = euler;
+            targetSetting.rotation.eulerAngles = euler;
 
-            if (Config.Global.snapToGround || Config.Global.preventClipGround)
+            if (Config.G.GroundClippingOption != Config.GroundClipping.None)
             {
-                var minHeight = GeneralUT.GetMinHeightAt(camPosition)
-                                + Config.Global.groundOffset * 3f;    // TODO: find suitable factor
-                if (Config.Global.snapToGround || camPosition.y < minHeight)
-                    setting.position.y = minHeight;
+                var minHeight = GameUT.GetMinHeightAt(camPosition) + Config.G.DistanceFromGround;
+                if (Config.G.GroundClippingOption == Config.GroundClipping.SnapToGround
+                    || camPosition.y < minHeight)
+                    targetSetting.position.y = minHeight;
             }
-            return setting;
         }
         private CamOffset GetControlOffsetAfterHandleInput()
         {
             if (ControlUT.KeyToggle || ControlUT.KeyEsc)
             {
+                if (ControlUT.KeyEsc) configPanelUI.onEsc();
                 if (isCamOn) SwitchState(State.idle);
                 else if (ControlUT.KeyToggle) StartFreeCam();
             }
@@ -370,8 +356,8 @@ namespace FPSCamMod
             if (ControlUT.KeyReset) ResetCamLocal();
 
             CamOffset controlOffset = CamOffset.Identity;
-            var speed = (isFreeCam ? Config.Global.cameraMoveSpeed : 1f) *
-                        (ControlUT.KeyFaster ? Config.Global.goFasterSpeedMultiplier : 1f);
+            var speed = (isFreeCam ? Config.G.MovementSpeed : 1f) *
+                        (ControlUT.KeyFaster ? Config.G.SpeedUpFactor : 1f);
 
             if (ControlUT.KeyForward) controlOffset.deltaPos += Vector3.forward;
             if (ControlUT.KeyBackward) controlOffset.deltaPos += Vector3.back;
@@ -382,32 +368,52 @@ namespace FPSCamMod
             controlOffset.deltaPos *= speed * Time.deltaTime;
 
             Cursor.visible =
-                isFreeCam && Config.Global.showCursorWhileFreeCam != ControlUT.KeySwitchCursor
-                || isFollowing && Config.Global.showCursorWhileFollow != ControlUT.KeySwitchCursor;
+                isFreeCam && Config.G.ShowCursorWhileFreeCam != ControlUT.KeySwitchCursor
+                || isFollowing && Config.G.ShowCursorWhileFollow != ControlUT.KeySwitchCursor;
 
 
+            // TODO: ensure rotateSensitivity factor 2f
             ref Vector2 delXY = ref controlOffset.deltaEulerXY;
             if (!Cursor.visible)
             {
-                delXY.y = ControlUT.MouseMoveHori * Config.Global.cameraRotationSensitivity;
-                delXY.x = -ControlUT.MouseMoveVert * Config.Global.cameraRotationSensitivity;
-                if (Config.Global.invertRotateHorizontal) delXY.y = -delXY.y;
-                if (Config.Global.invertRotateVertical) delXY.x = -delXY.x;
+                delXY.y = ControlUT.MouseMoveHori * Config.G.rotateSensitivity / 4f;
+                delXY.x = -ControlUT.MouseMoveVert * Config.G.rotateSensitivity / 4f;
+                if (Config.G.InvertRotateHorizontal) delXY.y = -delXY.y;
+                if (Config.G.InvertRotateVertical) delXY.x = -delXY.x;
             }
-
-            // TODO: ensure factor 2f
             if (ControlUT.KeyRotateL)
-                delXY.y -= Time.deltaTime * Config.Global.cameraRotationSensitivity * 2f;
+                delXY.y -= Time.deltaTime * Config.G.rotateSensitivity;
             if (ControlUT.KeyRotateR)
-                delXY.y += Time.deltaTime * Config.Global.cameraRotationSensitivity * 2f;
+                delXY.y += Time.deltaTime * Config.G.rotateSensitivity;
+            if (ControlUT.KeyRotateU)
+                delXY.x -= Time.deltaTime * Config.G.rotateSensitivity;
+            if (ControlUT.KeyRotateD)
+                delXY.x += Time.deltaTime * Config.G.rotateSensitivity;
 
             // TODO: ENSURE FACTOR
-            float maxFOV = 75f, minFOV = 10f, factor = 1.1f;
+            float factor = 1.1f;
             var scroll = ControlUT.MouseScroll;
-            if (scroll > 0f) { if (targetFOV > minFOV) targetFOV /= factor; }
-            else if (scroll < 0f && targetFOV < maxFOV) targetFOV *= factor;
+            if (scroll > 0f && targetFOV > Config.G.CamFieldOfView.Min) targetFOV /= factor;
+            else if (scroll < 0f && targetFOV < Config.G.CamFieldOfView.Max) targetFOV *= factor;
 
             return controlOffset;
+        }
+
+        internal void ResetUI()
+        {
+            if (configPanelUI is object) Destroy(configPanelUI);
+            if (followCamUI is object) Destroy(followCamUI);
+            if (infoPanelUI is object) Destroy(infoPanelUI);
+
+            // TODO: introduce UI Manager
+            configPanelUI = gameObject.AddComponent<ConfigPanelUI>();
+            configPanelUI.registerWalkThruCallBack(StartWalkThruMode);
+            followCamUI = gameObject.AddComponent<FolloCamUI>();
+            if (ModLoad.IsInGameMode)
+            {
+                infoPanelUI = gameObject.AddComponent<InfoPanelUI>();
+                infoPanelUI.registerFollowCallBack(StartFollow);
+            }
         }
 
         private void LateUpdate()
@@ -415,27 +421,35 @@ namespace FPSCamMod
             var controlOffset = GetControlOffsetAfterHandleInput();
             if (isIdle) return;
 
-            camUnity.fieldOfView = Config.Global.animateTransitions ?
-                    Utils.GetNextValueOfSmoothTransition(
-                        camUnity.fieldOfView, targetFOV, Time.deltaTime, 1 / 3f, .5f, 5f)
-                    : targetFOV;
-            // TODO: smooth transition for all situation
+            camFOV = Config.G.SmoothTransition ?
+                            CamUT.GetNextValueOfSmoothTransition(
+                                    camFOV, targetFOV, Time.deltaTime, 1 / 3f, .5f, 5f)
+                            : targetFOV;
+
+            CamSetting targetSetting = camSetting;
             switch (state)
             {
             case State.freeCam:
-                camSetting = GetTargetSettingAfterUpdateFreeCam(controlOffset); break;
+                UpdateFreeCam(controlOffset); break;
             case State.follow:
-                camSetting = GetTargetSettingAfterUpdateFollowCam(controlOffset); break;
+                UpdateFollowCam(controlOffset); break;
             case State.walkThru:
-                camSetting = GetTargetSettingAfterUpdateFollowCam(controlOffset);
+                UpdateFollowCam(controlOffset);
                 UpdateWalkThru(); break;
             case State.exitFreeCam:
-                if (Utils.AlmostSame(targetFOV, camUnity.fieldOfView)
-                    && camSetting == transitionTarget) SwitchState(State.idle);
-                else camSetting = CamUT.GetNextSettingOfSmoothTransition(
-                                        camSetting, transitionTarget, Time.deltaTime);
+                if (Utils.AlmostSame(targetFOV, camFOV)
+                    && camSetting == targetSetting) SwitchState(State.idle);
                 break;
             }
+            camSetting = Config.G.SmoothTransition ?
+                                CamUT.GetNextSettingOfSmoothTransition(
+                                        camSetting, targetSetting, Time.deltaTime)
+                                : targetSetting;
+            // TODO: better solution like using velocity?
+            // Following Cam requires instant movement
+            if (Config.G.SmoothTransition && isFollowing &&
+                     (targetSetting.position - camPosition).magnitude < 10f)
+                camPosition = targetSetting.position;
         }
 
         // TODO: expect to remove
@@ -450,21 +464,19 @@ namespace FPSCamMod
         private bool oTiltEffectEnabled;
 
         // UI
-        private FPSCamUI mainUI;
-        private FPSCamInfoUI camInfoUI;
-        private GamePanelExtender panelUI;
+        private ConfigPanelUI configPanelUI;
+        private FolloCamUI followCamUI;
+        private InfoPanelUI infoPanelUI;
 
         // local camera properties
         private CamOffset userOffset;
         private float targetFOV;
+        private CamSetting targetSetting;
 
         // state
         private enum State : byte { idle, freeCam, exitFreeCam, follow, walkThru }
         private State state = State.idle;
 
-        // state: exitFreeCam
-        // TODO: config to switch on/off
-        private CamSetting transitionTarget;
 
         // state: follow
         private UUID idToFollow;

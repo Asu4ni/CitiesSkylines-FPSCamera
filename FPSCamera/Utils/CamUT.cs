@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace FPSCamMod
 {
@@ -54,38 +55,49 @@ namespace FPSCamMod
         public static Quaternion GetRotation(Vector2 deltaAngles)
             => Quaternion.Euler(deltaAngles.x, deltaAngles.y, 0);
 
-        // TODO: use CamController.m_targetPosition
-        // TODO: also apply to following mode
+
+
+        public static float GetNextValueOfSmoothTransition(float value, float target,
+                                float elapsedTime, float reduceFactorPer10thSecond = .5f,
+                                float minDiff = 0f, float maxDiff = float.MaxValue)
+        {
+            var reduceFactor = Config.G.GetReduceFactor(elapsedTime);
+            var diff = Math.Abs(target - value);
+            if (diff < minDiff) return target;
+            else if (diff * reduceFactor > maxDiff) reduceFactor = maxDiff / diff;
+            else if (diff * reduceFactor < minDiff) reduceFactor = minDiff / diff;
+            return value + reduceFactor * (target - value);
+        }
         public static CamSetting GetNextSettingOfSmoothTransition(CamSetting from, CamSetting to, float elapsedTime)
         {
-            // intend to reduce the diff by defaultReduceFactor per 0.1s (unitTime)
-            const float unitTime = .1f;
-            const float defaultReduceFactor = 1f / 2;
             const float minMovement = 1f, maxMovement = 100f;
             const float minRotation = .5f, maxRotation = 10f;
 
             CamSetting result = default;
             {   // position
-                var reduceFactor = defaultReduceFactor * (elapsedTime / unitTime);
-                if (reduceFactor > 1f) reduceFactor = 1f;
+                var reduceFactor = Config.G.GetReduceFactor(elapsedTime);
 
                 var diff = Vector3.Distance(from.position, to.position);
-                if (diff < minMovement) reduceFactor = 1f;
-                else if (diff * reduceFactor > maxMovement) reduceFactor = maxMovement / diff;
-                else if (diff * reduceFactor < minMovement) reduceFactor = minMovement / diff;
-
-                result.position = Vector3.Lerp(from.position, to.position, reduceFactor);
+                if (diff < minMovement) result.position = to.position;
+                else
+                {
+                    if (diff * reduceFactor > maxMovement) reduceFactor = maxMovement / diff;
+                    else if (diff * reduceFactor < minMovement) reduceFactor = minMovement / diff;
+                    result.position = Vector3.Lerp(from.position, to.position, reduceFactor);
+                }
             }
             {   // rotation
-                var reduceFactor = defaultReduceFactor * (elapsedTime / unitTime);
+                var reduceFactor = Config.G.GetReduceFactor(elapsedTime); ;
                 if (reduceFactor > 1f) reduceFactor = 1f;
 
                 var diff = Quaternion.Angle(from.rotation, to.rotation);
-                if (diff < minRotation) reduceFactor = 1f;
-                else if (diff * reduceFactor > maxRotation) reduceFactor = maxRotation / diff;
-                else if (diff * reduceFactor < minRotation) reduceFactor = minRotation / diff;
-
-                result.rotation = Quaternion.Slerp(from.rotation, to.rotation, reduceFactor);
+                if (diff < minRotation) result.rotation = to.rotation;
+                else
+                {
+                    if (diff * reduceFactor > maxRotation) reduceFactor = maxRotation / diff;
+                    else if (diff * reduceFactor < minRotation) reduceFactor = minRotation / diff;
+                    result.rotation = Quaternion.Slerp(from.rotation, to.rotation, reduceFactor);
+                }
             }
             return result;
         }

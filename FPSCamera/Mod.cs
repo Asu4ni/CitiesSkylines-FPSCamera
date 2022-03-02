@@ -14,22 +14,22 @@ namespace FPSCamMod
         {
             if (camOptionsUI is null)
             {
-                camOptionsUI = new GameObject("FPSCameraControlsOptionsUI").AddComponent<FPSCamOptionsUI>();
+                camOptionsUI = new GameObject("FPSCameraControlsOptionsUI").AddComponent<OptionsUI>();
             }
             camOptionsUI.GenerateSettings(helper);
         }
         public void OnEnabled()
         {
             HarmonyHelper.DoOnHarmonyReady(() => HarmonyPatcher.Patch());
-            Config.Global = Config.Load() ?? Config.Global;
-            Config.Global.Save();
+            Config.G = Config.Load() ?? Config.G;
+            Config.G.Save();
         }
         public void OnDisabled()
         {
             if (HarmonyHelper.IsHarmonyInstalled) HarmonyPatcher.Unpatch();
         }
 
-        private FPSCamOptionsUI camOptionsUI = null;
+        private OptionsUI camOptionsUI = null;
     }
 
     public class ModLoad : LoadingExtensionBase

@@ -4,7 +4,7 @@ namespace FPSCamMod
 {
     internal class CitizenCam : FPSCam
     {
-        private readonly Vector3 camOffset = new Vector3(0f, 2f, 0f);
+        private const float camOffsetUp = 2f;
 
         public CitizenCam(UUID idToFollow) : base()
         {
@@ -27,15 +27,14 @@ namespace FPSCamMod
                 return vehicleCamera.GetDestinationStr();
 
             var citizen = FPSCitizen.Of(citizenID);
-            return GeneralUT.GetBuildingName(citizen.targetBuildingID)
-                   ?? GeneralUT.GetBuildingName(citizen.TargetID().Building)
+            return GameUT.GetBuildingName(citizen.targetBuildingID)
+                   ?? GameUT.GetBuildingName(citizen.TargetID().Building)
                    ?? unknownStr;
         }
         public override string GetDisplayInfoStr()
             => state == State.waiting && vehicleCamera is object ?
                     vehicleCamera.GetDisplayInfoStr() :
-                    GeneralUT.RaycastRoad(FPSCitizen.Of(citizenID).Position()) ?? unknownStr;
-
+                    $"At> {GameUT.RaycastRoad(FPSCitizen.Of(citizenID).Position()) ?? unknownStr}";
         public override CamSetting GetNextCamSetting()
         {
             var citizen = FPSCitizen.Of(citizenID);
@@ -77,7 +76,12 @@ namespace FPSCamMod
             }
 
             citizen.PositionRotation(out Vector3 position, out Quaternion rotation);
-            return new CamSetting(position + camOffset, rotation);
+
+            var offset = CamUT.GetOffset(rotation, Config.G.CitizenCamOffset.forward,
+                                                   Config.G.CitizenCamOffset.up + camOffsetUp,
+                                                   Config.G.CitizenCamOffset.right);
+
+            return new CamSetting(position + offset, rotation);
         }
 
         private CitizenID citizenID;

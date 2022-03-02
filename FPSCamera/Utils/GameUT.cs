@@ -2,7 +2,7 @@
 
 namespace FPSCamMod
 {
-    public static class GeneralUT
+    public static class GameUT
     {
         public static string GetBuildingName(BuildingID id)
             => BuildingManager.instance.GetBuildingName(id._id, default);
@@ -20,11 +20,8 @@ namespace FPSCamMod
         // TODO: investigate, sample point around for smoothness
         public static float GetMinHeightAt(Vector3 position)
         {
-            /* TODO: investigate
-             *   var offset = CameraController.CalculateCameraHeightOffset(position, 2);
-             *   return position.y + offset;
-             */
-            return Mathf.Max(GetTerrainLevel(position), GetWaterLevel(position));
+            const float defaultOffset = 2f;
+            return Mathf.Max(GetTerrainLevel(position), GetWaterLevel(position)) + defaultOffset;
         }
 
         private class Tool : ToolBase

@@ -12,18 +12,20 @@ namespace FPSCamMod
         public static float MouseScroll => Input.GetAxisRaw("Mouse ScrollWheel");  // +/i: up/down
 
         public static bool KeyEsc => Input.GetKeyDown(KeyCode.Escape);
-        public static bool KeyToggle => Input.GetKeyDown(Config.Global.keyToggleFPSCam);
-        public static bool KeyFaster => Input.GetKey(Config.Global.keyIncreaseSpeed);
-        public static bool KeySwitchCursor => Input.GetKey(Config.Global.keySwitchCursorMode);
+        public static bool KeyToggle => Input.GetKeyDown(Config.G.KeyToggleFPSCam);
+        public static bool KeyFaster => Input.GetKey(Config.G.KeySpeedUp);
+        public static bool KeySwitchCursor => Input.GetKey(Config.G.KeySwitchCursor);
 
-        public static bool KeyForward => Input.GetKey(Config.Global.cameraMoveForward);
-        public static bool KeyBackward => Input.GetKey(Config.Global.cameraMoveBackward);
-        public static bool KeyLeft => Input.GetKey(Config.Global.cameraMoveLeft);
-        public static bool KeyRight => Input.GetKey(Config.Global.cameraMoveRight);
-        public static bool KeyUp => Input.GetKey(Config.Global.cameraMoveUp);
-        public static bool KeyDown => Input.GetKey(Config.Global.cameraMoveDown);
-        public static bool KeyRotateL => Input.GetKey(Config.Global.cameraRotateLeft);
-        public static bool KeyRotateR => Input.GetKey(Config.Global.cameraRotateRight);
-        public static bool KeyReset => Input.GetKeyDown(Config.Global.cameraReset);
+        public static bool KeyForward => Input.GetKey(Config.G.KeyMoveForward);
+        public static bool KeyBackward => Input.GetKey(Config.G.KeyMoveBackward);
+        public static bool KeyLeft => Input.GetKey(Config.G.KeyMoveLeft);
+        public static bool KeyRight => Input.GetKey(Config.G.KeyMoveRight);
+        public static bool KeyUp => Input.GetKey(Config.G.KeyMoveUp);
+        public static bool KeyDown => Input.GetKey(Config.G.KeyMoveDown);
+        public static bool KeyRotateL => Input.GetKey(Config.G.KeyRotateLeft);
+        public static bool KeyRotateR => Input.GetKey(Config.G.KeyRotateRight);
+        public static bool KeyRotateU => Input.GetKey(Config.G.KeyRotateUp);
+        public static bool KeyRotateD => Input.GetKey(Config.G.KeyRotateDown);
+        public static bool KeyReset => Input.GetKeyDown(Config.G.KeyCamReset);
     }
 }
