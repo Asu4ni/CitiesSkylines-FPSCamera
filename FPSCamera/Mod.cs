@@ -14,7 +14,7 @@ namespace FPSCamMod
         {
             if (camOptionsUI is null)
             {
-                camOptionsUI = new GameObject("FPSCameraControlsOptionsUI").AddComponent<OptionsUI>();
+                camOptionsUI = new GameObject("FPSCameraControlsOptionsUI").AddComponent<OptionsMenuUI>();
             }
             camOptionsUI.GenerateSettings(helper);
         }
@@ -29,7 +29,7 @@ namespace FPSCamMod
             if (HarmonyHelper.IsHarmonyInstalled) HarmonyPatcher.Unpatch();
         }
 
-        private OptionsUI camOptionsUI = null;
+        private OptionsMenuUI camOptionsUI = null;
     }
 
     public class ModLoad : LoadingExtensionBase

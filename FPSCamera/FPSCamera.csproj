@@ -65,8 +65,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="HarmonyPatcher.cs" />
-    <Compile Include="FPSUI\OptionsUI.cs" />
-    <Compile Include="FPSUI\FolloCamUI.cs" />
+    <Compile Include="UI\OptionsMenuUI.cs" />
+    <Compile Include="UI\FollowCamUI.cs" />
     <Compile Include="Utils\CitizenUT.cs" />
     <Compile Include="Utils\ControlUT.cs" />
     <Compile Include="Utils\GameUT.cs" />
@@ -74,8 +74,8 @@
     <Compile Include="FPSCam\CitizenCam.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="FPSController.cs" />
-    <Compile Include="FPSUI\ConfigPanelUI.cs" />
-    <Compile Include="FPSUI\InfoPanelUI.cs" />
+    <Compile Include="UI\ConfigPanelUI.cs" />
+    <Compile Include="UI\InfoPanelUI.cs" />
     <Compile Include="FPSCam\FPSCam.cs" />
     <Compile Include="Log.cs" />
     <Compile Include="Mod.cs" />

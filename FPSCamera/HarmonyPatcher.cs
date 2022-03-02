@@ -2,6 +2,7 @@
 
 namespace FPSCamMod
 {
+    // TODO: integrate ... or not? use pathcing instead of Unity system?
     internal static class HarmonyPatcher
     {
         private const string HarmonyId = "v2.FPSCamera";

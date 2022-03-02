@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace FPSCamMod
 {
-    public class FolloCamUI : MonoBehaviour
+    public class FollowCamUI : MonoBehaviour
     {
         private const string missingText = "---";
 
@@ -31,7 +31,7 @@ namespace FPSCamMod
             var width = (float) Screen.width;
             var height = Mathf.Max(Screen.height * .18f, 50f);
 
-            GUI.color = new Color(0f, 0f, .2f, .6f);
+            GUI.color = new Color(0f, 0f, .2f, .8f);
             GUI.Box(new Rect(0f, -10f, width, height + 10f), "");
             GUI.color = Color.white;
 
@@ -39,8 +39,8 @@ namespace FPSCamMod
                         * (Config.G.UseMetricUnit ? 1.666f : 1.035f);
 
             var style = new GUIStyle();
-            style.fontSize = (int) Mathf.Clamp(width * .015f, 8f, Mathf.Max(height * .2f, 12f));
-            style.normal.textColor = new Color(.8f, .8f, 1f);
+            style.fontSize = (int) Mathf.Clamp(width * .016f, 8f, Mathf.Max(height * .2f, 12f));
+            style.normal.textColor = new Color(.9f, .9f, 1f);
             var blockWidth = width / 3f;
             var margin = Mathf.Clamp(width * .01f, style.fontSize, style.fontSize * 4f);
 

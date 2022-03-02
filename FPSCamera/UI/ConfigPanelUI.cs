@@ -8,7 +8,7 @@ namespace FPSCamMod
     // TODO: expanding side of: panel, label
     public class ConfigPanelUI : MonoBehaviour
     {
-        private static readonly Color32 textColor = new Color32(201, 200, 240, 255);
+        private static readonly Color32 textColor = new Color32(221, 220, 250, 255);
         private ConfigPanelUI()
         {
             var uiView = FindObjectOfType<UIView>();
@@ -47,61 +47,33 @@ namespace FPSCamMod
 
             var y = 20f;
 
-            AddCheckbox(Config.G.HideUIwhenActivate, mainPanel,
-                                "HideUI", "Hide UI when activated", ref y);
-            AddSlider(Config.G.CamFieldOfView, mainPanel,
-                                "FieldOfView", "Field of view", ref y, 1f, "F0");
-            AddSlider(Config.G.rotateSensitivity, mainPanel,
-                                "RotateSensitivity", "Camera Rotation Sensitivity", ref y, .25f);
-            y += 10;
-            AddSlider(Config.G.MovementSpeed, mainPanel,
-                                "MovementSpeed", "Camera Movement speed", ref y, 1f, "F0");
-            AddSlider(Config.G.SpeedUpFactor, mainPanel,
-                                "SpeedUpFactor", "Speed up factor", ref y, .25f);
-            y += 10;
-            AddCheckbox(Config.G.SmoothTransition, mainPanel,
-                                "SmoothTransition", "Smooth transition", ref y);
-            AddSlider(Config.G.TransitionSpeed, mainPanel,
-                                "TransitionSpeed", "Transition speed", ref y, 1f, "F0");
-            y += 10;
-            AddDropDown(Config.G.GroundClippingOption, mainPanel,
-                                "GroundClipping", "Ground Clipping Mode", ref y);
-            AddSlider(Config.G.DistanceFromGround, mainPanel,
-                                "DistanceFromGround", "Distance from Ground", ref y);
-            /* TODO: move to option
-            AddCheckbox(Config.G.InvertRotateHorizontal, mainPanel,
-                                "InvertRotateHorizontal", "Invert Horizontal Rotation", ref y);
-            AddCheckbox(Config.G.InvertRotateVertical, mainPanel,
-                                "InvertRotateVertical", "Invert Vertical Rotation", ref y);
-            AddSlider(Config.G.VehicleCamOffset.forward, mainPanel,
-                            "VehicleOffsetF", "Vehicle Cam Offset: forward", ref y);
-            AddSlider(Config.G.VehicleCamOffset.up, mainPanel,
-                            "VehicleOffsetU", "Vehicle Cam Offset: up", ref y);
-            AddSlider(Config.G.VehicleCamOffset.right, mainPanel,
-                            "VehicleOffsetR", "Vehicle Cam Offset: right", ref y);
-            AddSlider(Config.G.CitizenCamOffset.forward, mainPanel,
-                            "CitizenOffsetF", "Citizen Cam Offset: forward", ref y);
-            AddSlider(Config.G.CitizenCamOffset.up, mainPanel,
-                            "CitizenOffsetU", "Citizen Cam Offset: up", ref y);
-            AddSlider(Config.G.CitizenCamOffset.right, mainPanel,
-                            "CitizenOffsetR", "Citizen Cam Offset: right", ref y);
-            */
-            y += 10;
+            AddCheckbox(Config.G.HideUIwhenActivate, mainPanel, ref y);
+            AddSlider(Config.G.CamFieldOfView, mainPanel, ref y, 1f, "F0");
+            AddSlider(Config.G.rotateSensitivity, mainPanel, ref y, .25f);
+            y += 15f;
+            AddSlider(Config.G.MovementSpeed, mainPanel, ref y, 1f, "F0");
+            AddSlider(Config.G.SpeedUpFactor, mainPanel, ref y, .25f);
+            y += 15f;
+            AddCheckbox(Config.G.SmoothTransition, mainPanel, ref y);
+            AddSlider(Config.G.TransitionSpeed, mainPanel, ref y, 1f, "F0");
+            y += 15f;
+            AddDropDown(Config.G.GroundClippingOption, mainPanel, ref y);
+            AddSlider(Config.G.DistanceFromGround, mainPanel, ref y);
+
             if (ModLoad.IsInGameMode)
             {   // TODO: organize, text field or slider ?
-                AddCheckbox(Config.G.StickToFrontVehicle, mainPanel,
-                                "StickToFrontVehicle", "Stick to front vehicle", ref y);
-                AddCheckbox(Config.G.ShowInfoPanel4Follow, mainPanel,
-                                "ShowInfoPanel", "Display Info panel while following", ref y);
-                y += 5;
-                AddCheckbox(Config.G.ClickToSwitch4WalkThru, mainPanel,
-                                "ClickToSwitch", "Switch target manually (Mouse Click)", ref y);
-                AddSlider(Config.G.Period4WalkThru, mainPanel,
-                                "PeriodWalkThru", "Period (in seconds)", ref y, 1f, "F0");
+                y += 15;
+                AddCheckbox(Config.G.StickToFrontVehicle, mainPanel, ref y);
+                AddCheckbox(Config.G.ShowInfoPanel4Follow, mainPanel, ref y);
+                y += 15;
+                AddCheckbox(Config.G.ClickToSwitch4WalkThru, mainPanel, ref y);
+                AddSlider(Config.G.Period4WalkThru, mainPanel, ref y, 1f, "F0");
+                mainPanel.height = y + 80f;
 
-                walkThruBtn = AddWalkThruButton("WalkThruButton", "Start Walk-Through", mainPanel, ref y,
-                                        () => walkThruCallBack());
+                walkThruBtn = AddWalkThruButton("WalkThruButton", "Start Walk-Through", mainPanel,
+                                                () => walkThruCallBack());
             }
+            else mainPanel.height = y + 20f;
         }
 
         private UIPanel AddPanel(string name, UIView view, Vector2 size, float posX = 0f, float posY = 0f)
@@ -129,7 +101,10 @@ namespace FPSCamMod
 
             toggleHintLabel.color = new Color32(255, 255, 255, 255);
             toggleHintLabel.AlignTo(uiSwitchBtn, UIAlignAnchor.BottomRight);
-            toggleHintLabel.relativePosition += new Vector3(-uiSwitchBtn.width,
+
+            toggleHintLabel.relativePosition += new Vector3(
+                    uiSwitchBtn.absolutePosition.x > Screen.width / 2f ?
+                        -uiSwitchBtn.width : toggleHintLabel.width + 3f,
                     (toggleHintLabel.height - uiSwitchBtn.height) / 2f + 3f);
             toggleHintLabel.Show();
         }
@@ -163,25 +138,24 @@ namespace FPSCamMod
                     new Vector2(Config.G.CamUIOffset.right, Config.G.CamUIOffset.up);
             else
             {
-                // TODO: why ESC
                 UIComponent escbutton = parentView.FindUIComponent("Esc");
                 button.relativePosition = new Vector2(
-                        escbutton.relativePosition.x + 4f,
-                        escbutton.relativePosition.y + button.height * 2f
+                        escbutton.relativePosition.x,
+                        escbutton.relativePosition.y + escbutton.height * 2f
                 );
             }
             return button;
         }
 
         private delegate void ButtonClicked();
-        private static UIButton AddWalkThruButton(string name, string text, UIPanel panel, ref float y,
-                                          ButtonClicked onClick)
+        private static UIButton AddWalkThruButton(string name, string text, UIPanel panel,
+                                                  ButtonClicked onClick)
         {
             var button = panel.AddUIComponent<UIButton>();
             button.name = name;
             button.text = text;
             button.size = new Vector2(240f, 40f);
-            button.relativePosition = new Vector3(80f, panel.height - button.height - 5f);
+            button.relativePosition = new Vector3(80f, panel.height - button.height - 25f);
             button.normalBgSprite = "ButtonMenu";
             button.disabledBgSprite = "ButtonMenuDisabled";
             button.hoveredBgSprite = "ButtonMenuHovered";
@@ -191,18 +165,16 @@ namespace FPSCamMod
             button.disabledTextColor = new Color32(120, 120, 140, 255);
             button.disabledColor = new Color32(0, 0, 255, 255);
             button.textColor = textColor;
-            y = button.relativePosition.y + button.height;
             return button;
         }
 
         // TODO: add tooltip, ensure necessity of all field assignments
-        private static UICheckBox AddCheckbox(
-                ConfigData<bool> value, UIPanel panel, string name, string text, ref float y)
+        private static UICheckBox AddCheckbox(ConfigData<bool> value, UIPanel panel, ref float y)
         {
             var checkbox = panel.AddUIComponent<UICheckBox>();
-            checkbox.name = name + "Box";
+            checkbox.name = value.Name + "Box";
             checkbox.size = new Vector2(20f, 20f);
-            checkbox.relativePosition = new Vector3(8f, y + checkbox.height / 2f - 1.5f);
+            checkbox.relativePosition = new Vector3(5f, y + checkbox.height / 2f - 1.5f);
             checkbox.isVisible = true;
             checkbox.canFocus = true;
             checkbox.isInteractive = true;
@@ -223,26 +195,27 @@ namespace FPSCamMod
             checkbox.checkedBoxObject = checkSprite;
 
             var label = panel.AddUIComponent<UILabel>();
-            label.name = name + "Label";
-            label.text = text;
+            label.name = value.Name + "Label";
+            label.text = value.Description;
             label.textColor = textColor;
             label.relativePosition = new Vector3(checkbox.relativePosition.x
-                                                    + checkbox.width + 12f, y);
+                                                    + checkbox.width + 20f, y);
+            label.eventClick += (component, param) => checkbox.SimulateClick();
             y += 30f;
             return checkbox;
         }
-        private static UISlider AddSlider(
-                CfFloat value, UIPanel panel, string name, string text,
+        private static UISlider AddSlider(CfFloat value, UIPanel panel,
                 ref float y, float stepSize = 0.25f, string valueFormat = "F2")
         {
             var label = panel.AddUIComponent<UILabel>();
-            label.name = name + "Label";
-            label.text = text;
-            label.relativePosition = new Vector3(10f, y);
+            label.name = value.Name + "Label";
+            label.text = value.Description;
             label.textColor = textColor;
-            y += 30f;
+            label.relativePosition = new Vector3(15f, y);
+
+            y += 25f;
             var slider = panel.AddUIComponent<UISlider>();
-            slider.name = name + "Slider";
+            slider.name = value.Name + "Slider";
             slider.minValue = value.Min;
             slider.maxValue = value.Max;
             slider.stepSize = stepSize;
@@ -263,7 +236,7 @@ namespace FPSCamMod
             slider.isInteractive = true;
 
             var valueLabel = panel.AddUIComponent<UILabel>();
-            valueLabel.name = name + "ValueLabel";
+            valueLabel.name = value.Name + "ValueLabel";
             valueLabel.text = slider.value.ToString(valueFormat);
             valueLabel.relativePosition = new Vector3(350.0f, y);
             valueLabel.textColor = textColor;
@@ -277,16 +250,16 @@ namespace FPSCamMod
             return slider;
         }
         private static UIDropDown AddDropDown<EnumType>(
-                ConfigData<EnumType> value, UIPanel panel, string name, string text, ref float y)
-                        where EnumType : Enum
+                ConfigData<EnumType> value, UIPanel panel, ref float y) where EnumType : Enum
         {
             var label = panel.AddUIComponent<UILabel>();
-            label.name = name + "Label";
-            label.text = text;
-            label.relativePosition = new Vector3(10f, y + 3f);
+            label.name = value.Name + "Label";
+            label.text = value.Description;
+            label.textColor = textColor;
+            label.relativePosition = new Vector3(15f, y);
 
             var dropdown = panel.AddUIComponent<UIDropDown>();
-            dropdown.relativePosition = new Vector3(210f, y);
+            dropdown.relativePosition = new Vector3(210f, y - 6f);
             dropdown.isVisible = true;
             dropdown.canFocus = true;
             dropdown.isInteractive = true;
@@ -343,7 +316,7 @@ namespace FPSCamMod
             return dragComp;
         }
 
-        internal void onEsc() => mainPanel.enabled = false;
+        internal void OnEsc() => mainPanel.enabled = false;
 
         void LateUpdate()
         {

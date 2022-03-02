@@ -7,7 +7,7 @@ namespace FPSCamMod
 {
     // TODO: add Reset Config Button
     // TODO: add x button to cancel the binding or disrupt
-    public class OptionsUI : MonoBehaviour
+    public class OptionsMenuUI : MonoBehaviour
     {
         enum KeyCodeSelectType
         {

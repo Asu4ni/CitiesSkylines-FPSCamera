@@ -99,7 +99,7 @@ namespace FPSCamMod
         {
             Log.Msg("start FPS camera");
 
-            transitionTarget = (CamSetting) camUnity.transform;
+            targetSetting = originalSetting = CamSetting;
             configPanelUI.OnCamActivate();
             infoPanelUI.OnCamActivate();
             if (Config.G.HideUIwhenActivate) UIUT.HideUI();
@@ -152,6 +152,7 @@ namespace FPSCamMod
         {
             Log.Msg("FPSController: transition to exit FreeCam");
             targetFOV = oFieldOfView;
+            targetSetting = originalSetting;
         }
 
         void ResetCamLocal()
@@ -184,20 +185,20 @@ namespace FPSCamMod
         }
 
         private float camFOV { get => camUnity.fieldOfView; set => camUnity.fieldOfView = value; }
-        private Vector3 camPosition
+        private Vector3 CamPosition
         {
             get => camUnity.transform.position;
             set => camUnity.transform.position = value;
         }
-        private Quaternion camRotation
+        private Quaternion CamRotation
         {
             get => camUnity.transform.rotation;
             set => camUnity.transform.rotation = value;
         }
-        private CamSetting camSetting
+        private CamSetting CamSetting
         {
-            get => new CamSetting(camPosition, camRotation);
-            set { camPosition = value.position; camRotation = value.rotation; }
+            get => new CamSetting(CamPosition, CamRotation);
+            set { CamPosition = value.position; CamRotation = value.rotation; }
         }
 
         private ushort GetRandomVehicle()
@@ -298,7 +299,7 @@ namespace FPSCamMod
 
         private void UpdateFollowCam(CamOffset controlOffset)
         {
-            const float heightMovementFactor = .1f;
+            const float heightMovementFactor = .2f;
 
             if (camToFollow is object)
             {
@@ -327,7 +328,7 @@ namespace FPSCamMod
         }
         private void UpdateFreeCam(CamOffset controlOffset)
         {
-            targetSetting.position += camSetting.rotation * controlOffset.deltaPos;
+            targetSetting.position += CamSetting.rotation * controlOffset.deltaPos;
             var euler = targetSetting.rotation.eulerAngles;
             euler.x = Utils.ModulusClamp(euler.x + controlOffset.deltaEulerXY.x,
                             -Config.G.MaxVertRotate, Config.G.MaxVertRotate, 360f, -180f);
@@ -337,9 +338,9 @@ namespace FPSCamMod
 
             if (Config.G.GroundClippingOption != Config.GroundClipping.None)
             {
-                var minHeight = GameUT.GetMinHeightAt(camPosition) + Config.G.DistanceFromGround;
+                var minHeight = GameUT.GetMinHeightAt(CamPosition) + Config.G.DistanceFromGround;
                 if (Config.G.GroundClippingOption == Config.GroundClipping.SnapToGround
-                    || camPosition.y < minHeight)
+                    || CamPosition.y < minHeight)
                     targetSetting.position.y = minHeight;
             }
         }
@@ -347,7 +348,7 @@ namespace FPSCamMod
         {
             if (ControlUT.KeyToggle || ControlUT.KeyEsc)
             {
-                if (ControlUT.KeyEsc) configPanelUI.onEsc();
+                if (ControlUT.KeyEsc) configPanelUI.OnEsc();
                 if (isCamOn) SwitchState(State.idle);
                 else if (ControlUT.KeyToggle) StartFreeCam();
             }
@@ -408,7 +409,7 @@ namespace FPSCamMod
             // TODO: introduce UI Manager
             configPanelUI = gameObject.AddComponent<ConfigPanelUI>();
             configPanelUI.registerWalkThruCallBack(StartWalkThruMode);
-            followCamUI = gameObject.AddComponent<FolloCamUI>();
+            followCamUI = gameObject.AddComponent<FollowCamUI>();
             if (ModLoad.IsInGameMode)
             {
                 infoPanelUI = gameObject.AddComponent<InfoPanelUI>();
@@ -421,12 +422,7 @@ namespace FPSCamMod
             var controlOffset = GetControlOffsetAfterHandleInput();
             if (isIdle) return;
 
-            camFOV = Config.G.SmoothTransition ?
-                            CamUT.GetNextValueOfSmoothTransition(
-                                    camFOV, targetFOV, Time.deltaTime, 1 / 3f, .5f, 5f)
-                            : targetFOV;
 
-            CamSetting targetSetting = camSetting;
             switch (state)
             {
             case State.freeCam:
@@ -438,18 +434,34 @@ namespace FPSCamMod
                 UpdateWalkThru(); break;
             case State.exitFreeCam:
                 if (Utils.AlmostSame(targetFOV, camFOV)
-                    && camSetting == targetSetting) SwitchState(State.idle);
+                    && CamSetting == targetSetting) SwitchState(State.idle);
                 break;
             }
-            camSetting = Config.G.SmoothTransition ?
-                                CamUT.GetNextSettingOfSmoothTransition(
-                                        camSetting, targetSetting, Time.deltaTime)
-                                : targetSetting;
-            // TODO: better solution like using velocity?
-            // Following Cam requires instant movement
-            if (Config.G.SmoothTransition && isFollowing &&
-                     (targetSetting.position - camPosition).magnitude < 10f)
-                camPosition = targetSetting.position;
+
+            if (Config.G.SmoothTransition)
+            {
+                var distance = Vector3.Distance(targetSetting.position, CamPosition);
+                if (distance > Config.G.GiveUpDistance)
+                {
+                    // TODO: fade out fade in
+                    CamSetting = targetSetting; camFOV = targetFOV;
+                }
+                else
+                {
+                    var reduceFactor = Config.G.GetReduceFactor(Time.deltaTime);
+                    CamPosition = distance < Config.G.InstantMoveMax ?
+                                  targetSetting.position :
+                                  GameUT.GetNextPosFromSmoothTrans(
+                                            CamPosition, targetSetting.position, reduceFactor,
+                                            Config.G.DeltaPosMin, Config.G.DeltaPosMax);
+                    CamRotation = GameUT.GetNextQuatFromSmoothTrans(
+                                            CamRotation, targetSetting.rotation, reduceFactor,
+                                            Config.G.DeltaRotateMin, Config.G.DeltaRotateMax);
+                    camFOV = GameUT.GetNextFloatFromSmoothTrans(
+                                            camFOV, targetFOV, reduceFactor, 1f, 5f);
+                }
+            }
+            else { CamSetting = targetSetting; camFOV = targetFOV; }
         }
 
         // TODO: expect to remove
@@ -465,13 +477,13 @@ namespace FPSCamMod
 
         // UI
         private ConfigPanelUI configPanelUI;
-        private FolloCamUI followCamUI;
+        private FollowCamUI followCamUI;
         private InfoPanelUI infoPanelUI;
 
         // local camera properties
         private CamOffset userOffset;
         private float targetFOV;
-        private CamSetting targetSetting;
+        private CamSetting targetSetting, originalSetting;
 
         // state
         private enum State : byte { idle, freeCam, exitFreeCam, follow, walkThru }

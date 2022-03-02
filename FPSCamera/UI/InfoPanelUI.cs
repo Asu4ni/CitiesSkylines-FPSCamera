@@ -6,7 +6,7 @@ namespace FPSCamMod
     //TODO: disable if not idle
     internal class InfoPanelUI : MonoBehaviour
     {
-        private static readonly Vector3 cameraButtonOffset = new Vector3(-8f, 36f, 0f);
+        private static readonly Vector3 cameraButtonOffset = new Vector3(-4f, -20f, 0f);
         private const int cameraButtonSize = 30;
 
         internal void registerFollowCallBack(System.Action<UUID> callBackAction)
