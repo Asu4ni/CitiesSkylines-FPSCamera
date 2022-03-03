@@ -2,7 +2,7 @@
 
 > This is an updated version for [First Person Camera: Updated](https://steamcommunity.com/sharedfiles/filedetails/?id=650805785) by tony56a
 
-![First Person Camera mod banner](/image/banner.svg)
+![First Person Camera mod banner](/images/banner.svg)
 
 ### Quick Start Guide 
 > The following instructions are based on DEFAULT setting.
