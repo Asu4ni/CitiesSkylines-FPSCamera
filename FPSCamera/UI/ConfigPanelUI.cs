@@ -263,7 +263,7 @@ namespace FPSCamMod
             dropdown.isVisible = true;
             dropdown.canFocus = true;
             dropdown.isInteractive = true;
-            dropdown.size = new Vector2(180f, 30f);
+            dropdown.size = new Vector2(180f, 30f); // TODO: width adjustment
             dropdown.itemHeight = 26;
             dropdown.itemHover = "ListItemHover";
             dropdown.itemHighlight = "OptionsDropboxDisabled";

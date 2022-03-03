@@ -9,15 +9,15 @@
 - Enable the mod in Content Manager
 
  
-- After the game/editor starts, press "BackQuote"[`] (to the left of "1") to toggle Free Camera Mode.
-- In Free Camera Mode, use mouse to rotate camera, "W/A/S/D" keys to move horizontally, and "PgUp/PgDn" to move vertically.
+- After the game/editor starts, press \` "BackQuote" (to the left of "1") to toggle Free-Camera Mode.
+- In Free-Camera Mode, use mouse to rotate camera, "W/A/S/D" keys to move horizontally, and "PgUp/PgDn" to move vertically.
 - Use "Esc" or "BackQuote" to exit the mode.
 
 ---
-- After clicking on any citizen, tourist, or driving vehicles, click on the button with a camera icon at the buttom left of the Info panel to enter Follow Mode.
+- After clicking on any citizen, tourist, or driving vehicles, click on the button with a camera icon at the bottom right of the Info panel to enter Follow Mode.
 - In Follow Mode, the camera follows the view of the selected person/vehicle.
-- As in Free Camera Mode, use keys to move around.
-- In order to look around (rotate camera), move the mouse while hold "Left Ctrl".
+- As in Free-Camera Mode, use keys to move around.
+- In order to look around (rotate camera), move the mouse while holding down "Left Ctrl".
 - Use "Esc" or "BackQuote" to exit the mode.
 
 ---
