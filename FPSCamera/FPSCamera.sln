@@ -8,25 +8,13 @@ EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
-		Debug-3.5|Any CPU = Debug-3.5|Any CPU
-		Debug-4.7.1|Any CPU = Debug-4.7.1|Any CPU
 		Release|Any CPU = Release|Any CPU
-		Release-3.5|Any CPU = Release-3.5|Any CPU
-		Release-4.7.1|Any CPU = Release-4.7.1|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{72C99E7C-C11B-4669-90ED-0944DE5B9085}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{72C99E7C-C11B-4669-90ED-0944DE5B9085}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{72C99E7C-C11B-4669-90ED-0944DE5B9085}.Debug-3.5|Any CPU.ActiveCfg = Debug|Any CPU
-		{72C99E7C-C11B-4669-90ED-0944DE5B9085}.Debug-3.5|Any CPU.Build.0 = Debug|Any CPU
-		{72C99E7C-C11B-4669-90ED-0944DE5B9085}.Debug-4.7.1|Any CPU.ActiveCfg = Debug|Any CPU
-		{72C99E7C-C11B-4669-90ED-0944DE5B9085}.Debug-4.7.1|Any CPU.Build.0 = Debug|Any CPU
 		{72C99E7C-C11B-4669-90ED-0944DE5B9085}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{72C99E7C-C11B-4669-90ED-0944DE5B9085}.Release|Any CPU.Build.0 = Release|Any CPU
-		{72C99E7C-C11B-4669-90ED-0944DE5B9085}.Release-3.5|Any CPU.ActiveCfg = Release|Any CPU
-		{72C99E7C-C11B-4669-90ED-0944DE5B9085}.Release-3.5|Any CPU.Build.0 = Release|Any CPU
-		{72C99E7C-C11B-4669-90ED-0944DE5B9085}.Release-4.7.1|Any CPU.ActiveCfg = Release|Any CPU
-		{72C99E7C-C11B-4669-90ED-0944DE5B9085}.Release-4.7.1|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
