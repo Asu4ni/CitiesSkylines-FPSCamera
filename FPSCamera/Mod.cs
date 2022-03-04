@@ -43,6 +43,9 @@ namespace FPSCamMod
         public override void OnLevelUnloading()
         {
             Object.Destroy(fpsController);
+#if DEBUG
+            Object.Destroy(DebugUI.Panel);
+#endif
         }
 
         private FPSController fpsController;

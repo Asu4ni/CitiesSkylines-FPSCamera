@@ -5,6 +5,9 @@ namespace FPSCamMod
     internal static class UIUT
     {
         // TODO: investigate
+
+        public static ColossalFramework.UI.UIView UIView
+                        => Object.FindObjectOfType<ColossalFramework.UI.UIView>();
         public static void HideUI()
         {
             var cameraController = GameObject.FindObjectOfType<CameraController>();

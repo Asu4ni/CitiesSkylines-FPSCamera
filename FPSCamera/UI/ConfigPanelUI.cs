@@ -47,6 +47,10 @@ namespace FPSCamMod
 
             var y = 20f;
 
+#if DEBUG
+            AddCheckbox(DebugUI.Displayed, mainPanel, ref y);
+#endif
+
             AddCheckbox(Config.G.HideUIwhenActivate, mainPanel, ref y);
             AddSlider(Config.G.CamFieldOfView, mainPanel, ref y, 1f, "F0");
             AddSlider(Config.G.rotateSensitivity, mainPanel, ref y, .25f);
