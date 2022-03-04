@@ -1,4 +1,3 @@
-using CitiesHarmony.API;
 using ICities;
 using UnityEngine;
 
@@ -20,14 +19,10 @@ namespace FPSCamMod
         }
         public void OnEnabled()
         {
-            HarmonyHelper.DoOnHarmonyReady(() => HarmonyPatcher.Patch());
             Config.G = Config.Load() ?? Config.G;
             Config.G.Save();
         }
-        public void OnDisabled()
-        {
-            if (HarmonyHelper.IsHarmonyInstalled) HarmonyPatcher.Unpatch();
-        }
+        public void OnDisabled() { }
 
         private OptionsMenuUI camOptionsUI = null;
     }
