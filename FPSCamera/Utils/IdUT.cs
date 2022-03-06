@@ -1,4 +1,4 @@
-﻿
+
 namespace FPSCamMod
 {
     public struct ObjectType

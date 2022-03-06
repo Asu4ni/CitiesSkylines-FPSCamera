@@ -1,4 +1,4 @@
-﻿using ColossalFramework.UI;
+using ColossalFramework.UI;
 using System;
 using UnityEngine;
 
@@ -11,7 +11,7 @@ namespace FPSCamMod
         private static readonly Color32 textColor = new Color32(221, 220, 250, 255);
         private ConfigPanelUI()
         {
-            var uiView = FindObjectOfType<UIView>();
+            var uiView = UIUT.UIView;
 
             uiSwitchBtn = AddPanelSwitchbutton(uiView);
             uiSwitchBtn.eventPositionChanged += (component, param) => {
@@ -315,7 +315,7 @@ namespace FPSCamMod
 
         internal void OnEsc() => mainPanel.enabled = false;
 
-        void LateUpdate()
+        private void LateUpdate()
         {
             if (toggleHintLabel)    // fadeOut Label
             {

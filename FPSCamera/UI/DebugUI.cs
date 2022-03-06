@@ -1,4 +1,4 @@
-﻿namespace FPSCamMod
+namespace FPSCamMod
 {
     using System.Collections.Generic;
 #if DEBUG

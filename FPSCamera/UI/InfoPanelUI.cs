@@ -3,7 +3,6 @@ using UnityEngine;
 
 namespace FPSCamMod
 {
-    //TODO: disable if not idle
     internal class InfoPanelUI : MonoBehaviour
     {
         private static readonly Vector3 cameraButtonOffset = new Vector3(-4f, -20f, 0f);
@@ -14,25 +13,22 @@ namespace FPSCamMod
 
         internal InfoPanelUI()
         {
-            var uiView = FindObjectOfType<UIView>();
+            var uiView = UIUT.UIView;
 
             buttons = new UIButton[]
             {
-                CreateFollowBtn<CitizenVehicleWorldInfoPanel>(uiView, 200f,"VehicleName"),
-                CreateFollowBtn<CityServiceVehicleWorldInfoPanel>(uiView, 200f,"VehicleName"),
-                CreateFollowBtn<PublicTransportVehicleWorldInfoPanel>(uiView, 200f,"VehicleName"),
-                CreateFollowBtn<CitizenWorldInfoPanel>(uiView, 180f, "PersonName"),
-                CreateFollowBtn<TouristWorldInfoPanel>(uiView, 180f, "PersonName")
+                CreateFollowBtn<CitizenVehicleWorldInfoPanel>(),
+                CreateFollowBtn<CityServiceVehicleWorldInfoPanel>(),
+                CreateFollowBtn<PublicTransportVehicleWorldInfoPanel>(),
+                CreateFollowBtn<CitizenWorldInfoPanel>(),
+                CreateFollowBtn<TouristWorldInfoPanel>()
             };
         }
 
-        private UIButton CreateFollowBtn<Panel>(UIView view, float width,
-                                    string fieldName) where Panel : UICustomControl
+        private UIButton CreateFollowBtn<Panel>() where Panel : UICustomControl
         {
-            var panel = GameObject.Find($"(Library) {typeof(Panel).Name}").GetComponent<Panel>();
-            panel.Find<UITextField>(fieldName).width = width; // TODO: investigate
-
-            var button = view.AddUIComponent(typeof(UIButton)) as UIButton;
+            var panel = UIView.library.Get<Panel>(typeof(Panel).Name);
+            var button = panel.component.AddUIComponent(typeof(UIButton)) as UIButton;
             button.name = "ModTools Button";
             button.width = cameraButtonSize;
             button.height = cameraButtonSize;

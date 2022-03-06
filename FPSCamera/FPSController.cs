@@ -23,7 +23,7 @@ namespace FPSCamMod
             SwitchState(State.walkThru);
         }
 
-        protected void Start()
+        private void Start()
         {
             camController = FindObjectOfType<CameraController>();
             camUnity = camController.GetComponent<Camera>();
@@ -375,12 +375,15 @@ namespace FPSCamMod
             return controlOffset;
         }
 
-        internal void ResetUI()
+        private void DestroyUI()
         {
             if (configPanelUI is object) Destroy(configPanelUI);
             if (followModeUI is object) Destroy(followModeUI);
             if (infoPanelUI is object) Destroy(infoPanelUI);
-
+        }
+        internal void ResetUI()
+        {
+            DestroyUI();
             // TODO: introduce UI Manager
             configPanelUI = gameObject.AddComponent<ConfigPanelUI>();
             configPanelUI.registerWalkThruCallBack(StartWalkThruMode);
@@ -432,6 +435,8 @@ namespace FPSCamMod
             }
             else { CamSetting = targetSetting; camFOV = targetFOV; }
         }
+        private void OnDestroy() => DestroyUI();
+
 
         // TODO: expect to remove
         private CameraController camController;
