@@ -23,7 +23,7 @@ namespace FPSCamMod
 
             toggleHintLabel = uiView.AddUIComponent(typeof(UILabel)) as UILabel;
             toggleHintLabel.name = "FPSToggleHintLabel";
-            toggleHintLabel.text = $"Press [{Config.G.KeyToggleFPSCam}] to switch off";
+            toggleHintLabel.text = $"Press [{Config.G.KeyCamToggle}] to switch off";
             toggleHintLabel.textColor = textColor;
             toggleHintLabel.Hide();
 

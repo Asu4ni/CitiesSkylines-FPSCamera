@@ -12,9 +12,9 @@ namespace FPSCamMod
         public static float MouseScroll => Input.GetAxisRaw("Mouse ScrollWheel");  // +/i: up/down
 
         public static bool KeyEsc => Input.GetKeyDown(KeyCode.Escape);
-        public static bool KeyToggle => Input.GetKeyDown(Config.G.KeyToggleFPSCam);
+        public static bool KeyToggle => Input.GetKeyDown(Config.G.KeyCamToggle);
         public static bool KeyFaster => Input.GetKey(Config.G.KeySpeedUp);
-        public static bool KeySwitchCursor => Input.GetKey(Config.G.KeySwitchCursor);
+        public static bool KeySwitchCursor => Input.GetKey(Config.G.KeyCursorToggle);
 
         public static bool KeyForward => Input.GetKey(Config.G.KeyMoveForward);
         public static bool KeyBackward => Input.GetKey(Config.G.KeyMoveBackward);

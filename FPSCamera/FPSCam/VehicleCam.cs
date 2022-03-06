@@ -4,10 +4,6 @@ namespace FPSCamMod
 {
     internal class VehicleCam : FPSCam
     {
-        // TODO: move to config
-        private const float camOffsetUp = 2f;
-        private const float middleVehicelOffsetUp = 3f;
-
         private VehicleID vehicleID;
         private bool wasReversed;
 
@@ -30,7 +26,6 @@ namespace FPSCamMod
         public override Vector3 GetVelocity() => FPSVehicle.Of(vehicleID).Velocity();
         public override string GetDestinationStr()
         {
-            // TODO: ensure that using firstVehicle is necessary
             var vehicle = FPSVehicle.Of(FPSVehicle.Of(vehicleID).FrontVehicleID());
             if (vehicle.IsOfType(VehicleType.Bicycle)) {
                 // TODO: ensure if alternatives are necessary
@@ -83,8 +78,9 @@ namespace FPSCamMod
 
             var offset = CamUT.GetOffset(rotation,
                     Config.G.VehicleCamOffset.forward + vehicle.AttachOffsetFront(),
-                    Config.G.VehicleCamOffset.up + camOffsetUp
-                        + (vehicle.isLeading || vehicle.isTrailing ? 0f : middleVehicelOffsetUp),
+                    Config.G.VehicleCamOffset.up + Config.G.VehicleFOffsetUp
+                        + (vehicle.isLeading || vehicle.isTrailing ?
+                          0f : Config.G.MiddleVehicleFOffsetUp),
                     Config.G.VehicleCamOffset.right);
 
             // TODO: always look toward moving direction, hot key to change direction

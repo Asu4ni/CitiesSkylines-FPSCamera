@@ -20,8 +20,9 @@ namespace FPSCamMod
         public Config() : this(defaultConfigPath) { }
 
         /*----------- global config -----------------------------------------*/
-        [Config("ToggleFPSCamKey", "Key to toggle FPS Camera")]
-        public readonly CfKey KeyToggleFPSCam = new CfKey(KeyCode.BackQuote);
+
+        [Config("CamToggle", "Key to toggle FPS Camera")]
+        public readonly CfKey KeyCamToggle = new CfKey(KeyCode.BackQuote);
         [Config("HideUI", "Hide UI when activated")]
         public readonly CfFlag HideUIwhenActivate = new CfFlag(false);
         [Config("", "")]
@@ -49,17 +50,17 @@ namespace FPSCamMod
         public readonly CfFloat DeltaRotateMax = new CfFloat(10f, 5f, 45f);
 
         // camera control
-        [Config("", "")]
+        [Config("Forward", "")]
         public readonly CfKey KeyMoveForward = new CfKey(KeyCode.W);
-        [Config("", "")]
+        [Config("Left", "")]
         public readonly CfKey KeyMoveLeft = new CfKey(KeyCode.A);
-        [Config("", "")]
+        [Config("Backward", "")]
         public readonly CfKey KeyMoveBackward = new CfKey(KeyCode.S);
-        [Config("", "")]
+        [Config("Right", "")]
         public readonly CfKey KeyMoveRight = new CfKey(KeyCode.D);
-        [Config("", "")]
+        [Config("Up", "")]
         public readonly CfKey KeyMoveUp = new CfKey(KeyCode.PageUp);
-        [Config("", "")]
+        [Config("Down", "")]
         public readonly CfKey KeyMoveDown = new CfKey(KeyCode.PageDown);
 
         [Config("", "")]
@@ -71,9 +72,9 @@ namespace FPSCamMod
         [Config("", "")]
         public readonly CfKey KeyRotateRight = new CfKey(KeyCode.None);
 
-        [Config("", "")]
+        [Config("SpeedUp", "")]
         public readonly CfKey KeySpeedUp = new CfKey(KeyCode.CapsLock);
-        [Config("", "")]
+        [Config("CamReset", "")]
         public readonly CfKey KeyCamReset = new CfKey(KeyCode.Backspace);
 
         [Config("MovementSpeed", "Camera Movement speed")]
@@ -97,8 +98,8 @@ namespace FPSCamMod
         public readonly CfFloat CamFieldOfView = new CfFloat(45f, 10f, 75f);
 
         // cursor
-        [Config("", "")]
-        public readonly CfKey KeySwitchCursor = new CfKey(KeyCode.LeftControl);
+        [Config("CursorToggle", "")]
+        public readonly CfKey KeyCursorToggle = new CfKey(KeyCode.LeftControl);
         [Config("", "")]
         public readonly CfFlag ShowCursorWhileFreeCam = new CfFlag(false);
         [Config("", "")]
@@ -141,6 +142,14 @@ namespace FPSCamMod
         public readonly CfFlag ClickToSwitch4WalkThru = new CfFlag(false);
         [Config("PeriodWalkThru", "Period(second) for each random target")]
         public readonly CfFloat Period4WalkThru = new CfFloat(20f, 5f, 300f);
+
+        /*--------- configurable constants ----------------------------------*/
+
+        [Config("VehicleDOfstUp", "Cam fixed offset.up for vehicle")]
+        public readonly CfFloat VehicleFOffsetUp = new CfFloat(2f);
+
+        [Config("VehicleDOfstUp", "Cam fixed offset.up for vehicle in the middle")]
+        public readonly CfFloat MiddleVehicleFOffsetUp = new CfFloat(3f);
 
         /*-------------------------------------------------------------------*/
 
