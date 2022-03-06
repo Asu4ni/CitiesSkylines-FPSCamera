@@ -48,8 +48,7 @@ namespace FPSCamMod
 
         private static void output(string str)
         {
-            using (var writer = File.AppendText(logPath))
-            {
+            using (var writer = File.AppendText(logPath)) {
                 writer.WriteLine(str);
             }
         }

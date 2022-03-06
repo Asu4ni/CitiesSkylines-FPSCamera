@@ -156,8 +156,7 @@ namespace FPSCamMod
         public static void Save(Config config, string configPath = defaultConfigPath)
         {
             var serializer = new XmlSerializer(typeof(Config));
-            using (var writer = new StreamWriter(configPath))
-            {
+            using (var writer = new StreamWriter(configPath)) {
                 serializer.Serialize(writer, config);
             }
         }
@@ -165,17 +164,15 @@ namespace FPSCamMod
         public static Config Load(string configPath = defaultConfigPath)
         {
             var serializer = new XmlSerializer(typeof(Config));
-            try
-            {
-                using (var reader = new StreamReader(configPath))
-                {
+            try {
+                using (var reader = new StreamReader(configPath)) {
                     return (Config) serializer.Deserialize(reader);
                 }
-            } catch (FileNotFoundException e)
-            {
+            }
+            catch (FileNotFoundException e) {
                 Log.Msg($"config file ({e.FileName}) not existed");
-            } catch (Exception e)
-            {
+            }
+            catch (Exception e) {
                 Log.Err($"exception while reading configuration: {e}");
             }
             return null;
@@ -185,22 +182,18 @@ namespace FPSCamMod
         public void ReadXml(XmlReader reader)
         {
             reader.ReadStartElement();
-            while (reader.IsStartElement())
-            {
+            while (reader.IsStartElement()) {
                 var fieldName = reader.Name;
                 reader.ReadStartElement();
-                if (GetType().GetField(fieldName) is FieldInfo field)
-                {
-                    if (field.GetValue(this) is IConfigData config)
-                    {
+                if (GetType().GetField(fieldName) is FieldInfo field) {
+                    if (field.GetValue(this) is IConfigData config) {
                         var str = reader.ReadContentAsString();
                         if (!config.AssignByParsing(str))
                             Log.Warn($"Config: invalid value({str}) for field[{fieldName}]");
                     }
                     else Log.Err($"Config: invalid type of config field[{fieldName}]");
                 }
-                else
-                {
+                else {
                     Log.Warn($"Config: unknown config field name [{fieldName}]");
                     reader.Skip();
                 }
@@ -210,8 +203,7 @@ namespace FPSCamMod
         }
         public void WriteXml(XmlWriter writer)
         {
-            foreach (var field in GetType().GetFields(BindingFlags.Public | BindingFlags.Instance))
-            {
+            foreach (var field in GetType().GetFields(BindingFlags.Public | BindingFlags.Instance)) {
                 writer.WriteStartElement(field.Name);
                 if (field.GetValue(this) is IConfigData config)
                     writer.WriteString(config.ToString());
@@ -222,10 +214,8 @@ namespace FPSCamMod
 
         private void StoreConfigAttr()
         {
-            foreach (var field in GetType().GetFields(BindingFlags.Public | BindingFlags.Instance))
-            {
-                if (field.GetValue(this) is IConfigData config)
-                {
+            foreach (var field in GetType().GetFields(BindingFlags.Public | BindingFlags.Instance)) {
+                if (field.GetValue(this) is IConfigData config) {
                     var attrs = field.GetCustomAttributes(typeof(ConfigAttribute), false)
                                                                     as ConfigAttribute[];
                     foreach (var attr in attrs) config._set(attr.Name, attr.Description);
@@ -261,8 +251,8 @@ namespace FPSCamMod
         public override string ToString() => value.ToString();
         public virtual bool AssignByParsing(string str)
         {
-            try { assign((T) TypeDescriptor.GetConverter(value).ConvertFromString(str)); } catch
-            {
+            try { assign((T) TypeDescriptor.GetConverter(value).ConvertFromString(str)); }
+            catch {
                 Log.Err($"Config loading: cannot convert {str} to type[{typeof(T).Name}]");
                 return false;
             }
@@ -308,12 +298,12 @@ namespace FPSCamMod
         {
             var strs = str.Split(' ');
             if (strs.Length != 3) return false;
-            try
-            {
+            try {
                 value.forward.assign(float.Parse(strs[0]));
                 value.up.assign(float.Parse(strs[1]));
                 value.right.assign(float.Parse(strs[2]));
-            } catch { return false; }
+            }
+            catch { return false; }
             return true;
         }
     }

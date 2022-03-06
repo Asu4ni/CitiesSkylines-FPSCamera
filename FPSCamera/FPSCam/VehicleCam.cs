@@ -17,13 +17,11 @@ namespace FPSCamMod
             if (Config.G.StickToFrontVehicle)
                 vehicleID = FPSVehicle.Of(vehicleID).FrontVehicleID();
 
-            if (FPSVehicle.Of(vehicleID).exists)
-            {
+            if (FPSVehicle.Of(vehicleID).exists) {
                 Log.Msg($"start following vehicle(ID:{vehicleID})");
                 wasReversed = FPSVehicle.Of(vehicleID).isReversed;
             }
-            else
-            {
+            else {
                 Log.Warn($"vehicle(ID:{vehicleID}) to follow does not exist");
                 state = State.stopped;
             }
@@ -34,8 +32,7 @@ namespace FPSCamMod
         {
             // TODO: ensure that using firstVehicle is necessary
             var vehicle = FPSVehicle.Of(FPSVehicle.Of(vehicleID).FrontVehicleID());
-            if (vehicle.IsOfType(VehicleType.Bicycle))
-            {
+            if (vehicle.IsOfType(VehicleType.Bicycle)) {
                 // TODO: ensure if alternatives are necessary
                 var biker = FPSCitizen.Of(vehicle.OwnerID().Citizen);
                 return GameUT.GetBuildingName(vehicle.TargetID().Building)
@@ -43,8 +40,7 @@ namespace FPSCamMod
                        ?? GameUT.GetBuildingName(biker.TargetID().Building)
                        ?? unknownStr;
             }
-            else
-            {
+            else {
                 return GameUT.GetBuildingName(vehicle.TargetID().Building)
                        ?? GameUT.GetBuildingName(vehicle.OwnerID().Building)
                        ?? unknownStr;
@@ -54,8 +50,7 @@ namespace FPSCamMod
         {
             var vehicle = FPSVehicle.Of(FPSVehicle.Of(vehicleID).FrontVehicleID());
             string info = "";
-            if (vehicle.IsOfService(Service.PublicTransport))
-            {
+            if (vehicle.IsOfService(Service.PublicTransport)) {
                 info += $"Service> {vehicle.TransportLineName() ?? unknownStr}\n";
                 vehicle.GetPassengerSizeCapacity(out int size, out int capacity);
                 info += $"Passenger>{size,4} /{capacity,4}\n";
@@ -69,15 +64,13 @@ namespace FPSCamMod
         {
             var vehicle = FPSVehicle.Of(vehicleID);
 
-            if (!(vehicle.exists && vehicle.spawned))
-            {
+            if (!(vehicle.exists && vehicle.spawned)) {
                 Log.Msg($"vehicle(ID:{vehicleID}) disappears");
                 state = State.stopped;
                 return CamSetting.Identity;
             }
 
-            if (Config.G.StickToFrontVehicle && vehicle.isReversed != wasReversed)
-            {
+            if (Config.G.StickToFrontVehicle && vehicle.isReversed != wasReversed) {
                 Log.Msg($"vehicle(ID:{vehicleID}) changes direction");
                 vehicleID = vehicle.FrontVehicleID();
             }

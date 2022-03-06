@@ -65,10 +65,8 @@ namespace FPSCamMod
 
         private UIButton[] buttons;
         private System.Action<UUID> _followCallBack;
-        private System.Action<UUID> followCallBack
-        {
-            get
-            {
+        private System.Action<UUID> followCallBack {
+            get {
                 if (_followCallBack is null)
                     Log.Err("followCallBack from GamePanelExtender has not been registered");
                 return _followCallBack;

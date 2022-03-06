@@ -18,10 +18,8 @@ namespace FPSCamMod
         {
             if (keyCodeSelctMode == KeyCodeSelectType.none) return;
             KeyCode pressedKey = FindKeyPressed();
-            if (pressedKey != KeyCode.None && pressedKey != KeyCode.Mouse0)
-            {
-                switch (keyCodeSelctMode)
-                {
+            if (pressedKey != KeyCode.None && pressedKey != KeyCode.Mouse0) {
+                switch (keyCodeSelctMode) {
                 case KeyCodeSelectType.forward:
                     forwardBtn.text = pressedKey.ToString();
                     Config.G.KeyMoveForward.assign(pressedKey);
@@ -67,10 +65,8 @@ namespace FPSCamMod
         // TODO: improve
         private KeyCode FindKeyPressed()
         {
-            foreach (KeyCode code in Enum.GetValues(typeof(KeyCode)))
-            {
-                if (Input.GetKeyDown(code))
-                {
+            foreach (KeyCode code in Enum.GetValues(typeof(KeyCode))) {
+                if (Input.GetKeyDown(code)) {
                     return code;
                 }
             }
@@ -84,12 +80,10 @@ namespace FPSCamMod
 
             UILabel uILabel = uIPanel.Find<UILabel>("Name");
             UIButton uIButton = uIPanel.Find<UIButton>("Binding");
-            uIButton.eventKeyDown += (component, eventParam) =>
-            {
+            uIButton.eventKeyDown += (component, eventParam) => {
                 OnBtnClicked(uIButton, selectType);
             };
-            uIButton.eventMouseDown += (component, eventParam) =>
-            {
+            uIButton.eventMouseDown += (component, eventParam) => {
                 OnBtnClicked(uIButton, selectType);
             };
 

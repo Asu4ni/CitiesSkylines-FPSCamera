@@ -64,8 +64,7 @@ namespace FPSCamMod
                         || (state == State.exitFreeCam && newState == State.freeCam),
                        $"FPSController state invalid transition: [{state}] > [{newState}]");
 
-            switch (state)
-            {
+            switch (state) {
             case State.idle: EnableFPSCam(); break;
             case State.freeCam:
                 if (Config.G.SmoothTransition && newState == State.idle)
@@ -78,8 +77,7 @@ namespace FPSCamMod
                 StopFollowing(); break;
             case State.exitFreeCam: break;
             }
-            switch (newState)
-            {
+            switch (newState) {
             case State.idle: DisableFPSCam(); break;
             case State.freeCam: PrepareFreeCam(); break;
             case State.follow: PrepareFollowing(); break;
@@ -132,8 +130,7 @@ namespace FPSCamMod
         private void PrepareFreeCam() { }
         private void PrepareFollowing()
         {
-            switch (idToFollow.Type.switchValue)
-            {
+            switch (idToFollow.Type.switchValue) {
             case ObjectType.sCitizen:
                 camToFollow = new CitizenCam(idToFollow); break;
             case ObjectType.sVehicle:
@@ -185,18 +182,15 @@ namespace FPSCamMod
         }
 
         private float camFOV { get => camUnity.fieldOfView; set => camUnity.fieldOfView = value; }
-        private Vector3 CamPosition
-        {
+        private Vector3 CamPosition {
             get => camUnity.transform.position;
             set => camUnity.transform.position = value;
         }
-        private Quaternion CamRotation
-        {
+        private Quaternion CamRotation {
             get => camUnity.transform.rotation;
             set => camUnity.transform.rotation = value;
         }
-        private CamSetting CamSetting
-        {
+        private CamSetting CamSetting {
             get => new CamSetting(CamPosition, CamRotation);
             set { CamPosition = value.position; CamRotation = value.rotation; }
         }
@@ -206,20 +200,16 @@ namespace FPSCamMod
             var vmanager = VehicleManager.instance;
             int skip = Random.Range(0, vmanager.m_vehicleCount - 1);
 
-            for (ushort i = 0; i < vmanager.m_vehicles.m_buffer.Length; i++)
-            {
-                if ((vmanager.m_vehicles.m_buffer[i].m_flags & (Vehicle.Flags.Created | Vehicle.Flags.Deleted)) != Vehicle.Flags.Created)
-                {
+            for (ushort i = 0; i < vmanager.m_vehicles.m_buffer.Length; i++) {
+                if ((vmanager.m_vehicles.m_buffer[i].m_flags & (Vehicle.Flags.Created | Vehicle.Flags.Deleted)) != Vehicle.Flags.Created) {
                     continue;
                 }
 
-                if (vmanager.m_vehicles.m_buffer[i].Info.m_vehicleAI is CarTrailerAI)
-                {
+                if (vmanager.m_vehicles.m_buffer[i].Info.m_vehicleAI is CarTrailerAI) {
                     continue;
                 }
 
-                if (skip > 0)
-                {
+                if (skip > 0) {
                     skip--;
                     continue;
                 }
@@ -227,16 +217,13 @@ namespace FPSCamMod
                 return i;
             }
 
-            for (ushort i = 0; i < vmanager.m_vehicles.m_buffer.Length; i++)
-            {
+            for (ushort i = 0; i < vmanager.m_vehicles.m_buffer.Length; i++) {
                 if ((vmanager.m_vehicles.m_buffer[i].m_flags & (Vehicle.Flags.Created | Vehicle.Flags.Deleted)) !=
-                    Vehicle.Flags.Created)
-                {
+                    Vehicle.Flags.Created) {
                     continue;
                 }
 
-                if (vmanager.m_vehicles.m_buffer[i].Info.m_vehicleAI is CarTrailerAI)
-                {
+                if (vmanager.m_vehicles.m_buffer[i].Info.m_vehicleAI is CarTrailerAI) {
                     continue;
                 }
 
@@ -250,15 +237,12 @@ namespace FPSCamMod
             var cmanager = CitizenManager.instance;
             int skip = Random.Range(0, cmanager.m_instanceCount - 1);
 
-            for (uint i = 0; i < cmanager.m_instances.m_buffer.Length; i++)
-            {
-                if ((cmanager.m_instances.m_buffer[i].m_flags & (CitizenInstance.Flags.Created | CitizenInstance.Flags.Deleted)) != CitizenInstance.Flags.Created)
-                {
+            for (uint i = 0; i < cmanager.m_instances.m_buffer.Length; i++) {
+                if ((cmanager.m_instances.m_buffer[i].m_flags & (CitizenInstance.Flags.Created | CitizenInstance.Flags.Deleted)) != CitizenInstance.Flags.Created) {
                     continue;
                 }
 
-                if (skip > 0)
-                {
+                if (skip > 0) {
                     skip--;
                     continue;
                 }
@@ -266,10 +250,8 @@ namespace FPSCamMod
                 return cmanager.m_instances.m_buffer[i].m_citizen;
             }
 
-            for (uint i = 0; i < cmanager.m_instances.m_buffer.Length; i++)
-            {
-                if ((cmanager.m_instances.m_buffer[i].m_flags & (CitizenInstance.Flags.Created | CitizenInstance.Flags.Deleted)) != CitizenInstance.Flags.Created)
-                {
+            for (uint i = 0; i < cmanager.m_instances.m_buffer.Length; i++) {
+                if ((cmanager.m_instances.m_buffer[i].m_flags & (CitizenInstance.Flags.Created | CitizenInstance.Flags.Deleted)) != CitizenInstance.Flags.Created) {
                     continue;
                 }
 
@@ -286,11 +268,9 @@ namespace FPSCamMod
 
             if (!Config.G.ClickToSwitch4WalkThru) walkThruTimer -= Time.deltaTime;
             if (camToFollow is null || (Config.G.ClickToSwitch4WalkThru ?
-                                        ControlUT.MousePrimary : walkThruTimer <= 0.0f))
-            {
+                                        ControlUT.MousePrimary : walkThruTimer <= 0.0f)) {
                 Log.Msg("UpdateWalkThru: switching target");
-                if (!SwitchTarget4WalkThru())
-                {
+                if (!SwitchTarget4WalkThru()) {
                     SwitchState(State.idle);
                     Dialog.ShowMsg("Cannot find any vehicle or citizen");
                 }
@@ -301,12 +281,10 @@ namespace FPSCamMod
         {
             const float heightMovementFactor = .2f;
 
-            if (camToFollow is object)
-            {
+            if (camToFollow is object) {
                 controlOffset.deltaPos.y *= heightMovementFactor;
                 var setting = camToFollow.GetNextCamSetting();
-                if (camToFollow.isRunning)
-                {
+                if (camToFollow.isRunning) {
                     targetSetting = setting;
                     userOffset.deltaPos += CamUT.GetRotation(userOffset.deltaEulerXY)
                                            * controlOffset.deltaPos;
@@ -336,8 +314,7 @@ namespace FPSCamMod
             euler.z = 0;
             targetSetting.rotation.eulerAngles = euler;
 
-            if (Config.G.GroundClippingOption != Config.GroundClipping.None)
-            {
+            if (Config.G.GroundClippingOption != Config.GroundClipping.None) {
                 var minHeight = GameUT.GetMinHeightAt(CamPosition) + Config.G.DistanceFromGround;
                 if (Config.G.GroundClippingOption == Config.GroundClipping.SnapToGround
                     || CamPosition.y < minHeight)
@@ -346,8 +323,7 @@ namespace FPSCamMod
         }
         private CamOffset GetControlOffsetAfterHandleInput()
         {
-            if (ControlUT.KeyToggle || ControlUT.KeyEsc)
-            {
+            if (ControlUT.KeyToggle || ControlUT.KeyEsc) {
                 if (ControlUT.KeyEsc) configPanelUI.OnEsc();
                 if (isCamOn) SwitchState(State.idle);
                 else if (ControlUT.KeyToggle) StartFreeCam();
@@ -375,8 +351,7 @@ namespace FPSCamMod
 
             // TODO: ensure rotateSensitivity factor 2f
             ref Vector2 delXY = ref controlOffset.deltaEulerXY;
-            if (!Cursor.visible)
-            {
+            if (!Cursor.visible) {
                 delXY.y = ControlUT.MouseMoveHori * Config.G.rotateSensitivity / 4f;
                 delXY.x = -ControlUT.MouseMoveVert * Config.G.rotateSensitivity / 4f;
                 if (Config.G.InvertRotateHorizontal) delXY.y = -delXY.y;
@@ -421,9 +396,7 @@ namespace FPSCamMod
             var controlOffset = GetControlOffsetAfterHandleInput();
             if (isIdle) return;
 
-
-            switch (state)
-            {
+            switch (state) {
             case State.freeCam:
                 UpdateFreeCam(controlOffset); break;
             case State.follow:
@@ -437,16 +410,13 @@ namespace FPSCamMod
                 break;
             }
 
-            if (Config.G.SmoothTransition)
-            {
+            if (Config.G.SmoothTransition) {
                 var distance = Vector3.Distance(targetSetting.position, CamPosition);
-                if (distance > Config.G.GiveUpDistance)
-                {
+                if (distance > Config.G.GiveUpDistance) {
                     // TODO: fade out fade in
                     CamSetting = targetSetting; camFOV = targetFOV;
                 }
-                else
-                {
+                else {
                     var reduceFactor = Config.G.GetReduceFactor(Time.deltaTime);
                     CamPosition = distance < Config.G.InstantMoveMax ?
                                   targetSetting.position :

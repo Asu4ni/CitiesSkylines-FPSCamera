@@ -22,8 +22,7 @@ namespace FPSCamMod
         private void LateUpdate()
         {
             var cam = camWRef?.Target as FPSCam;
-            if (cam is null)
-            {
+            if (cam is null) {
                 camWRef = null;
                 enabled = false;
                 return;

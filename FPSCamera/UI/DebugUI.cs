@@ -8,10 +8,8 @@
         static DebugUI() { Displayed._set("DisplayDebugPanel", "Show Debug Panel"); }
         internal static readonly ConfigData<bool> Displayed = new ConfigData<bool>(false);
 
-        public static DebugUI Panel
-        {
-            get
-            {
+        public static DebugUI Panel {
+            get {
                 if (panel is null) panel = UIUT.UIView.gameObject.AddComponent<DebugUI>();
                 return panel;
             }
@@ -47,13 +45,11 @@
             boxWidth -= 2f * margin;
             const int btnPerLine = 4;
             float btnW = (boxWidth - margin * 2f) / btnPerLine, btnH = boxHeight / 16f;
-            for (int i = 0; i < nameList.Count; ++i)
-            {
+            for (int i = 0; i < nameList.Count; ++i) {
                 if (GUI.Button(new Rect(curX, curY, btnW, btnH), nameList[i]))
                     actionList[i].Invoke();
 
-                if (i % btnPerLine == btnPerLine - 1)
-                { curX = margin; curY += btnH; }
+                if (i % btnPerLine == btnPerLine - 1) { curX = margin; curY += btnH; }
                 else curX += btnW;
             }
             if (curX > margin) curY += btnH;

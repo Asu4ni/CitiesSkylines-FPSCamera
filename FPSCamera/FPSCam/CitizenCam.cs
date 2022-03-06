@@ -11,8 +11,7 @@ namespace FPSCamMod
             citizenID = idToFollow.Citizen;
             if (FPSCitizen.Of(citizenID).exists)
                 Log.Msg($"start following citizen(ID:{citizenID})");
-            else
-            {
+            else {
                 Log.Warn($"citizen(ID:{citizenID}) to follow does not exist");
                 state = State.stopped;
             }
@@ -39,27 +38,22 @@ namespace FPSCamMod
         {
             var citizen = FPSCitizen.Of(citizenID);
 
-            if (state == State.following && citizen.isEnteringVehicle)
-            {
+            if (state == State.following && citizen.isEnteringVehicle) {
                 var vehicleID = citizen.riddenVehicleID;
-                if (vehicleID.exists)
-                {
+                if (vehicleID.exists) {
                     Log.Msg($"citizen(ID:{citizenID}) entering a vehicle");
                     state = State.waiting;
                     vehicleCamera = new VehicleCam(FPSVehicle.Of(vehicleID).FrontVehicleID());
                 }
-                else
-                {
+                else {
                     Log.Warn($"vehicle of citizen (ID:{citizenID}) not found while the citizen entering it");
                     state = State.stopped;
                     return CamSetting.Identity;
                 }
             }
 
-            if (vehicleCamera is object)
-            {
-                if (citizen.riddenVehicleID.exists && vehicleCamera.isRunning)
-                {
+            if (vehicleCamera is object) {
+                if (citizen.riddenVehicleID.exists && vehicleCamera.isRunning) {
                     var setting = vehicleCamera.GetNextCamSetting();
                     if (vehicleCamera.isRunning) return setting;
                 }
@@ -68,8 +62,7 @@ namespace FPSCamMod
                 state = State.following;
             }
 
-            if (!citizen.exists)
-            {
+            if (!citizen.exists) {
                 Log.Msg($"citizen(ID:{citizenID}) disappears");
                 state = State.stopped;
                 return CamSetting.Identity;

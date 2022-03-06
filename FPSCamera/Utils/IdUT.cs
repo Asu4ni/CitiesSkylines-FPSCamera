@@ -27,8 +27,7 @@ namespace FPSCamMod
         public static implicit operator UUID(VehicleID id)
         { UUID uid = default; uid.Vehicle = id; return uid; }
 
-        public BuildingID Building
-        {
+        public BuildingID Building {
             get => (BuildingID) _id.Building;
             set => _id.Building = value._id;
         }

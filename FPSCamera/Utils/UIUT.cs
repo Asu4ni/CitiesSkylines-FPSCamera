@@ -15,10 +15,8 @@ namespace FPSCamMod
             camera.GetComponent<OverlayEffect>().enabled = false;
             bool cachedEnabled = cameraController.enabled;
             var cameras = GameObject.FindObjectsOfType<Camera>();
-            foreach (var cam in cameras)
-            {
-                if (cam.name == "UIView")
-                {
+            foreach (var cam in cameras) {
+                if (cam.name == "UIView") {
                     cam.enabled = false;
                     break;
                 }
@@ -38,10 +36,8 @@ namespace FPSCamMod
             bool cachedEnabled = cameraController.enabled;
 
             var cameras = GameObject.FindObjectsOfType<Camera>();
-            foreach (var cam in cameras)
-            {
-                if (cam.name == "UIView")
-                {
+            foreach (var cam in cameras) {
+                if (cam.name == "UIView") {
                     cam.enabled = true;
                     break;
                 }

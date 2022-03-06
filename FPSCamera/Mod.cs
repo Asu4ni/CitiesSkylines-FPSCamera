@@ -11,8 +11,7 @@ namespace FPSCamMod
 
         public void OnSettingsUI(UIHelperBase helper)
         {
-            if (camOptionsUI is null)
-            {
+            if (camOptionsUI is null) {
                 camOptionsUI = new GameObject("FPSCameraControlsOptionsUI").AddComponent<OptionsMenuUI>();
             }
             camOptionsUI.GenerateSettings(helper);

@@ -14,8 +14,7 @@ namespace FPSCamMod
             var uiView = FindObjectOfType<UIView>();
 
             uiSwitchBtn = AddPanelSwitchbutton(uiView);
-            uiSwitchBtn.eventPositionChanged += (component, param) =>
-            {
+            uiSwitchBtn.eventPositionChanged += (component, param) => {
                 Config.G.CamUIOffset.right.assign(uiSwitchBtn.relativePosition.x);
                 Config.G.CamUIOffset.up.assign(uiSwitchBtn.relativePosition.y);
                 Config.G.Save();
@@ -31,8 +30,7 @@ namespace FPSCamMod
             mainPanel = AddPanel("FPSConfigPanel", uiView, new Vector2(400f, 740f));
             mainPanel.enabled = false;
 
-            uiSwitchBtn.eventClick += (component, param) =>
-            {
+            uiSwitchBtn.eventClick += (component, param) => {
                 mainPanel.relativePosition = new Vector3(
                     uiSwitchBtn.absolutePosition.x > Screen.width / 2f ?
                         uiSwitchBtn.relativePosition.x - mainPanel.width + 10f :
@@ -64,8 +62,7 @@ namespace FPSCamMod
             AddDropDown(Config.G.GroundClippingOption, mainPanel, ref y);
             AddSlider(Config.G.DistanceFromGround, mainPanel, ref y);
 
-            if (ModLoad.IsInGameMode)
-            {   // TODO: organize, text field or slider ?
+            if (ModLoad.IsInGameMode) {   // TODO: organize, text field or slider ?
                 y += 15;
                 AddCheckbox(Config.G.StickToFrontVehicle, mainPanel, ref y);
                 AddCheckbox(Config.G.ShowInfoPanel4Follow, mainPanel, ref y);
@@ -140,8 +137,7 @@ namespace FPSCamMod
             if (Config.G.CamUIOffset.up != 0f || Config.G.CamUIOffset.right != 0)
                 button.relativePosition =
                     new Vector2(Config.G.CamUIOffset.right, Config.G.CamUIOffset.up);
-            else
-            {
+            else {
                 UIComponent escbutton = parentView.FindUIComponent("Esc");
                 button.relativePosition = new Vector2(
                         escbutton.relativePosition.x,
@@ -245,8 +241,7 @@ namespace FPSCamMod
             valueLabel.relativePosition = new Vector3(350.0f, y);
             valueLabel.textColor = textColor;
 
-            slider.eventValueChanged += (component, newValue) =>
-            {
+            slider.eventValueChanged += (component, newValue) => {
                 Config.G.Save(value.assign(newValue));
                 valueLabel.text = newValue.ToString(valueFormat);
             };
@@ -290,18 +285,16 @@ namespace FPSCamMod
 
             foreach (var itemName in Enum.GetNames(typeof(EnumType)))
                 dropdown.AddItem(itemName);
-            try
-            {
+            try {
                 dropdown.selectedIndex = (int) (object) (EnumType) value;
-            } catch { Log.Err("AddDropDown in CamUI fails due to casting to int"); }
+            }
+            catch { Log.Err("AddDropDown in CamUI fails due to casting to int"); }
 
-            dropdown.eventSelectedIndexChanged += (component, newValue) =>
-            {
-                try
-                {
+            dropdown.eventSelectedIndexChanged += (component, newValue) => {
+                try {
                     Config.G.Save(value.assign((EnumType) (object) newValue));
-                } catch (InvalidCastException)
-                {
+                }
+                catch (InvalidCastException) {
                     Log.Err($"Config for [{typeof(EnumType).Name}] " +
                             $"assigned invalid value: {newValue}");
                 }
@@ -327,8 +320,7 @@ namespace FPSCamMod
             if (toggleHintLabel)    // fadeOut Label
             {
                 var color = toggleHintLabel.color;
-                if (color.a > 0)
-                {
+                if (color.a > 0) {
                     --color.a;
                     toggleHintLabel.color = color;
                 }
@@ -348,10 +340,8 @@ namespace FPSCamMod
         private UIButton walkThruBtn;
 
         private System.Action _walkThruCallBack;
-        private System.Action walkThruCallBack
-        {
-            get
-            {
+        private System.Action walkThruCallBack {
+            get {
                 if (_walkThruCallBack is null)
                     Log.Err("walkThruCallBack from FPSCamUI has not been registered");
                 return _walkThruCallBack;
