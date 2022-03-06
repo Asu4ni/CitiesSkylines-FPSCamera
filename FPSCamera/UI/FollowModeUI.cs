@@ -1,11 +1,17 @@
-﻿using System;
+﻿using ColossalFramework.UI;
+using System;
 using UnityEngine;
 
 namespace FPSCamMod
 {
-    public class FollowCamUI : MonoBehaviour
+    // TODO: switch to Colossal UI
+    public class FollowModeUI : MonoBehaviour
     {
-        private const string missingText = "---";
+        // TODO: allow other Mods to get UI element
+        public UIPanel GetPanel() { return null; }
+        public UILabel GetLabelOnLeft() { return null; }
+        public UILabel GetLabelMiddle() { return null; }
+        public UILabel GetLabelOnRight() { return null; }
 
         internal void SetAssociatedCam(FPSCam cam)
         {
@@ -58,6 +64,7 @@ namespace FPSCamMod
             GUI.Label(rect, $"{speed,5:F1} {(Config.G.UseMetricUnit ? "k" : "m")}ph", style);
         }
 
+        private const string missingText = "---";
         private WeakReference camWRef;
     }
 }

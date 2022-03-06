@@ -65,8 +65,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="UI\DebugUI.cs" />
+    <Compile Include="UI\FollowModeUI.cs" />
     <Compile Include="UI\OptionsMenuUI.cs" />
-    <Compile Include="UI\FollowCamUI.cs" />
     <Compile Include="Utils\CitizenUT.cs" />
     <Compile Include="Utils\ControlUT.cs" />
     <Compile Include="Utils\GameUT.cs" />

@@ -92,7 +92,7 @@ namespace FPSCamMod
         private void StopFollowing()
         {
             camToFollow = null;
-            if (Config.G.ShowInfoPanel4Follow) followCamUI.enabled = false;
+            if (Config.G.ShowInfoPanel4Follow) followModeUI.enabled = false;
         }
 
         private void EnableFPSCam()
@@ -144,7 +144,7 @@ namespace FPSCamMod
                 return;
             }
             ResetCamLocal();
-            if (Config.G.ShowInfoPanel4Follow) followCamUI.SetAssociatedCam(camToFollow);
+            if (Config.G.ShowInfoPanel4Follow) followModeUI.SetAssociatedCam(camToFollow);
             Log.Msg($"start following UUID:{idToFollow}");
         }
         private void PrepareWalkThru() { SwitchTarget4WalkThru(); }
@@ -403,15 +403,14 @@ namespace FPSCamMod
         internal void ResetUI()
         {
             if (configPanelUI is object) Destroy(configPanelUI);
-            if (followCamUI is object) Destroy(followCamUI);
+            if (followModeUI is object) Destroy(followModeUI);
             if (infoPanelUI is object) Destroy(infoPanelUI);
 
             // TODO: introduce UI Manager
             configPanelUI = gameObject.AddComponent<ConfigPanelUI>();
             configPanelUI.registerWalkThruCallBack(StartWalkThruMode);
-            followCamUI = gameObject.AddComponent<FollowCamUI>();
-            if (ModLoad.IsInGameMode)
-            {
+            followModeUI = gameObject.AddComponent<FollowModeUI>();
+            if (ModLoad.IsInGameMode) {
                 infoPanelUI = gameObject.AddComponent<InfoPanelUI>();
                 infoPanelUI.registerFollowCallBack(StartFollow);
             }
@@ -477,7 +476,7 @@ namespace FPSCamMod
 
         // UI
         private ConfigPanelUI configPanelUI;
-        private FollowCamUI followCamUI;
+        private FollowModeUI followModeUI;
         private InfoPanelUI infoPanelUI;
 
         // local camera properties
