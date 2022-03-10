@@ -15,8 +15,16 @@ namespace FPSCamMod
         static Log() { logger = silentLogger; }
 #endif
         public static void Msg(string msg) { silentLogger.Msg(msg); }
-        public static void Warn(string msg) { logger.Warn(msg); }
-        public static void Err(string msg) { logger.Err(msg); }
+        public static void Warn(string msg)
+        {
+            if (ModLoad.IsInGameMode) logger.Warn(msg);
+            else silentLogger.Warn(msg);
+        }
+        public static void Err(string msg)
+        {
+            if (ModLoad.IsInGameMode) logger.Err(msg);
+            else silentLogger.Err(msg);
+        }
 
         public static void Assert(bool condition, string errMsg)
         {
