@@ -167,14 +167,14 @@ namespace FPSCamMod
         }
         private UUID GetWalkThruTarget()
         {
-            bool vehicleOrCitizen = Random.Range(0, 1) == 0;
+            bool chooseCitizen = Random.Range(0, 2) == 0;
             camToFollow = null;
 
-            var vehicleID = (VehicleID) GetRandomVehicle();
-            var citizenID = (CitizenID) GetRandomCitizenInstance();
+            var vehicleID = FPSVehicle.GetRandomID();
+            var citizenID = FPSCitizen.GetRandomID();
 
             if (vehicleID.exists && citizenID.exists)
-                return vehicleOrCitizen ? (UUID) vehicleID : citizenID;
+                return chooseCitizen ? (UUID) citizenID : vehicleID;
             else if (vehicleID.exists) return vehicleID;
             else if (citizenID.exists) return citizenID;
             Log.Msg("GetWalkThruTarget: nothing found");
@@ -193,72 +193,6 @@ namespace FPSCamMod
         private CamSetting CamSetting {
             get => new CamSetting(CamPosition, CamRotation);
             set { CamPosition = value.position; CamRotation = value.rotation; }
-        }
-
-        private ushort GetRandomVehicle()
-        {
-            var vmanager = VehicleManager.instance;
-            int skip = Random.Range(0, vmanager.m_vehicleCount - 1);
-
-            for (ushort i = 0; i < vmanager.m_vehicles.m_buffer.Length; i++) {
-                if ((vmanager.m_vehicles.m_buffer[i].m_flags & (Vehicle.Flags.Created | Vehicle.Flags.Deleted)) != Vehicle.Flags.Created) {
-                    continue;
-                }
-
-                if (vmanager.m_vehicles.m_buffer[i].Info.m_vehicleAI is CarTrailerAI) {
-                    continue;
-                }
-
-                if (skip > 0) {
-                    skip--;
-                    continue;
-                }
-
-                return i;
-            }
-
-            for (ushort i = 0; i < vmanager.m_vehicles.m_buffer.Length; i++) {
-                if ((vmanager.m_vehicles.m_buffer[i].m_flags & (Vehicle.Flags.Created | Vehicle.Flags.Deleted)) !=
-                    Vehicle.Flags.Created) {
-                    continue;
-                }
-
-                if (vmanager.m_vehicles.m_buffer[i].Info.m_vehicleAI is CarTrailerAI) {
-                    continue;
-                }
-
-                return i;
-            }
-
-            return 0;
-        }
-        private uint GetRandomCitizenInstance()
-        {
-            var cmanager = CitizenManager.instance;
-            int skip = Random.Range(0, cmanager.m_instanceCount - 1);
-
-            for (uint i = 0; i < cmanager.m_instances.m_buffer.Length; i++) {
-                if ((cmanager.m_instances.m_buffer[i].m_flags & (CitizenInstance.Flags.Created | CitizenInstance.Flags.Deleted)) != CitizenInstance.Flags.Created) {
-                    continue;
-                }
-
-                if (skip > 0) {
-                    skip--;
-                    continue;
-                }
-
-                return cmanager.m_instances.m_buffer[i].m_citizen;
-            }
-
-            for (uint i = 0; i < cmanager.m_instances.m_buffer.Length; i++) {
-                if ((cmanager.m_instances.m_buffer[i].m_flags & (CitizenInstance.Flags.Created | CitizenInstance.Flags.Deleted)) != CitizenInstance.Flags.Created) {
-                    continue;
-                }
-
-                return cmanager.m_instances.m_buffer[i].m_citizen;
-            }
-
-            return 0;
         }
 
         private void UpdateWalkThru()

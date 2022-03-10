@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine;
 
 namespace FPSCamMod
@@ -32,6 +33,16 @@ namespace FPSCamMod
             _instance.Info.m_citizenAI.GetLocalizedStatus(_citizen.m_instance, ref _instance,
                 out InstanceID targetID);
             return (UUID) targetID;
+        }
+
+        public static CitizenID GetRandomID()
+        {
+            var indices = Enumerable.Range(0, citizenM.m_instances.m_buffer.Length).Where(
+                i => Of((CitizenID) citizenM.m_instances.m_buffer[i].m_citizen).exists
+            );
+            return indices.Count() == 0 ?
+                        default : (CitizenID)
+                        citizenM.m_instances.m_buffer[Random.Range(0, indices.Count())].m_citizen;
         }
 
         private Citizen _citizen;
