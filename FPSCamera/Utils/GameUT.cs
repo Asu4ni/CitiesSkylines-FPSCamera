@@ -4,8 +4,6 @@ namespace FPSCamMod
 {
     public static class GameUT
     {
-        public static ColossalFramework.Math.Randomizer Randomizer
-                        = new ColossalFramework.Math.Randomizer(System.Environment.TickCount);
         public static string GetBuildingName(BuildingID id)
             => BuildingManager.instance.GetBuildingName(id._id, default);
 

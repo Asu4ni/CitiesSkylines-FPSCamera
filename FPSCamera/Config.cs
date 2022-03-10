@@ -197,7 +197,7 @@ namespace FPSCamMod
                 Log.Msg($"config file ({e.FileName}) not existed");
             }
             catch (Exception e) {
-                Log.Msg($"exception while reading configuration: {e}");
+                Log.Err($"exception while reading configuration: {e}");
             }
             return null;
         }

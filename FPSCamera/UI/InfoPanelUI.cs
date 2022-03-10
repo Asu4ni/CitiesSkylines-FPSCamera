@@ -13,8 +13,6 @@ namespace FPSCamMod
 
         internal InfoPanelUI()
         {
-            var uiView = UIutils.UIroot;
-
             buttons = new UIButton[]
             {
                 CreateFollowBtn<CitizenVehicleWorldInfoPanel>(),

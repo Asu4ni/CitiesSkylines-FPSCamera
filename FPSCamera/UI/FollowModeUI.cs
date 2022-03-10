@@ -64,6 +64,7 @@ namespace FPSCamMod
             style.alignment = TextAnchor.MiddleCenter;
             style.fontSize = (int) (style.fontSize * 1.5f);
             GUI.Label(rect, $"{speed,5:F1} {(Config.G.UseMetricUnit ? "k" : "m")}ph", style);
+
             rect.y = rect.height - 25f; rect.height = 25f;
             style.alignment = TextAnchor.LowerCenter;
             style.fontSize = (int) Mathf.Max(8f, style.fontSize / 2f);
