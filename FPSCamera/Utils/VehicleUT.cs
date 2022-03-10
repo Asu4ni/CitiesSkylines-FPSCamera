@@ -35,9 +35,12 @@ namespace FPSCamMod
         public VehicleID FrontVehicleID()
             => (VehicleID) (isReversed ? _vehicle.GetLastVehicle(id._id)
                                       : _vehicle.GetFirstVehicle(id._id));
+        public VehicleID HeadVehicleID()
+            => (VehicleID) _vehicle.GetFirstVehicle(id._id);
         public UUID OwnerID() => (UUID) _vehicle.Info.m_vehicleAI.GetOwnerID(id._id, ref _vehicle);
         public UUID TargetID() => (UUID) _vehicle.Info.m_vehicleAI.GetTargetID(id._id, ref _vehicle);
 
+        public string Name() => vehicleM.GetVehicleName(id._id);
         public string TransportLineName()
             => TransportManager.instance.GetLineName(_vehicle.m_transportLine);
         public void GetPassengerSizeCapacity(out int size, out int capacity)

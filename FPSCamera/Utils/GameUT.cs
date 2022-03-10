@@ -4,6 +4,8 @@ namespace FPSCamMod
 {
     public static class GameUT
     {
+        public static ColossalFramework.Math.Randomizer Randomizer
+                        = new ColossalFramework.Math.Randomizer(System.Environment.TickCount);
         public static string GetBuildingName(BuildingID id)
             => BuildingManager.instance.GetBuildingName(id._id, default);
 
@@ -14,7 +16,12 @@ namespace FPSCamMod
 
         public static string RaycastRoad(Vector3 position)
         {
-            return Tool.RaycastRoad(position);
+            const float offset = 5f;
+            return Tool.RaycastRoad(new Vector2(position.x, position.z)) ??
+                   Tool.RaycastRoad(new Vector2(position.x, position.z + offset)) ??
+                   Tool.RaycastRoad(new Vector2(position.x + offset, position.z)) ??
+                   Tool.RaycastRoad(new Vector2(position.x - offset, position.z)) ??
+                   Tool.RaycastRoad(new Vector2(position.x, position.z - offset));
         }
 
         // TODO: investigate, sample point around for smoothness
@@ -40,7 +47,7 @@ namespace FPSCamMod
         public static float GetNextFloatFromSmoothTrans(float current, float target,
                 float reduceFactor, float minDiff = 0f, float maxDiff = float.MaxValue)
             => GetNextFromSmoothTrans<float>(current, target, reduceFactor,
-                        (a, b) => a - b, Mathf.Lerp, minDiff, maxDiff);
+                        (a, b) => Mathf.Abs(a - b), Mathf.Lerp, minDiff, maxDiff);
         public static Vector3 GetNextPosFromSmoothTrans(Vector3 current, Vector3 target,
                 float reduceFactor, float minDiff = 0f, float maxDiff = float.MaxValue)
             => GetNextFromSmoothTrans<Vector3>(current, target, reduceFactor,
@@ -52,17 +59,22 @@ namespace FPSCamMod
 
         private class Tool : ToolBase
         {
-            public static string RaycastRoad(Vector3 position)
+            public static string RaycastRoad(Vector2 position)
             {
-                RaycastInput raycastInput = new RaycastInput(new Ray(position, new Vector3(0, -1, 0)), 1000f);
+                RaycastInput raycastInput = new RaycastInput(
+                                new Ray(new Vector3(position.x, 1000f, position.y),
+                                new Vector3(0, -1, 0)), 1000f);
                 raycastInput.m_netService.m_service = ItemClass.Service.Road;
-                raycastInput.m_netService.m_itemLayers = ItemClass.Layer.Default | ItemClass.Layer.MetroTunnels;
+                raycastInput.m_netService.m_itemLayers = ItemClass.Layer.Default |
+                                                         ItemClass.Layer.MetroTunnels;
                 raycastInput.m_ignoreSegmentFlags = NetSegment.Flags.None;
                 raycastInput.m_ignoreNodeFlags = NetNode.Flags.None;
                 raycastInput.m_ignoreTerrain = true;
 
-                if (ToolBase.RayCast(raycastInput, out RaycastOutput result))
-                    return NetManager.instance.GetSegmentName(result.m_netSegment);
+                if (ToolBase.RayCast(raycastInput, out RaycastOutput result)) {
+                    var name = NetManager.instance.GetSegmentName(result.m_netSegment);
+                    if (string.IsNullOrEmpty(name)) name = "(unnamed)";
+                }
 
                 return null;
             }

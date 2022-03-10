@@ -16,6 +16,7 @@ namespace FPSCamMod
         internal void SetAssociatedCam(FPSCam cam)
         {
             camWRef = new WeakReference(cam);
+            elapsedTime = 0f;
             enabled = true;
         }
 
@@ -25,7 +26,9 @@ namespace FPSCamMod
             if (cam is null) {
                 camWRef = null;
                 enabled = false;
-                return;
+            }
+            else {
+                elapsedTime += Time.deltaTime;
             }
         }
 
@@ -44,7 +47,7 @@ namespace FPSCamMod
                         * (Config.G.UseMetricUnit ? 1.666f : 1.035f);
 
             var style = new GUIStyle();
-            style.fontSize = (int) Mathf.Clamp(width * .016f, 8f, Mathf.Max(height * .2f, 12f));
+            style.fontSize = (int) Mathf.Clamp(width * .015f, 8f, Mathf.Max(height * .2f, 12f));
             style.normal.textColor = new Color(.9f, .9f, 1f);
             var blockWidth = width / 3f;
             var margin = Mathf.Clamp(width * .01f, style.fontSize, style.fontSize * 4f);
@@ -59,11 +62,18 @@ namespace FPSCamMod
 
             rect.x -= blockWidth;
             style.alignment = TextAnchor.MiddleCenter;
-            style.fontSize = (int) (style.fontSize * 1.2f);
+            style.fontSize = (int) (style.fontSize * 1.5f);
             GUI.Label(rect, $"{speed,5:F1} {(Config.G.UseMetricUnit ? "k" : "m")}ph", style);
+            rect.y = rect.height - 25f; rect.height = 25f;
+            style.alignment = TextAnchor.LowerCenter;
+            style.fontSize = (int) Mathf.Max(8f, style.fontSize / 2f);
+            GUI.Label(rect, style: style,
+                      text: $"Time: {((uint) elapsedTime) / 60:00}:{((uint) elapsedTime) % 60:00}"
+            );
         }
 
         private const string missingText = "---";
         private WeakReference camWRef;
+        private float elapsedTime = 0f;
     }
 }

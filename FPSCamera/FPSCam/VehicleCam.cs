@@ -26,32 +26,39 @@ namespace FPSCamMod
         public override Vector3 GetVelocity() => FPSVehicle.Of(vehicleID).Velocity();
         public override string GetDestinationStr()
         {
-            var vehicle = FPSVehicle.Of(FPSVehicle.Of(vehicleID).FrontVehicleID());
+            var vehicle = FPSVehicle.Of(vehicleID);
+            string str;
             if (vehicle.IsOfType(VehicleType.Bicycle)) {
-                // TODO: ensure if alternatives are necessary
+                // TODO: ensure if alternat ives are necessary
                 var biker = FPSCitizen.Of(vehicle.OwnerID().Citizen);
-                return GameUT.GetBuildingName(vehicle.TargetID().Building)
+                str = GameUT.GetBuildingName(vehicle.TargetID().Building)
                        ?? GameUT.GetBuildingName(biker.targetBuildingID)
-                       ?? GameUT.GetBuildingName(biker.TargetID().Building)
-                       ?? unknownStr;
+                       ?? GameUT.GetBuildingName(biker.TargetID().Building);
             }
             else {
-                return GameUT.GetBuildingName(vehicle.TargetID().Building)
-                       ?? GameUT.GetBuildingName(vehicle.OwnerID().Building)
-                       ?? unknownStr;
+                // TODO: if not Building
+                str = GameUT.GetBuildingName(vehicle.TargetID().Building)
+                        ?? GameUT.GetBuildingName(vehicle.OwnerID().Building);
             }
+
+            if (str is null && vehicle.IsOfService(Service.PublicTransport))
+                str = "(circular)";
+            return str ?? unknownStr;
         }
         public override string GetDisplayInfoStr()
         {
-            var vehicle = FPSVehicle.Of(FPSVehicle.Of(vehicleID).FrontVehicleID());
+            var vehicle = FPSVehicle.Of(vehicleID);
             string info = "";
             if (vehicle.IsOfService(Service.PublicTransport)) {
-                info += $"Service> {vehicle.TransportLineName() ?? unknownStr}\n";
-                vehicle.GetPassengerSizeCapacity(out int size, out int capacity);
+                var head = FPSVehicle.Of(vehicle.HeadVehicleID());
+                info += $"Service> {head.TransportLineName() ?? unknownStr}\n";
+                head.GetPassengerSizeCapacity(out int size, out int capacity);
                 info += $"Passenger>{size,4} /{capacity,4}\n";
             }
-            // TODO: investigae: not working
-            info += $"At> {GameUT.RaycastRoad(vehicle.Position()) ?? unknownStr}";
+            // TODO: integrate RaycastRoad
+            if (vehicle.IsOfType(VehicleType.Bicycle))
+                info += $"Name> {FPSCitizen.Of(vehicle.OwnerID().Citizen).Name()}";
+            else info += $"Name> {vehicle.Name()}";
             return info;
         }
 

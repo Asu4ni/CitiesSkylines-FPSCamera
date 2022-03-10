@@ -26,8 +26,8 @@ namespace FPSCamMod
         {
             _instance.GetSmoothPosition(_citizen.m_instance, out position, out rotation);
         }
-        public Vector3 Velocity() // TODO: improvement
-            => _instance.GetLastFrameData().m_velocity;
+        public Vector3 Velocity() => _instance.GetLastFrameData().m_velocity;
+        public string Name() => citizenM.GetInstanceName(_citizen.m_instance);
         public UUID TargetID()
         {
             _instance.Info.m_citizenAI.GetLocalizedStatus(_citizen.m_instance, ref _instance,

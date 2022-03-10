@@ -20,18 +20,24 @@ namespace FPSCamMod
                     vehicleCamera.GetVelocity() : FPSCitizen.Of(citizenID).Velocity();
         public override string GetDestinationStr()
         {
-            if (state == State.waiting && vehicleCamera is object)
-                return vehicleCamera.GetDestinationStr();
-
             var citizen = FPSCitizen.Of(citizenID);
-            return GameUT.GetBuildingName(citizen.targetBuildingID)
+            var str = GameUT.GetBuildingName(citizen.targetBuildingID)
                    ?? GameUT.GetBuildingName(citizen.TargetID().Building)
                    ?? unknownStr;
+            if (state == State.waiting && vehicleCamera is object)
+                str += "\n-Vehicle > " + vehicleCamera.GetDestinationStr();
+
+            return str;
         }
         public override string GetDisplayInfoStr()
-            => state == State.waiting && vehicleCamera is object ?
-                    vehicleCamera.GetDisplayInfoStr() :
-                    $"At> {GameUT.RaycastRoad(FPSCitizen.Of(citizenID).Position()) ?? unknownStr}";
+        {
+            // TODO: integrate RaycastRoad
+            var info = $"Name> {FPSCitizen.Of(citizenID).Name()}";
+            if (state == State.waiting && vehicleCamera is object)
+                info += "\n--- Vehicle ---\n" + vehicleCamera.GetDisplayInfoStr();
+            return info;
+        }
+
         public override CamSetting GetNextCamSetting()
         {
             var citizen = FPSCitizen.Of(citizenID);
