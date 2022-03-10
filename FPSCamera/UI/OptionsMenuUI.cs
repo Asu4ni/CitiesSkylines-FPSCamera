@@ -1,111 +1,173 @@
 using ColossalFramework.UI;
 using ICities;
-using System;
 using UnityEngine;
 
 namespace FPSCamMod
 {
-    // TODO: add Reset Config Button
-    // TODO: add x button to cancel the binding or disrupt
-    public class OptionsMenuUI : MonoBehaviour
+    using CfKey = ConfigData<KeyCode>;
+
+    public static class OptionsMenuUI
     {
-        enum KeyCodeSelectType
+        public static void Generate(UIHelperBase uiHelper)
         {
-            none, forward, back, left, right, up, down
+            helperPanel = (uiHelper as UIHelper).self as UIScrollablePanel;
+            SetUp();
+        }
+        private static void SetUp()
+        {
+            var mainPanel = UIutils.AddGroup("First Person Camera", helperPanel);
+            const float margin = 5f;
+            {
+                var panel = UIutils.AddGroup("General Options", mainPanel);
+                panel.autoLayout = false;
+                UIComponent comp;
+                var y = 0f;
+                comp = UIutils.AddCheckbox(Config.G.UseMetricUnit, panel, yPos: y);
+                y += comp.height + margin;
+                comp = UIutils.AddCheckbox(Config.G.InvertRotateVertical, panel, yPos: y);
+                y += comp.height + margin;
+                comp = UIutils.AddCheckbox(Config.G.InvertRotateHorizontal, panel, yPos: y);
+                y += comp.height + margin;
+                comp = UIutils.AddSlider(Config.G.RotateSensitivity, panel, .25f,
+                                         yPos: y, width: panel.width, oneLine: true);
+                y += comp.height + margin;
+                comp = UIutils.AddSlider(Config.G.MaxVertRotate, panel, 1f, "F0",
+                                         yPos: y, width: panel.width, oneLine: true);
+                y += comp.height + margin;
+                panel.height = y;
+                UIutils.AddButton("ReloadConfig", "Reload Configurations", new Vector2(200f, 35f),
+                                   (_, p) => { Mod.LoadConfig(); Mod.ResetUI(); },
+                                   panel, panel.width - 240f, 0f);
+                UIutils.AddButton("ResetConfig", "Reset Configurations", new Vector2(200f, 35f),
+                                   (_, p) => Mod.ResetConfig(), panel, panel.width - 240f, 35f);
+            }
+            {
+                var panel = UIutils.AddGroup("Free-Camera Mode Options", mainPanel);
+                UIutils.AddCheckbox(Config.G.ShowCursorWhileFreeCam, panel);
+                UIutils.AddSlider(Config.G.GroundLevelOffset, panel, .25f,
+                                  width: panel.width, oneLine: true);
+            }
+            {
+                var panel = UIutils.AddGroup("Follow/Walk-Through Mode Options", mainPanel);
+                UIutils.AddCheckbox(Config.G.ShowCursorWhileFollow, panel);
+                UIutils.AddSlider(Config.G.MaxVertRotate4Follow, panel, 1f, "F0",
+                                  width: panel.width, oneLine: true);
+                UIutils.AddSlider(Config.G.MaxHoriRotate4Follow, panel, 1f, "F0",
+                                  width: panel.width, oneLine: true);
+                UIutils.AddSlider(Config.G.InstantMoveMax, panel, 1f, "F0",
+                                  width: panel.width, oneLine: true);
+            }
+            {
+                var panel = UIutils.AddGroup("Key Mapping", mainPanel);
+                var label = UIutils.AddLabel("KeyMappingComment",
+                                "* Press [ESC]: cancel |  * Press [Shift]+[X]: remove", panel);
+                panel.gameObject.AddComponent<KeyMappingUI>();
+            }
+            {
+                var panel = UIutils.AddGroup("Smooth Transition Options", mainPanel);
+                UIutils.AddSlider(Config.G.TransitionSpeed, panel, 1f, "F0",
+                                  width: panel.width, oneLine: true);
+                UIutils.AddSlider(Config.G.GiveUpTransitionDistance, panel, 50f, "F0",
+                                  width: panel.width, oneLine: true);
+                UIutils.AddSlider(Config.G.DeltaPosMin, panel, .05f,
+                                  width: panel.width, oneLine: true);
+                UIutils.AddSlider(Config.G.DeltaPosMax, panel, 1f, "F0",
+                                  width: panel.width, oneLine: true);
+                UIutils.AddSlider(Config.G.DeltaRotateMin, panel, .05f,
+                                  width: panel.width, oneLine: true);
+                UIutils.AddSlider(Config.G.DeltaRotateMax, panel, 1f, "F0",
+                                  width: panel.width, oneLine: true);
+            }
+            {
+                var panel = UIutils.AddGroup("Camera Offsets", mainPanel);
+                UIutils.AddOffsetSliders(Config.G.VehicleCamOffset, panel, width: panel.width);
+                UIutils.AddOffsetSliders(Config.G.CitizenCamOffset, panel, width: panel.width);
+            }
+        }
+        public static void Destroy()
+        {
+            if (helperPanel != null) {
+                var optionPanel = helperPanel.Find("OptionsGroupTemplate(Clone)");
+                helperPanel.RemoveUIComponent(optionPanel);
+                Object.Destroy(optionPanel);
+            }
+        }
+        public static void Rebuild() { if (helperPanel != null) { Destroy(); SetUp(); } }
+
+        private static UIScrollablePanel helperPanel;
+    }
+
+    public class KeyMappingUI : UICustomControl
+    {
+        private CfKey configWaiting;
+
+        private void Awake()
+        {
+            AddKeyMapping(Config.G.KeyCamToggle);
+
+            AddKeyMapping(Config.G.KeySpeedUp);
+            AddKeyMapping(Config.G.KeyCamReset);
+            AddKeyMapping(Config.G.KeyCursorToggle);
+
+            AddKeyMapping(Config.G.KeyMoveForward);
+            AddKeyMapping(Config.G.KeyMoveBackward);
+            AddKeyMapping(Config.G.KeyMoveLeft);
+            AddKeyMapping(Config.G.KeyMoveRight);
+            AddKeyMapping(Config.G.KeyMoveUp);
+            AddKeyMapping(Config.G.KeyMoveDown);
+
+            AddKeyMapping(Config.G.KeyRotateUp);
+            AddKeyMapping(Config.G.KeyRotateDown);
+            AddKeyMapping(Config.G.KeyRotateLeft);
+            AddKeyMapping(Config.G.KeyRotateRight);
         }
 
-        public void Update()
+        private void AddKeyMapping(CfKey config)
         {
-            if (keyCodeSelctMode == KeyCodeSelectType.none) return;
-            KeyCode pressedKey = FindKeyPressed();
-            if (pressedKey != KeyCode.None && pressedKey != KeyCode.Mouse0) {
-                switch (keyCodeSelctMode) {
-                case KeyCodeSelectType.forward:
-                    forwardBtn.text = pressedKey.ToString();
-                    Config.G.KeyMoveForward.assign(pressedKey);
-                    break;
-                case KeyCodeSelectType.back:
-                    backBtn.text = pressedKey.ToString();
-                    Config.G.KeyMoveBackward.assign(pressedKey);
-                    break;
-                case KeyCodeSelectType.left:
-                    leftBtn.text = pressedKey.ToString();
-                    Config.G.KeyMoveLeft.assign(pressedKey);
-                    break;
-                case KeyCodeSelectType.right:
-                    rightBtn.text = pressedKey.ToString();
-                    Config.G.KeyMoveRight.assign(pressedKey);
-                    break;
-                case KeyCodeSelectType.up:
-                    upBtn.text = pressedKey.ToString();
-                    Config.G.KeyMoveUp.assign(pressedKey);
-                    break;
-                case KeyCodeSelectType.down:
-                    downBtn.text = pressedKey.ToString();
-                    Config.G.KeyMoveDown.assign(pressedKey);
-                    break;
-                }
+            var panel = UIutils.AddUI<UIPanel>("KeyBindingTemplate", component);
+
+            var btn = panel.Find<UIButton>("Binding");
+            btn.eventKeyDown += new KeyPressHandler(KeyPressAction);
+            btn.eventMouseDown += new MouseEventHandler(MouseEventAction);
+            btn.text = config.ToString();
+            btn.textColor = UIutils.textColor;
+            btn.objectUserData = config;
+
+            var label = panel.Find<UILabel>("Name");
+            label.text = config.Description; label.tooltip = config.Detail;
+            label.textColor = UIutils.textColor;
+        }
+
+        private void KeyPressAction(UIComponent comp, UIKeyEventParameter p)
+        {
+            if (configWaiting is object) {
+                p.Use();
+                UIView.PopModal();
+
+                var btn = p.source as UIButton;
+                var key = p.keycode;
+                if (p.shift && key == KeyCode.X) configWaiting.assign(KeyCode.None);
+                else if (key != KeyCode.Escape) configWaiting.assign(key);
+
+                btn.text = configWaiting.ToString();
                 Config.G.Save();
+                Log.Msg($"Config: assign \"{configWaiting}\" to [{configWaiting.Name}]");
+                configWaiting = null;
             }
-            keyCodeSelctMode = KeyCodeSelectType.none;
-
         }
 
-        public void GenerateSettings(UIHelperBase helper)
+        private void MouseEventAction(UIComponent comp, UIMouseEventParameter p)
         {
-            UIHelper controlGroup = helper.AddGroup("FPS Camera Control settings") as UIHelper;
-            forwardBtn = AddKeymapping(controlGroup, "Forward Button", Config.G.KeyMoveForward, KeyCodeSelectType.forward);
-            backBtn = AddKeymapping(controlGroup, "Backward Button", Config.G.KeyMoveBackward, KeyCodeSelectType.back);
-            leftBtn = AddKeymapping(controlGroup, "Left Button", Config.G.KeyMoveLeft, KeyCodeSelectType.left);
-            rightBtn = AddKeymapping(controlGroup, "Right Button", Config.G.KeyMoveRight, KeyCodeSelectType.right);
-            upBtn = AddKeymapping(controlGroup, "Up Button", Config.G.KeyMoveUp, KeyCodeSelectType.up);
-            downBtn = AddKeymapping(controlGroup, "Down Button", Config.G.KeyMoveDown, KeyCodeSelectType.down);
-        }
+            if (configWaiting is null) {
+                p.Use();
 
-        // TODO: improve
-        private KeyCode FindKeyPressed()
-        {
-            foreach (KeyCode code in Enum.GetValues(typeof(KeyCode))) {
-                if (Input.GetKeyDown(code)) {
-                    return code;
-                }
+                var btn = p.source as UIButton;
+                configWaiting = (CfKey) btn.objectUserData;
+
+                btn.text = "(Press a key)";
+                btn.Focus();
+                UIView.PushModal(btn);
             }
-            return KeyCode.None;
         }
-
-        private UIButton AddKeymapping(UIHelper parent, string label, KeyCode initialKeycode, KeyCodeSelectType selectType)
-        {
-            var parentPanel = parent.self as UIPanel;
-            var uIPanel = parentPanel.AttachUIComponent(UITemplateManager.GetAsGameObject("KeyBindingTemplate")) as UIPanel;
-
-            UILabel uILabel = uIPanel.Find<UILabel>("Name");
-            UIButton uIButton = uIPanel.Find<UIButton>("Binding");
-            uIButton.eventKeyDown += (component, eventParam) => {
-                OnBtnClicked(uIButton, selectType);
-            };
-            uIButton.eventMouseDown += (component, eventParam) => {
-                OnBtnClicked(uIButton, selectType);
-            };
-
-            uILabel.text = label;
-            uIButton.text = initialKeycode.ToString();
-            parent.AddSpace(10);
-            return uIButton;
-        }
-
-        private void OnBtnClicked(UIButton button, KeyCodeSelectType selectType)
-        {
-            keyCodeSelctMode = selectType;
-            button.text = "???";
-        }
-
-        private KeyCodeSelectType keyCodeSelctMode = KeyCodeSelectType.none;
-
-        private UIButton forwardBtn;
-        private UIButton backBtn;
-        private UIButton leftBtn;
-        private UIButton rightBtn;
-        private UIButton upBtn;
-        private UIButton downBtn;
     }
 }

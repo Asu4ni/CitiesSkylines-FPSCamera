@@ -10,20 +10,36 @@ namespace FPSCamMod
         public string Description => "View your city from a different perspective";
 
         public void OnSettingsUI(UIHelperBase helper)
-        {
-            if (camOptionsUI is null) {
-                camOptionsUI = new GameObject("FPSCameraControlsOptionsUI").AddComponent<OptionsMenuUI>();
-            }
-            camOptionsUI.GenerateSettings(helper);
-        }
+        { OptionsMenuUI.Generate(helper); }
+
         public void OnEnabled()
+        {
+            LoadConfig();
+            Log.Msg("Mod enabled.");
+        }
+        public void OnDisabled()
+        {
+            Log.Msg("Mod disabled.");
+            OptionsMenuUI.Destroy();
+        }
+
+        internal static void LoadConfig()
         {
             Config.G = Config.Load() ?? Config.G;
             Config.G.Save();
         }
-        public void OnDisabled() { }
-
-        private OptionsMenuUI camOptionsUI = null;
+        internal static void ResetConfig()
+        {
+            Config.G = new Config();
+            Config.G.Save();
+            ResetUI();
+        }
+        internal static void ResetUI()
+        {
+            OptionsMenuUI.Rebuild();
+            var fps = Object.FindObjectOfType<FPSController>();
+            if (fps is object) fps.ResetUI();
+        }
     }
 
     public class ModLoad : LoadingExtensionBase

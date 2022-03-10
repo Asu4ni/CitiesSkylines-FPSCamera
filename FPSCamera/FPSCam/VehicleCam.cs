@@ -77,7 +77,8 @@ namespace FPSCamMod
             // TODO: ensure AttachOffsetFront
 
             var offset = CamUT.GetOffset(rotation,
-                    Config.G.VehicleCamOffset.forward + vehicle.AttachOffsetFront(),
+                    Config.G.VehicleCamOffset.forward + Config.G.VehicleFOffsetForward
+                        + vehicle.AttachOffsetFront(),
                     Config.G.VehicleCamOffset.up + Config.G.VehicleFOffsetUp
                         + (vehicle.isLeading || vehicle.isTrailing ?
                           0f : Config.G.MiddleVehicleFOffsetUp),

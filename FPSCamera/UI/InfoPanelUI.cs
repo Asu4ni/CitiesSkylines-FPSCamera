@@ -13,7 +13,7 @@ namespace FPSCamMod
 
         internal InfoPanelUI()
         {
-            var uiView = UIUT.UIView;
+            var uiView = UIutils.UIroot;
 
             buttons = new UIButton[]
             {

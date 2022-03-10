@@ -1,17 +1,34 @@
+#if DEBUG
+using System.Collections.Generic;
+using UnityEngine;
+
 namespace FPSCamMod
 {
-    using System.Collections.Generic;
-#if DEBUG
-    using UnityEngine;
     internal class DebugUI : MonoBehaviour
     {
-        static DebugUI() { Displayed._set("DisplayDebugPanel", "Show Debug Panel"); }
-        internal static readonly ConfigData<bool> Displayed = new ConfigData<bool>(false);
+        internal class DisplayFlag : ConfigData<bool>
+        {
+            public static implicit operator bool(DisplayFlag data) => data.enabled;
+            public DisplayFlag() : base(false)
+            {
+                _set("DisplayDebugPanel", "Show Debug Panel", "");
+            }
+            public override bool assign(bool value) { return enabled = value; }
+            public override string ToString() => enabled.ToString();
+            public override bool AssignByParsing(string str)
+                => enabled = base.AssignByParsing(str);
+
+            private bool enabled {
+                get => DebugUI.Panel.enabled;
+                set => DebugUI.Panel.enabled = value;
+            }
+        }
+        internal static readonly DisplayFlag Displayed = new DisplayFlag();
 
         public static DebugUI Panel {
             get {
-                if (panel is null) panel = UIUT.UIView.gameObject.AddComponent<DebugUI>();
-                return panel;
+                if (_panel is null) _panel = UIutils.UIroot.gameObject.AddComponent<DebugUI>();
+                return _panel;
             }
         }
 
@@ -32,7 +49,7 @@ namespace FPSCamMod
         private void OnGUI()
         {
             var boxWidth = Mathf.Min(Screen.width / 5f, 400f);
-            var boxHeight = Mathf.Max(Screen.height / 2f, 1000f);
+            var boxHeight = Mathf.Min(Screen.height / 2f, 1000f);
 
             GUI.color = new Color(0f, 0f, 0f, .8f);
             GUI.Box(new Rect(0f, boxHeight / 2f, boxWidth, boxHeight), "");
@@ -66,7 +83,7 @@ namespace FPSCamMod
         private List<string> nameList = new List<string>();
         private List<System.Action> actionList = new List<System.Action>();
 
-        private static DebugUI panel;
+        private static DebugUI _panel;
     }
-#endif
 }
+#endif

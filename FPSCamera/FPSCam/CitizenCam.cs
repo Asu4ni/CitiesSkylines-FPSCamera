@@ -4,8 +4,6 @@ namespace FPSCamMod
 {
     internal class CitizenCam : FPSCam
     {
-        private const float camOffsetUp = 2f;
-
         public CitizenCam(UUID idToFollow) : base()
         {
             citizenID = idToFollow.Citizen;
@@ -70,9 +68,10 @@ namespace FPSCamMod
 
             citizen.PositionRotation(out Vector3 position, out Quaternion rotation);
 
-            var offset = CamUT.GetOffset(rotation, Config.G.CitizenCamOffset.forward,
-                                                   Config.G.CitizenCamOffset.up + camOffsetUp,
-                                                   Config.G.CitizenCamOffset.right);
+            var offset = CamUT.GetOffset(rotation,
+                                    Config.G.CitizenCamOffset.forward,
+                                    Config.G.CitizenCamOffset.up + Config.G.CitizenFOffsetUp,
+                                    Config.G.CitizenCamOffset.right);
 
             return new CamSetting(position + offset, rotation);
         }

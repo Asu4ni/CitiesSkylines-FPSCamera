@@ -21,98 +21,95 @@ namespace FPSCamMod
 
         /*----------- global config -----------------------------------------*/
 
-        [Config("CamToggle", "Key to toggle FPS Camera")]
+        [Config("KeyCamToggle", "FPS Camera toggle")]
         public readonly CfKey KeyCamToggle = new CfKey(KeyCode.BackQuote);
         [Config("HideUI", "Hide UI when activated")]
         public readonly CfFlag HideUIwhenActivate = new CfFlag(false);
-        [Config("", "")]
+        [Config("UseMetricUnit", "Use metric units")]
         public readonly CfFlag UseMetricUnit = new CfFlag(true);
-        [Config("", "")]
-        public readonly CfOffset CamUIOffset
-                = new CfOffset(new CfFloat(0f, 0f, 0f), new CfFloat(0f, 0f), new CfFloat(0f, 0f));
-        //                        always 0 (forward)  |    y-axis (up)     |    x-axis (right)
 
         [Config("SmoothTransition", "Smooth transition")]
         public readonly CfFlag SmoothTransition = new CfFlag(true);
-        [Config("TransitionSpeed", "Transition speed")]
+        [Config("TransitionSpeed", "Smooth transition speed")]
         public readonly CfFloat TransitionSpeed = new CfFloat(5f, 1f, 9f);
-        [Config("", "")]
-        public readonly CfFloat InstantMoveMax = new CfFloat(15f, 5f, 50f);
-        [Config("", "")]
-        public readonly CfFloat GiveUpDistance = new CfFloat(500f, 100f, 2000f);
-        [Config("", "")]
+        [Config("GiveUpTransitionDistance", "Max distance to transition smoothly",
+                "When the camera target position is too far, smooth transition takes too long.\n" +
+                "This number sets the distance to give up the transition.")]
+        public readonly CfFloat GiveUpTransitionDistance = new CfFloat(500f, 100f, 2000f);
+        [Config("DeltaPosMin", "Min movement for smooth transition")]
         public readonly CfFloat DeltaPosMin = new CfFloat(.5f, .1f, 5f);
-        [Config("", "")]
+        [Config("DeltaPosMax", "Max movement for smooth transition")]
         public readonly CfFloat DeltaPosMax = new CfFloat(30f, 5f, 100f);
-        [Config("", "")]
-        public readonly CfFloat DeltaRotateMin = new CfFloat(.1f, .01f, 5f);
-        [Config("", "")]
+        [Config("DeltaRotateMin", "Min rotation for smooth transition", "unit: degree")]
+        public readonly CfFloat DeltaRotateMin = new CfFloat(.1f, .05f, 5f);
+        [Config("DeltaRotateMax", "Max rotation for smooth transition", "unit: degree")]
         public readonly CfFloat DeltaRotateMax = new CfFloat(10f, 5f, 45f);
 
         // camera control
-        [Config("Forward", "")]
+        [Config("KeyMoveForward", "Move/Offset forward")]
         public readonly CfKey KeyMoveForward = new CfKey(KeyCode.W);
-        [Config("Left", "")]
+        [Config("KeyMoveLeft", "Move/Offset left")]
         public readonly CfKey KeyMoveLeft = new CfKey(KeyCode.A);
-        [Config("Backward", "")]
+        [Config("KeyMoveBackward", "Move/Offset backward")]
         public readonly CfKey KeyMoveBackward = new CfKey(KeyCode.S);
-        [Config("Right", "")]
+        [Config("KeyMoveRight", "Move/Offset right")]
         public readonly CfKey KeyMoveRight = new CfKey(KeyCode.D);
-        [Config("Up", "")]
+        [Config("KeyMoveUp", "Move/Offset up")]
         public readonly CfKey KeyMoveUp = new CfKey(KeyCode.PageUp);
-        [Config("Down", "")]
+        [Config("KeyMoveDown", "Move/Offset down")]
         public readonly CfKey KeyMoveDown = new CfKey(KeyCode.PageDown);
 
-        [Config("", "")]
+        [Config("KeyRotateUp", "Rotate/Look up")]
         public readonly CfKey KeyRotateUp = new CfKey(KeyCode.None);
-        [Config("", "")]
+        [Config("KeyRotateDown", "Rotate/Look down")]
         public readonly CfKey KeyRotateDown = new CfKey(KeyCode.None);
-        [Config("", "")]
+        [Config("KeyRotateLeft", "Rotate/Look left")]
         public readonly CfKey KeyRotateLeft = new CfKey(KeyCode.None);
-        [Config("", "")]
+        [Config("KeyRotateRight", "Rotate/Look right")]
         public readonly CfKey KeyRotateRight = new CfKey(KeyCode.None);
 
-        [Config("SpeedUp", "")]
+        [Config("KeySpeedUp", "Speed up movement/offset")]
         public readonly CfKey KeySpeedUp = new CfKey(KeyCode.CapsLock);
-        [Config("CamReset", "")]
+        [Config("KeyCamReset", "Reset Camera offset & rotation")]
         public readonly CfKey KeyCamReset = new CfKey(KeyCode.Backspace);
 
-        [Config("MovementSpeed", "Camera Movement speed")]
-        public readonly CfFloat MovementSpeed = new CfFloat(40f, 1f, 60f);
-        [Config("SpeedUpFactor", "Movement Speed up factor")]
+        [Config("MovementSpeed", "Movement/Offset speed")]
+        public readonly CfFloat MovementSpeed = new CfFloat(30f, 1f, 60f);
+        [Config("SpeedUpFactor", "Speed-Up factor for movement/offset")]
         public readonly CfFloat SpeedUpFactor = new CfFloat(4f, 1.5f, 10f);
 
-        [Config("", "")]
+        [Config("MaxVertRotate", "Max vertical viewing range",
+                "The maximum degree to rotate camera up & down.")]
         public readonly CfFloat MaxVertRotate = new CfFloat(70f, 30f, 85f);
-        [Config("RotateSensitivity", "Camera Rotation Sensitivity")]
-        public readonly CfFloat rotateSensitivity = new CfFloat(4f, 1f, 10f);
-        [Config("InvertRotateHorizontal", "Invert Horizontal Rotation")]
+        [Config("RotateSensitivity", "Camera rotation sensitivity")]
+        public readonly CfFloat RotateSensitivity = new CfFloat(4f, 1f, 10f);
+        [Config("InvertRotateHorizontal", "Invert horizontal rotation")]
         public readonly CfFlag InvertRotateHorizontal = new CfFlag(false);
-        [Config("InvertRotateVertical", "Invert Vertical Rotation")]
+        [Config("InvertRotateVertical", "Invert vertical rotation")]
         public readonly CfFlag InvertRotateVertical = new CfFlag(false);
 
         // camera config
-        [Config("", "")]
+        [Config("EnableDOF", "Apply depth of field effect")]
         public readonly CfFlag EnableDOF = new CfFlag(false);
-        [Config("FieldOfView", "Camera field of view")]
+        [Config("FieldOfView", "Camera field of view", "Viewing range of the camera (degrees)")]
         public readonly CfFloat CamFieldOfView = new CfFloat(45f, 10f, 75f);
 
         // cursor
-        [Config("CursorToggle", "")]
+        [Config("KeyCursorToggle", "Cursor visibility toggle")]
         public readonly CfKey KeyCursorToggle = new CfKey(KeyCode.LeftControl);
-        [Config("", "")]
+        [Config("ShowCursorWhileFreeCam", "Show cursor in Free-Camera Mode")]
         public readonly CfFlag ShowCursorWhileFreeCam = new CfFlag(false);
-        [Config("", "")]
+        [Config("ShowCursorWhileFollow", "Show cursor in Follow/Walk-Through Mode")]
         public readonly CfFlag ShowCursorWhileFollow = new CfFlag(true);
 
         // position offset
-        [Config("VehicleCamOffset", "Vehicle Camera Offset")]
+        [Config("VehicleCamOffset", "Camera offset while following vehicles")]
         public readonly CfOffset VehicleCamOffset = new CfOffset(
             new CfFloat(0f, -20f, 40f),
             new CfFloat(0f, -20f, 40f),
             new CfFloat(0f, -30f, 30f)
         );
-        [Config("CitizenCamOffset", "Citizen Camera Offset")]
+        [Config("CitizenCamOffset", "Camera offset while following citizens")]
         public readonly CfOffset CitizenCamOffset = new CfOffset(
             new CfFloat(0f, -20f, 40f),
             new CfFloat(0f, -20f, 40f),
@@ -120,37 +117,55 @@ namespace FPSCamMod
         );
 
         // free cam config
-        public enum GroundClipping { None, SnapToGround, PreventClip }
-        [Config("GroundClipping", "Ground Clipping Option")]
+        public enum GroundClipping { None, PreventClip, SnapToGround }
+        [Config("GroundClipping", "Ground clipping option",
+                "For Free-Camera Mode: -[None] free movement\n" +
+                "-[PreventClip] camera always above ground\n" +
+                "-[SnapToGround] camera sticks to ground")]
         public readonly ConfigData<GroundClipping> GroundClippingOption
                             = new ConfigData<GroundClipping>(GroundClipping.PreventClip);
-        [Config("DistanceFromGround", "Distance from Ground")]
-        public readonly CfFloat DistanceFromGround = new CfFloat(0f, -2f, 10f);
+        [Config("GroundLevelOffset", "Ground level offset",
+                "Vertical offset for ground level used for ground clipping option")]
+        public readonly CfFloat GroundLevelOffset = new CfFloat(0f, -2f, 10f);
 
         // follow config
         [Config("StickToFrontVehicle", "Alway follow the front vehicle")]
         public readonly CfFlag StickToFrontVehicle = new CfFlag(true);
         [Config("ShowInfoPanel", "Display Info panel while following")]
         public readonly CfFlag ShowInfoPanel4Follow = new CfFlag(true);
-        [Config("", "")]
+        [Config("MaxHoriRotate4Follow", "Max horizontal viewing range")]
         public readonly CfFloat MaxHoriRotate4Follow = new CfFloat(45f, 5f, 160f);
-        [Config("", "")]
-        public readonly CfFloat MaxVertRotate4Follow = new CfFloat(30f, 5f, 80f);
+        [Config("MaxVertRotate4Follow", "Max vertical viewing range")]
+        public readonly CfFloat MaxVertRotate4Follow = new CfFloat(30f, 5f, 85f);
+        [Config("InstantMoveMax", "Min distance for smooth transition",
+                "In Follow Mode, camera needs to move instantly with\n" +
+                "the target even when smooth transition is enabled.\n" +
+                "This number sets the minimum distance to apply smooth transition.")]
+        public readonly CfFloat InstantMoveMax = new CfFloat(15f, 5f, 50f);
 
         // walkThru config
         [Config("ClickToSwitch", "Switch target manually (Mouse Click)")]
         public readonly CfFlag ClickToSwitch4WalkThru = new CfFlag(false);
-        [Config("PeriodWalkThru", "Period(second) for each random target")]
+        [Config("PeriodWalkThru", "Period (seconds) for each random target")]
         public readonly CfFloat Period4WalkThru = new CfFloat(20f, 5f, 300f);
 
         /*--------- configurable constants ----------------------------------*/
 
-        [Config("VehicleDOfstUp", "Cam fixed offset.up for vehicle")]
+        [Config("CamUIOffset", "In-Game config panel position")]
+        public readonly CfOffset CamUIOffset
+                = new CfOffset(new CfFloat(0f, 0f, 0f), new CfFloat(-1f), new CfFloat(-1f));
+        //                        always 0 (forward)  |    y-axis (up)     |    x-axis (right)
+        // value == -1 : unset
+
+        [Config("VehicleFOffsetUp", "Cam fixed offset.up for vehicle")]
         public readonly CfFloat VehicleFOffsetUp = new CfFloat(2f);
 
-        [Config("VehicleDOfstUp", "Cam fixed offset.up for vehicle in the middle")]
+        [Config("VehicleFOffsetUp", "Cam fixed offset.up for vehicle")]
+        public readonly CfFloat VehicleFOffsetForward = new CfFloat(2f);
+        [Config("MiddleVehicleFOffsetUp", "Cam fixed offset.up for vehicle in the middle")]
         public readonly CfFloat MiddleVehicleFOffsetUp = new CfFloat(3f);
-
+        [Config("CitizenFOffsetUp", "Cam fixed offset.up for citizen")]
+        public readonly CfFloat CitizenFOffsetUp = new CfFloat(2f);
         /*-------------------------------------------------------------------*/
 
         // Return a ratio[0f, 1f] representing the proportion to reduce for a difference
@@ -182,7 +197,7 @@ namespace FPSCamMod
                 Log.Msg($"config file ({e.FileName}) not existed");
             }
             catch (Exception e) {
-                Log.Err($"exception while reading configuration: {e}");
+                Log.Msg($"exception while reading configuration: {e}");
             }
             return null;
         }
@@ -212,7 +227,8 @@ namespace FPSCamMod
         }
         public void WriteXml(XmlWriter writer)
         {
-            foreach (var field in GetType().GetFields(BindingFlags.Public | BindingFlags.Instance)) {
+            foreach (var field in GetType().GetFields(
+                                        BindingFlags.Public | BindingFlags.Instance)) {
                 writer.WriteStartElement(field.Name);
                 if (field.GetValue(this) is IConfigData config)
                     writer.WriteString(config.ToString());
@@ -223,11 +239,13 @@ namespace FPSCamMod
 
         private void StoreConfigAttr()
         {
-            foreach (var field in GetType().GetFields(BindingFlags.Public | BindingFlags.Instance)) {
+            foreach (var field in GetType().GetFields(
+                                        BindingFlags.Public | BindingFlags.Instance)) {
                 if (field.GetValue(this) is IConfigData config) {
                     var attrs = field.GetCustomAttributes(typeof(ConfigAttribute), false)
                                                                     as ConfigAttribute[];
-                    foreach (var attr in attrs) config._set(attr.Name, attr.Description);
+                    foreach (var attr in attrs)
+                        config._set(attr.Name, attr.Description, attr.Detail);
                 }
                 else Log.Err($"Config: invalid type of config field[{field.Name}]");
             }
@@ -241,15 +259,17 @@ namespace FPSCamMod
     {
         public readonly string Name;
         public readonly string Description;
-        public ConfigAttribute(string name, string description)
-        { Name = name; Description = description; }
+        public readonly string Detail;
+        public ConfigAttribute(string name, string description, string detail = "")
+        { Name = name; Description = description; Detail = detail; }
     }
     interface IConfigData
     {
         bool AssignByParsing(string str);
-        void _set(string name, string description);
+        void _set(string name, string description, string detail);
         string Name { get; }
         string Description { get; }
+        string Detail { get; }
     }
     public class ConfigData<T> : IConfigData
     {
@@ -271,8 +291,9 @@ namespace FPSCamMod
         protected T value;
         public string Name { get; private set; }
         public string Description { get; private set; }
-        public void _set(string name, string description)
-        { Name = name; Description = description; }
+        public string Detail { get; private set; }
+        public void _set(string name, string description, string detail)
+        { Name = name; Description = description; Detail = detail; }
     }
 
     public class CfFloat : ConfigData<float>

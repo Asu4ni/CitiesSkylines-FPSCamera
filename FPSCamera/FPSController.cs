@@ -100,7 +100,7 @@ namespace FPSCamMod
             targetSetting = originalSetting = CamSetting;
             configPanelUI.OnCamActivate();
             infoPanelUI.OnCamActivate();
-            if (Config.G.HideUIwhenActivate) UIUT.HideUI();
+            if (Config.G.HideUIwhenActivate) UIutils.HideUI();
 
             ResetCamLocal();
             camController.m_maxDistance = 50f;  // TODO: consider to remove
@@ -115,7 +115,7 @@ namespace FPSCamMod
 
             configPanelUI.OnCamDeactivate();
             infoPanelUI.OnCamDeactivate();
-            if (Config.G.HideUIwhenActivate) UIUT.ShowUI();
+            if (Config.G.HideUIwhenActivate) UIutils.ShowUI();
 
             camController.enabled = true;
             camFOV = oFieldOfView;
@@ -315,7 +315,7 @@ namespace FPSCamMod
             targetSetting.rotation.eulerAngles = euler;
 
             if (Config.G.GroundClippingOption != Config.GroundClipping.None) {
-                var minHeight = GameUT.GetMinHeightAt(CamPosition) + Config.G.DistanceFromGround;
+                var minHeight = GameUT.GetMinHeightAt(CamPosition) + Config.G.GroundLevelOffset;
                 if (Config.G.GroundClippingOption == Config.GroundClipping.SnapToGround
                     || CamPosition.y < minHeight)
                     targetSetting.position.y = minHeight;
@@ -352,19 +352,19 @@ namespace FPSCamMod
             // TODO: ensure rotateSensitivity factor 2f
             ref Vector2 delXY = ref controlOffset.deltaEulerXY;
             if (!Cursor.visible) {
-                delXY.y = ControlUT.MouseMoveHori * Config.G.rotateSensitivity / 4f;
-                delXY.x = -ControlUT.MouseMoveVert * Config.G.rotateSensitivity / 4f;
+                delXY.y = ControlUT.MouseMoveHori * Config.G.RotateSensitivity / 4f;
+                delXY.x = -ControlUT.MouseMoveVert * Config.G.RotateSensitivity / 4f;
                 if (Config.G.InvertRotateHorizontal) delXY.y = -delXY.y;
                 if (Config.G.InvertRotateVertical) delXY.x = -delXY.x;
             }
             if (ControlUT.KeyRotateL)
-                delXY.y -= Time.deltaTime * Config.G.rotateSensitivity;
+                delXY.y -= Time.deltaTime * Config.G.RotateSensitivity;
             if (ControlUT.KeyRotateR)
-                delXY.y += Time.deltaTime * Config.G.rotateSensitivity;
+                delXY.y += Time.deltaTime * Config.G.RotateSensitivity;
             if (ControlUT.KeyRotateU)
-                delXY.x -= Time.deltaTime * Config.G.rotateSensitivity;
+                delXY.x -= Time.deltaTime * Config.G.RotateSensitivity;
             if (ControlUT.KeyRotateD)
-                delXY.x += Time.deltaTime * Config.G.rotateSensitivity;
+                delXY.x += Time.deltaTime * Config.G.RotateSensitivity;
 
             // TODO: ENSURE FACTOR
             float factor = 1.1f;
@@ -415,13 +415,13 @@ namespace FPSCamMod
 
             if (Config.G.SmoothTransition) {
                 var distance = Vector3.Distance(targetSetting.position, CamPosition);
-                if (distance > Config.G.GiveUpDistance) {
+                if (distance > Config.G.GiveUpTransitionDistance) {
                     // TODO: fade out fade in
                     CamSetting = targetSetting; camFOV = targetFOV;
                 }
                 else {
                     var reduceFactor = Config.G.GetReduceFactor(Time.deltaTime);
-                    CamPosition = distance < Config.G.InstantMoveMax ?
+                    CamPosition = isFollowing && distance < Config.G.InstantMoveMax ?
                                   targetSetting.position :
                                   GameUT.GetNextPosFromSmoothTrans(
                                             CamPosition, targetSetting.position, reduceFactor,
