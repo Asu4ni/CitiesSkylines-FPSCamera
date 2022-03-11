@@ -13,5 +13,5 @@ Refer to the [wiki](https://github.com/Asu4ni/CitiesSkylines-FPSCamera/wiki) pag
 > The mod can also be downloaded on [Steam Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=2764243667).
 
 
-<p><img src="images/image1.png" width="350px" />
-<img src="images/image6.png" width="400px" /></p>
+<p><img src="images/image1.png" width="375px" />
+<img src="images/image4.png" width="375px" /></p>
