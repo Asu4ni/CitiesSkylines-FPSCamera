@@ -16,7 +16,7 @@ namespace FPSCamMod
             toggleHintLabel.Hide();
 
             mainPanel = UIutils.AddPanel("FPSConfigPanel", new Vector2(400f, 740f));
-            mainPanel.enabled = false;
+            PanelExpanded = false;
 
             panelBtn.eventPositionChanged += (component, param) => {
                 Config.G.CamUIOffset.right.assign(panelBtn.relativePosition.x);
@@ -33,7 +33,7 @@ namespace FPSCamMod
                         panelBtn.relativePosition.y + panelBtn.height - 15f :
                         panelBtn.relativePosition.y - mainPanel.height + 15f
                 );
-                mainPanel.enabled = !mainPanel.enabled;
+                PanelExpanded = !PanelExpanded;
             };
 
             const float margin = 5f;
@@ -94,7 +94,7 @@ namespace FPSCamMod
         }
         public void OnCamActivate()
         {
-            mainPanel.enabled = false;
+            PanelExpanded = false;
             if (walkThruBtn is object) walkThruBtn.Disable();
 
             toggleHintLabel.color = new Color32(255, 255, 255, 255);
@@ -105,6 +105,7 @@ namespace FPSCamMod
                         -panelBtn.width : toggleHintLabel.width + 3f,
                     (toggleHintLabel.height - panelBtn.height) / 2f + 3f);
             toggleHintLabel.Show();
+            panelBtn.Focus();
         }
 
         private UIButton SetUpPanelButton()
@@ -143,7 +144,11 @@ namespace FPSCamMod
             return btn;
         }
 
-        internal void OnEsc() => mainPanel.enabled = false;
+        internal void OnEsc() => PanelExpanded = false;
+        internal bool PanelExpanded {
+            get => mainPanel.enabled;
+            set { mainPanel.enabled = value; if (value) panelBtn.Focus(); }
+        }
 
         private void LateUpdate()
         {
@@ -177,7 +182,9 @@ namespace FPSCamMod
             set => _walkThruCallBack = value;
         }
 
-        internal void registerWalkThruCallBack(System.Action callBackAction)
-        { walkThruCallBack = callBackAction; }
+        internal void RegisterWalkThruCallBack(System.Action callBackAction)
+            => walkThruCallBack = callBackAction;
+        internal void RegisterKeyDownEvent(KeyPressHandler handler)
+            => panelBtn.eventKeyDown += handler;
     }
 }

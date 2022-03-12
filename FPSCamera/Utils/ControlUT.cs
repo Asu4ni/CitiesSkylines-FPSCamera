@@ -1,3 +1,4 @@
+using ColossalFramework.UI;
 using UnityEngine;
 
 namespace FPSCamMod
@@ -11,8 +12,8 @@ namespace FPSCamMod
         public static float MouseMoveVert => Input.GetAxis("Mouse Y");  // +/-: down/up
         public static float MouseScroll => Input.GetAxisRaw("Mouse ScrollWheel");  // +/i: up/down
 
-        public static bool KeyEsc => Input.GetKeyDown(KeyCode.Escape);
-        public static bool KeyToggle => Input.GetKeyDown(Config.G.KeyCamToggle);
+        public static bool KeyCamToggle => Input.GetKeyDown(Config.G.KeyCamToggle);
+        public static bool KeyCamReset => Input.GetKeyDown(Config.G.KeyCamReset);
         public static bool KeyFaster => Input.GetKey(Config.G.KeySpeedUp);
         public static bool KeySwitchCursor => Input.GetKey(Config.G.KeyCursorToggle);
 
@@ -26,6 +27,13 @@ namespace FPSCamMod
         public static bool KeyRotateR => Input.GetKey(Config.G.KeyRotateRight);
         public static bool KeyRotateU => Input.GetKey(Config.G.KeyRotateUp);
         public static bool KeyRotateD => Input.GetKey(Config.G.KeyRotateDown);
-        public static bool KeyReset => Input.GetKeyDown(Config.G.KeyCamReset);
+
+        // key press is consumed if handler returns true
+        public static KeyPressHandler GetKeyDownHandler(System.Func<KeyCode, bool> handler)
+        {
+            return (comp, eventParam) => {
+                if (handler(eventParam.keycode)) eventParam.Use();
+            };
+        }
     }
 }

@@ -256,14 +256,13 @@ namespace FPSCamMod
         }
         private CamOffset GetControlOffsetAfterHandleInput()
         {
-            if (ControlUT.KeyToggle || ControlUT.KeyEsc) {
-                if (ControlUT.KeyEsc) configPanelUI.OnEsc();
+            if (ControlUT.KeyCamToggle) {
                 if (isCamOn) SwitchState(State.idle);
-                else if (ControlUT.KeyToggle) StartFreeCam();
+                else StartFreeCam();
             }
             if (!isCamOn) return CamOffset.Identity;
 
-            if (ControlUT.KeyReset) ResetCamLocal();
+            if (ControlUT.KeyCamReset) ResetCamLocal();
 
             CamOffset controlOffset = CamOffset.Identity;
             var speed = (isFreeCam ? Config.G.MovementSpeed : 1f) *
@@ -315,12 +314,26 @@ namespace FPSCamMod
         {
             DestroyUI();
             configPanelUI = gameObject.AddComponent<ConfigPanelUI>();
-            configPanelUI.registerWalkThruCallBack(StartWalkThruMode);
+            configPanelUI.RegisterWalkThruCallBack(StartWalkThruMode);
+            configPanelUI.RegisterKeyDownEvent(ControlUT.GetKeyDownHandler(KeyDownHandler));
             followModeUI = gameObject.AddComponent<FollowModeUI>();
             if (ModLoad.IsInGameMode) {
                 infoPanelUI = gameObject.AddComponent<InfoPanelUI>();
                 infoPanelUI.registerFollowCallBack(StartFollow);
             }
+        }
+
+        // return true if the key is matched and should be consumed
+        private bool KeyDownHandler(KeyCode key)
+        {
+            bool used = false;
+            DebugUI.Panel.AppendMessage("pressed");
+            if (key == KeyCode.Escape) {
+                DebugUI.Panel.AppendMessage("ESC detected");
+                if (configPanelUI.PanelExpanded) { configPanelUI.OnEsc(); used = true; }
+                if (isCamOn) { SwitchState(State.idle); used = true; }
+            }
+            return used;
         }
 
         private void LateUpdate()
