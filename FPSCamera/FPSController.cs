@@ -3,7 +3,6 @@ using UnityStandardAssets.ImageEffects;
 
 namespace FPSCamMod
 {
-    // TODO: make static
     public class FPSController : MonoBehaviour
     {
         public void StartFreeCam()
@@ -36,7 +35,7 @@ namespace FPSCamMod
             else oDOFEnabled = camDOF.enabled;
             if (camTiltEffect is null) { Log.Msg("component camTiltEffect not found"); }
             else oTiltEffectEnabled = camTiltEffect.enabled;
-            camUnity.nearClipPlane = 1.0f;  // TODO: need restore while turn off?
+            camUnity.nearClipPlane = 1f;  // TODO: need restore while turn off? / ensure
 
             state = State.idle;
             ResetUI();
@@ -282,8 +281,6 @@ namespace FPSCamMod
                 isFreeCam && Config.G.ShowCursorWhileFreeCam != ControlUT.KeySwitchCursor
                 || isFollowing && Config.G.ShowCursorWhileFollow != ControlUT.KeySwitchCursor;
 
-
-            // TODO: ensure rotateSensitivity factor 2f
             ref Vector2 delXY = ref controlOffset.deltaEulerXY;
             if (!Cursor.visible) {
                 delXY.y = ControlUT.MouseMoveHori * Config.G.RotateSensitivity / 4f;
@@ -300,8 +297,7 @@ namespace FPSCamMod
             if (ControlUT.KeyRotateD)
                 delXY.x += Time.deltaTime * Config.G.RotateSensitivity;
 
-            // TODO: ENSURE FACTOR
-            float factor = 1.1f;
+            const float factor = 1.1f;
             var scroll = ControlUT.MouseScroll;
             if (scroll > 0f && targetFOV > Config.G.CamFieldOfView.Min) targetFOV /= factor;
             else if (scroll < 0f && targetFOV < Config.G.CamFieldOfView.Max) targetFOV *= factor;
@@ -318,7 +314,6 @@ namespace FPSCamMod
         internal void ResetUI()
         {
             DestroyUI();
-            // TODO: introduce UI Manager
             configPanelUI = gameObject.AddComponent<ConfigPanelUI>();
             configPanelUI.registerWalkThruCallBack(StartWalkThruMode);
             followModeUI = gameObject.AddComponent<FollowModeUI>();
@@ -371,8 +366,6 @@ namespace FPSCamMod
         }
         private void OnDestroy() => DestroyUI();
 
-
-        // TODO: expect to remove
         private CameraController camController;
         private Camera camUnity;
         private DepthOfField camDOF;

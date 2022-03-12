@@ -4,7 +4,6 @@ using UnityEngine;
 namespace FPSCamMod
 {
     // TODO: incorporate UnifiedUI
-    // TODO: expanding side of: panel, label
     internal class ConfigPanelUI : MonoBehaviour
     {
         private void Awake()

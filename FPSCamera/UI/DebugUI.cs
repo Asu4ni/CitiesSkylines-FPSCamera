@@ -58,7 +58,7 @@ namespace FPSCamMod
             style.fontSize = 12;
             style.normal.textColor = Color.white;
 
-            float margin = 5f, curY = margin, curX = margin;
+            float margin = 5f, curY = margin + boxHeight / 2f, curX = margin;
             boxWidth -= 2f * margin;
             const int btnPerLine = 4;
             float btnW = (boxWidth - margin * 2f) / btnPerLine, btnH = boxHeight / 16f;
@@ -72,7 +72,7 @@ namespace FPSCamMod
             if (curX > margin) curY += btnH;
 
             GUI.Label(new Rect(margin, curY,
-                               boxWidth, boxHeight - curY),
+                               boxWidth, boxHeight * (1 + 1 / 2f) - curY),
                       message);
         }
 

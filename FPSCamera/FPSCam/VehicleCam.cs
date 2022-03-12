@@ -77,12 +77,9 @@ namespace FPSCamMod
                 vehicleID = vehicle.FrontVehicleID();
             }
 
-            // TODO: detect changing direction
-
             vehicle.PositionRotation(out Vector3 position, out Quaternion rotation);
 
             // TODO: ensure AttachOffsetFront
-
             var offset = CamUT.GetOffset(rotation,
                     Config.G.VehicleCamOffset.forward + Config.G.VehicleFOffsetForward
                         + vehicle.AttachOffsetFront(),
@@ -91,7 +88,6 @@ namespace FPSCamMod
                           0f : Config.G.MiddleVehicleFOffsetUp),
                     Config.G.VehicleCamOffset.right);
 
-            // TODO: always look toward moving direction, hot key to change direction
             return new CamSetting(position + offset, rotation);
         }
     }

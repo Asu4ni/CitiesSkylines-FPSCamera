@@ -11,7 +11,7 @@ namespace FPSCamMod
         internal void registerFollowCallBack(System.Action<UUID> callBackAction)
         { followCallBack = callBackAction; }
 
-        internal InfoPanelUI()
+        private void Awake()
         {
             buttons = new UIButton[]
             {

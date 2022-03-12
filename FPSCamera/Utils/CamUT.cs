@@ -37,15 +37,6 @@ namespace FPSCamMod
 
     public static class CamUT
     {
-        // TODO: move to config
-        public const float camOffsetForward = 2.75f;
-        public const float camOffsetUp = 1.5f;
-        public static readonly Vector3 camOffset
-            = camOffsetForward * Vector3.forward + camOffsetUp * Vector3.up;
-
-        public static Vector3 CamPosition(Vector3 objPosition, Quaternion rotation)
-            => objPosition + rotation * camOffset;
-
         public static Vector3 GetOffset(Quaternion rotation, float offsetForward,
                                              float offsetUp, float offsetRight)
             => rotation * (offsetForward * Vector3.forward

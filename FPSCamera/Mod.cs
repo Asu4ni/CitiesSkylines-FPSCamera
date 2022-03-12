@@ -48,7 +48,7 @@ namespace FPSCamMod
 
         public override void OnLevelLoaded(LoadMode mode)
         {
-            Log.Msg("initializing in: " + mode.ToString());
+            Log.Msg("Level loaded in: " + mode.ToString());
             IsInGameMode = mode == LoadMode.LoadGame || mode == LoadMode.NewGame;
 
             fpsController = Object.FindObjectOfType<CameraController>()
@@ -57,10 +57,8 @@ namespace FPSCamMod
 
         public override void OnLevelUnloading()
         {
+            Log.Msg("Level unloaded");
             Object.Destroy(fpsController);
-#if DEBUG
-            Object.Destroy(DebugUI.Panel);
-#endif
         }
 
         private FPSController fpsController;
