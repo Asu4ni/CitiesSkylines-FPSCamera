@@ -37,12 +37,20 @@ namespace FPSCamMod
 
         public static CitizenID GetRandomID()
         {
-            var indices = Enumerable.Range(0, citizenM.m_instances.m_buffer.Length).Where(
-                i => Of((CitizenID) citizenM.m_instances.m_buffer[i].m_citizen).exists
+            var indices = Enumerable.Range(0, citizenM.m_instanceCount).Where(
+                i => {
+                    var c = Of((CitizenID) citizenM.m_instances.m_buffer[i].m_citizen);
+                    return c.exists && ((BuildingID) c._instance.m_targetBuilding).exists &&
+                           // TODO: investigate
+                           ((CitizenInstance.Flags.WaitingTransport | CitizenInstance.Flags.RidingBicycle)
+                                & c._instance.m_flags) == 0;
+                }
             );
+            DebugUI.Panel.AppendMessage($"valid count: {indices.Count()}");
             return indices.Count() == 0 ?
                         default : (CitizenID)
-                        citizenM.m_instances.m_buffer[Random.Range(0, indices.Count())].m_citizen;
+                        citizenM.m_instances.m_buffer[
+                            indices.ElementAt(Random.Range(0, indices.Count()))].m_citizen;
         }
 
         private Citizen _citizen;

@@ -51,7 +51,7 @@ namespace FPSCamMod
 
         public static VehicleID GetRandomID()
         {
-            var indices = Enumerable.Range(0, vehicleM.m_vehicles.m_buffer.Length).Where(i => {
+            var indices = Enumerable.Range(0, vehicleM.m_vehicleCount).Where(i => {
                 var v = Of((VehicleID) i);
                 return v.exists && (
                          v.IsOfType(VehicleType.Car) || v.IsOfType(VehicleType.Bicycle) ||
