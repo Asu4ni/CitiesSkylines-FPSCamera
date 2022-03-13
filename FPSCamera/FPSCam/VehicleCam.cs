@@ -13,7 +13,7 @@ namespace FPSCamMod
             if (Config.G.StickToFrontVehicle)
                 vehicleID = FPSVehicle.Of(vehicleID).FrontVehicleID();
 
-            if (FPSVehicle.Of(vehicleID).exists) {
+            if (FPSVehicle.Of(vehicleID).isValid) {
                 Log.Msg($"start following vehicle(ID:{vehicleID})");
                 wasReversed = FPSVehicle.Of(vehicleID).isReversed;
             }
@@ -66,7 +66,7 @@ namespace FPSCamMod
         {
             var vehicle = FPSVehicle.Of(vehicleID);
 
-            if (!(vehicle.exists && vehicle.spawned)) {
+            if (!(vehicle.isValid && vehicle.spawned)) {
                 Log.Msg($"vehicle(ID:{vehicleID}) disappears");
                 state = State.stopped;
                 return CamSetting.Identity;

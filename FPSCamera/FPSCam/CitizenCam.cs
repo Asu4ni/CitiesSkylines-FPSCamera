@@ -7,7 +7,7 @@ namespace FPSCamMod
         public CitizenCam(UUID idToFollow) : base()
         {
             citizenID = idToFollow.Citizen;
-            if (FPSCitizen.Of(citizenID).exists)
+            if (FPSCitizen.Of(citizenID).isValid)
                 Log.Msg($"start following citizen(ID:{citizenID})");
             else {
                 Log.Warn($"citizen(ID:{citizenID}) to follow does not exist");
@@ -66,7 +66,7 @@ namespace FPSCamMod
                 state = State.following;
             }
 
-            if (!citizen.exists) {
+            if (!citizen.isValid) {
                 Log.Msg($"citizen(ID:{citizenID}) disappears");
                 state = State.stopped;
                 return CamSetting.Identity;

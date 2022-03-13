@@ -3,19 +3,25 @@ using UnityEngine;
 
 namespace FPSCamMod
 {
-    public class FPSCitizen
+    public class FPSCitizen : FPSInstance
     {
-        private readonly static CitizenManager citizenM = CitizenManager.instance;
+        private readonly static CitizenManager Manager = CitizenManager.instance;
+
         public FPSCitizen(CitizenID id)
         {
-            _citizen = citizenM.m_citizens.m_buffer[id._id];
-            _instance = citizenM.m_instances.m_buffer[_citizen.m_instance];
+            _citizen = Manager.m_citizens.m_buffer[id._id];
+            _instance = Manager.m_instances.m_buffer[_citizen.m_instance];
+            ID = (CInstanceID) _citizen.m_instance;
         }
         public static FPSCitizen Of(CitizenID id) => new FPSCitizen(id);
+        public FPSCitizen(CInstanceID id)
+        {
+            _instance = Manager.m_instances.m_buffer[id._id];
+            _citizen = Manager.m_citizens.m_buffer[_instance.m_citizen];
+            ID = id;
+        }
+        public static FPSCitizen Of(CInstanceID id) => new FPSCitizen(id);
 
-        public bool exists
-            => CitizenInstance.Flags.Created == (_instance.m_flags
-               & (CitizenInstance.Flags.Created | CitizenInstance.Flags.Deleted));
         public bool isEnteringVehicle
             => (_instance.m_flags & CitizenInstance.Flags.EnteringVehicle) != 0;
         public VehicleID riddenVehicleID => (VehicleID) _citizen.m_vehicle;
@@ -27,7 +33,7 @@ namespace FPSCamMod
             _instance.GetSmoothPosition(_citizen.m_instance, out position, out rotation);
         }
         public Vector3 Velocity() => _instance.GetLastFrameData().m_velocity;
-        public string Name() => citizenM.GetInstanceName(_citizen.m_instance);
+        public string Name() => Manager.GetInstanceName(_citizen.m_instance);
         public UUID TargetID()
         {
             _instance.Info.m_citizenAI.GetLocalizedStatus(_citizen.m_instance, ref _instance,
@@ -37,19 +43,19 @@ namespace FPSCamMod
 
         public static CitizenID GetRandomID()
         {
-            var indices = Enumerable.Range(0, citizenM.m_instanceCount).Where(
+            var indices = Enumerable.Range(0, Manager.m_instanceCount).Where(
                 i => {
-                    var c = Of((CitizenID) citizenM.m_instances.m_buffer[i].m_citizen);
-                    return c.exists && ((BuildingID) c._instance.m_targetBuilding).exists &&
+                    var c = Of((CitizenID) Manager.m_instances.m_buffer[i].m_citizen);
+                    return c.isValid && ((BuildingID) c._instance.m_targetBuilding).exists &&
                            // TODO: investigate
                            ((CitizenInstance.Flags.WaitingTransport | CitizenInstance.Flags.RidingBicycle)
                                 & c._instance.m_flags) == 0;
                 }
             );
-            DebugUI.Panel.AppendMessage($"valid count: {indices.Count()}");
+
             return indices.Count() == 0 ?
                         default : (CitizenID)
-                        citizenM.m_instances.m_buffer[
+                        Manager.m_instances.m_buffer[
                             indices.ElementAt(Random.Range(0, indices.Count()))].m_citizen;
         }
 

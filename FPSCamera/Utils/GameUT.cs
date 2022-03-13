@@ -78,4 +78,14 @@ namespace FPSCamMod
             }
         }
     }
+
+    public class FPSInstance
+    {
+        public FPSInstance() { ID = UUID.Empty; }
+        public FPSInstance(UUID id) { ID = id; }
+
+        public bool isValid => InstanceManager.IsValid((InstanceID) ID);
+
+        public UUID ID { get; protected set; }
+    }
 }

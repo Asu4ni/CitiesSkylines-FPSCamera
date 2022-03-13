@@ -3,18 +3,16 @@ using UnityEngine;
 
 namespace FPSCamMod
 {
-    public class FPSVehicle
+    public class FPSVehicle : FPSInstance
     {
-        private readonly static VehicleManager vehicleM = VehicleManager.instance;
-        public FPSVehicle(VehicleID id)
+        private readonly static VehicleManager Manager = VehicleManager.instance;
+        public FPSVehicle(VehicleID id) : base(id)
         {
             this.id = id;
-            _vehicle = vehicleM.m_vehicles.m_buffer[id._id];
+            _vehicle = Manager.m_vehicles.m_buffer[id._id];
         }
         public static FPSVehicle Of(VehicleID id) => new FPSVehicle(id);
 
-        public bool exists => Vehicle.Flags.Created == (_vehicle.m_flags
-                                    & (Vehicle.Flags.Created | Vehicle.Flags.Deleted));
         public bool spawned => (_vehicle.m_flags & Vehicle.Flags.Spawned) != 0;
         public bool isReversed
             => (_vehicle.m_flags & Vehicle.Flags.Reversed) != 0;
@@ -40,7 +38,7 @@ namespace FPSCamMod
         public UUID OwnerID() => (UUID) _vehicle.Info.m_vehicleAI.GetOwnerID(id._id, ref _vehicle);
         public UUID TargetID() => (UUID) _vehicle.Info.m_vehicleAI.GetTargetID(id._id, ref _vehicle);
 
-        public string Name() => vehicleM.GetVehicleName(id._id);
+        public string Name() => Manager.GetVehicleName(id._id);
         public string TransportLineName()
             => TransportManager.instance.GetLineName(_vehicle.m_transportLine);
         public void GetPassengerSizeCapacity(out int size, out int capacity)
@@ -51,9 +49,9 @@ namespace FPSCamMod
 
         public static VehicleID GetRandomID()
         {
-            var indices = Enumerable.Range(0, vehicleM.m_vehicleCount).Where(i => {
+            var indices = Enumerable.Range(0, Manager.m_vehicleCount).Where(i => {
                 var v = Of((VehicleID) i);
-                return v.exists && (
+                return v.isValid && (
                          v.IsOfType(VehicleType.Car) || v.IsOfType(VehicleType.Bicycle) ||
                          v.IsOfType(VehicleType.Metro) || v.IsOfType(VehicleType.Train) ||
                          v.IsOfType(VehicleType.Tram) || v.IsOfType(VehicleType.Monorail) ||
@@ -67,7 +65,7 @@ namespace FPSCamMod
                         indices.ElementAt(Random.Range(0, indices.Count()));
         }
 
-        private VehicleID id;
+        private readonly VehicleID id;
         private Vehicle _vehicle;
     }
 

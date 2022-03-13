@@ -4,6 +4,7 @@ namespace FPSCamMod
     public struct ObjectType
     {
         public static readonly ObjectType Citizen = new ObjectType(InstanceType.Citizen);
+        public static readonly ObjectType CInstance = new ObjectType(InstanceType.CitizenInstance);
         public static readonly ObjectType Vehicle = new ObjectType(InstanceType.Vehicle);
         public static readonly ObjectType Building = new ObjectType(InstanceType.Building);
 
@@ -13,17 +14,31 @@ namespace FPSCamMod
 
         public byte switchValue => (byte) _type;
         public const byte sCitizen = (byte) InstanceType.Citizen;
+        public const byte sCInstance = (byte) InstanceType.CitizenInstance;
         public const byte sVehicle = (byte) InstanceType.Vehicle;
         public const byte sBuilding = (byte) InstanceType.Building;
     }
 
     public struct UUID
     {
-        public CitizenID Citizen { get => (CitizenID) _id.Citizen; set => _id.Citizen = value._id; }
+        public CitizenID Citizen {
+            get => (CitizenID) _id.Citizen;
+            set => _id.Citizen = value._id;
+        }
         public static implicit operator UUID(CitizenID id)
         { UUID uid = default; uid.Citizen = id; return uid; }
 
-        public VehicleID Vehicle { get => (VehicleID) _id.Vehicle; set => _id.Vehicle = value._id; }
+        public CInstanceID CInstance {
+            get => (CInstanceID) _id.CitizenInstance;
+            set => _id.CitizenInstance = value._id;
+        }
+        public static implicit operator UUID(CInstanceID id)
+        { UUID uid = default; uid.CInstance = id; return uid; }
+
+        public VehicleID Vehicle {
+            get => (VehicleID) _id.Vehicle;
+            set => _id.Vehicle = value._id;
+        }
         public static implicit operator UUID(VehicleID id)
         { UUID uid = default; uid.Vehicle = id; return uid; }
 
@@ -42,6 +57,7 @@ namespace FPSCamMod
         private InstanceID _id;
         private UUID(InstanceID id) { this._id = id; }
         public static explicit operator UUID(InstanceID _id) => new UUID(_id);
+        public static explicit operator InstanceID(UUID id) => id._id;
     }
 
     public class BaseID<T> where T : System.IComparable<T>
@@ -56,6 +72,11 @@ namespace FPSCamMod
     {
         private CitizenID(uint id) : base(id) { }
         public static explicit operator CitizenID(uint id) => new CitizenID(id);
+    }
+    public class CInstanceID : BaseID<ushort>
+    {
+        private CInstanceID(ushort id) : base(id) { }
+        public static explicit operator CInstanceID(ushort id) => new CInstanceID(id);
     }
     public class VehicleID : BaseID<ushort>
     {
