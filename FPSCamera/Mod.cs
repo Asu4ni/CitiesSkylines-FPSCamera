@@ -51,8 +51,8 @@ namespace FPSCamMod
             Log.Msg("Level loaded in: " + mode.ToString());
             IsInGameMode = mode == LoadMode.LoadGame || mode == LoadMode.NewGame;
 
-            fpsController = Object.FindObjectOfType<CameraController>()
-                            .gameObject.AddComponent<FPSController>();
+            CamControllerUT.Init();
+            fpsController = CamControllerUT.AddCustomController<FPSController>();
         }
 
         public override void OnLevelUnloading()

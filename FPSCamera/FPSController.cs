@@ -24,18 +24,15 @@ namespace FPSCamMod
 
         private void Start()
         {
-            camController = FindObjectOfType<CameraController>();
-            camUnity = camController.GetComponent<Camera>();
-            camDOF = camController.GetComponent<DepthOfField>();
-            camTiltEffect = camController.GetComponent<TiltShiftEffect>();
+            camGame = CamControllerUT.GetComponent<Camera>();
+            camDOF = CamControllerUT.GetComponent<DepthOfField>();
+            camTiltEffect = CamControllerUT.GetComponent<TiltShiftEffect>();
 
             oFieldOfView = camFOV;
-            oMaxDistance = camController.m_maxDistance;
-            if (camDOF is null) { Log.Msg("component Camera not found"); }
+            if (camDOF is null) { Log.Msg("component <DepthOfField> not found"); }
             else oDOFEnabled = camDOF.enabled;
-            if (camTiltEffect is null) { Log.Msg("component camTiltEffect not found"); }
+            if (camTiltEffect is null) { Log.Msg("component <TiltShiftEffect> not found"); }
             else oTiltEffectEnabled = camTiltEffect.enabled;
-            camUnity.nearClipPlane = 1f;  // TODO: need restore while turn off? / ensure
 
             state = State.idle;
             ResetUI();
@@ -55,7 +52,7 @@ namespace FPSCamMod
          *  walkThru| S > (->eF / D) |     -     |     -     |     -     | (redirect) P
          *  exitFree|        D       |     P     |     -     |     -     |      -       
          *  
-         *    * -: impossible | E: EnableFPSCam | D: DisableFPSCam | S: StopFollow
+         *    * -: impossible | E: EnableFPSCam | D: DisableFPSCam | S: StopFollow | P: Prepare***
          */
         private void SwitchState(State newState)
         {
@@ -102,8 +99,8 @@ namespace FPSCamMod
             if (Config.G.HideUIwhenActivate) UIutils.HideUI();
 
             ResetCamLocal();
-            camController.m_maxDistance = 50f;  // TODO: consider to remove
-            camController.enabled = false;
+            CamControllerUT.Disable();
+            camGame.nearClipPlane = 1f;    // TODO: ensure
 
             if (camDOF) camDOF.enabled = Config.G.EnableDOF;
             if (camTiltEffect) camTiltEffect.enabled = false;
@@ -116,9 +113,8 @@ namespace FPSCamMod
             infoPanelUI.OnCamDeactivate();
             if (Config.G.HideUIwhenActivate) UIutils.ShowUI();
 
-            camController.enabled = true;
+            CamControllerUT.Enable();
             camFOV = oFieldOfView;
-            camController.m_maxDistance = oMaxDistance;
 
             if (camDOF) camDOF.enabled = oDOFEnabled;
             if (camTiltEffect) camTiltEffect.enabled = oTiltEffectEnabled;
@@ -180,14 +176,14 @@ namespace FPSCamMod
             return UUID.Empty;
         }
 
-        private float camFOV { get => camUnity.fieldOfView; set => camUnity.fieldOfView = value; }
+        private float camFOV { get => camGame.fieldOfView; set => camGame.fieldOfView = value; }
         private Vector3 CamPosition {
-            get => camUnity.transform.position;
-            set => camUnity.transform.position = value;
+            get => camGame.transform.position;
+            set => camGame.transform.position = value;
         }
         private Quaternion CamRotation {
-            get => camUnity.transform.rotation;
-            set => camUnity.transform.rotation = value;
+            get => camGame.transform.rotation;
+            set => camGame.transform.rotation = value;
         }
         private CamSetting CamSetting {
             get => new CamSetting(CamPosition, CamRotation);
@@ -379,13 +375,11 @@ namespace FPSCamMod
         }
         private void OnDestroy() => DestroyUI();
 
-        private CameraController camController;
-        private Camera camUnity;
+        private Camera camGame;
         private DepthOfField camDOF;
         private TiltShiftEffect camTiltEffect;
         // CmameraController properties
         private float oFieldOfView;
-        private float oMaxDistance;
         private bool oDOFEnabled;
         private bool oTiltEffectEnabled;
 
