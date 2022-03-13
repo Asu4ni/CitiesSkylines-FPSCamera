@@ -113,7 +113,6 @@ namespace FPSCamMod
             var btn = UIutils.AddUI<UIButton>();
 
             btn.name = "FPSCamPanelSwitchBtn";
-            btn.gameObject.name = "FPSCamPanelSwitchBtn";
             btn.width = 50;
             btn.height = 48;
 
@@ -146,8 +145,8 @@ namespace FPSCamMod
 
         internal void OnEsc() => PanelExpanded = false;
         internal bool PanelExpanded {
-            get => mainPanel.enabled;
-            set { mainPanel.enabled = value; if (value) panelBtn.Focus(); }
+            get => mainPanel.isVisible;
+            set { mainPanel.isVisible = value; if (value) panelBtn.Focus(); }
         }
 
         private void LateUpdate()
