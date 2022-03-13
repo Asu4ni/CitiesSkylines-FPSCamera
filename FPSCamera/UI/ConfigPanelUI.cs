@@ -57,6 +57,8 @@ namespace FPSCamMod
             comp = UIutils.AddSlider(Config.G.SpeedUpFactor, mainPanel, .25f,
                                       yPos: y, width: mainPanel.width);
             y += comp.height + margin;
+            comp = UIutils.AddCheckbox(Config.G.SetToOriginalPos, mainPanel, yPos: y);
+            y += comp.height + margin;
             comp = UIutils.AddCheckbox(Config.G.SmoothTransition, mainPanel, yPos: y);
             y += comp.height + margin;
             comp = UIutils.AddDropDown(Config.G.GroundClippingOption, mainPanel,

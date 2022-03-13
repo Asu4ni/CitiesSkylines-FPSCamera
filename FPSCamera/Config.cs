@@ -19,7 +19,7 @@ namespace FPSCamMod
         public Config(string filePath) { this.filePath = filePath; StoreConfigAttr(); }
         public Config() : this(defaultConfigPath) { }
 
-        /*----------- global config -----------------------------------------*/
+        /*----------- general config ----------------------------------------*/
 
         [Config("KeyCamToggle", "FPS Camera toggle")]
         public readonly CfKey KeyCamToggle = new CfKey(KeyCode.BackQuote);
@@ -27,6 +27,10 @@ namespace FPSCamMod
         public readonly CfFlag HideUIwhenActivate = new CfFlag(false);
         [Config("UseMetricUnit", "Use metric units")]
         public readonly CfFlag UseMetricUnit = new CfFlag(true);
+        [Config("SetToOriginalPos", "Set camera back when toggle off",
+                "When leaving any mode, set the camera position \n" +
+                "back to where it left beforhand")]
+        public readonly CfFlag SetToOriginalPos = new CfFlag(true);
 
         [Config("SmoothTransition", "Smooth transition")]
         public readonly CfFlag SmoothTransition = new CfFlag(true);

@@ -45,40 +45,38 @@ namespace FPSCamMod
 
         /*  state transitions:
          *  
-         *  Fr\To   |      idle      |  freeCam  |   follow  |  walkThru | exitFree (eF)   
-         *  idle    |        -       |   E > P   |   E > P   |   E > P   |      -       
-         *  freeCam |    ->eF / D    |     -     |     -     |     -     | (redirect) P 
-         *  follow  | S > (->eF / D) |     -     |     -     |     -     | (redirect) P
-         *  walkThru| S > (->eF / D) |     -     |     -     |     -     | (redirect) P
-         *  exitFree|        D       |     P     |     -     |     -     |      -       
+         *  Fr\To   |   idle   |  freeCam  |   follow  |  walkThru | exitFree (eF)   
+         *  idle    |     -    |   E > P   |   E > P   |   E > P   |      -       
+         *  freeCam |   ->eF   |     -     |     -     |     -     | (redirect) P 
+         *  follow  | S > ->eF |     -     |     -     |     -     | (redirect) P
+         *  walkThru| S > ->eF |     -     |     -     |     -     | (redirect) P
+         *  exiting |     D    |     P     |     -     |     -     |      -       
          *  
-         *    * -: impossible | E: EnableFPSCam | D: DisableFPSCam | S: StopFollow | P: Prepare***
+         *   * -: impossible | E: EnableFPSCam | D: DisableFPSCam | S: StopFollow | P: Prepare***
          */
         private void SwitchState(State newState)
         {
-            Log.Assert((newState == State.idle != isIdle) && newState != State.exitFreeCam
-                        || (state == State.exitFreeCam && newState == State.freeCam),
+            Log.Assert((newState == State.idle != isIdle) && newState != State.exiting
+                        || (state == State.exiting && newState == State.freeCam),
                        $"FPSController state invalid transition: [{state}] > [{newState}]");
 
             switch (state) {
             case State.idle: EnableFPSCam(); break;
             case State.freeCam:
-                if (Config.G.SmoothTransition && newState == State.idle)
-                    newState = State.exitFreeCam;
+                if (newState == State.idle) newState = State.exiting;
                 break;
             case State.follow:
             case State.walkThru:
-                if (Config.G.SmoothTransition && newState == State.idle)
-                    newState = State.exitFreeCam;
+                if (newState == State.idle) newState = State.exiting;
                 StopFollowing(); break;
-            case State.exitFreeCam: break;
+            case State.exiting: break;
             }
             switch (newState) {
             case State.idle: DisableFPSCam(); break;
             case State.freeCam: PrepareFreeCam(); break;
             case State.follow: PrepareFollowing(); break;
             case State.walkThru: PrepareWalkThru(); break;
-            case State.exitFreeCam: PrepareExitFreeCam(); break;
+            case State.exiting: PrepareExiting(); break;
             }
             state = newState;
         }
@@ -140,10 +138,11 @@ namespace FPSCamMod
             Log.Msg($"start following UUID:{idToFollow}");
         }
         private void PrepareWalkThru() { SwitchTarget4WalkThru(); }
-        private void PrepareExitFreeCam()
+        private void PrepareExiting()
         {
             targetFOV = oFieldOfView;
-            targetSetting = originalSetting;
+            if (Config.G.SetToOriginalPos) targetSetting = originalSetting;
+            else CamControllerUT.LocateAt(CamSetting);
         }
 
         void ResetCamLocal()
@@ -342,7 +341,7 @@ namespace FPSCamMod
             case State.walkThru:
                 UpdateFollowCam(controlOffset);
                 UpdateWalkThru(); break;
-            case State.exitFreeCam:
+            case State.exiting:
                 if (Utils.AlmostSame(targetFOV, camFOV)
                     && CamSetting == targetSetting) SwitchState(State.idle);
                 break;
@@ -391,7 +390,7 @@ namespace FPSCamMod
         private CamSetting targetSetting, originalSetting;
 
         // state
-        private enum State : byte { idle, freeCam, exitFreeCam, follow, walkThru }
+        private enum State : byte { idle, freeCam, exiting, follow, walkThru }
         private State state = State.idle;
 
 
