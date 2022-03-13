@@ -7,9 +7,8 @@ namespace FPSCamMod
     {
         public static bool MousePrimary => Input.GetMouseButtonDown(0);
 
-        // TODO: ensure direction
         public static float MouseMoveHori => Input.GetAxis("Mouse X");  // +/-: right/left
-        public static float MouseMoveVert => Input.GetAxis("Mouse Y");  // +/-: down/up
+        public static float MouseMoveVert => Input.GetAxis("Mouse Y");  // +/-: up/down
         public static float MouseScroll => Input.GetAxisRaw("Mouse ScrollWheel");  // +/i: up/down
 
         public static bool KeyCamToggle => Input.GetKeyDown(Config.G.KeyCamToggle);

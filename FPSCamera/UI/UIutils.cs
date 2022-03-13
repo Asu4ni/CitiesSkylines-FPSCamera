@@ -228,6 +228,20 @@ namespace FPSCamMod
         }
 
         // TODO: investigate
+        /*  if (m_freeCamera != m_cachedFreeCamera) {
+                m_cachedFreeCamera = m_freeCamera;
+                UIView.Show(UIView.HasModalInput() || !m_freeCamera);
+                Singleton<NotificationManager>.instance.NotificationsVisible = !m_freeCamera;
+                Singleton<GameAreaManager>.instance.BordersVisible = !m_freeCamera;
+                Singleton<DistrictManager>.instance.NamesVisible = !m_freeCamera;
+                Singleton<PropManager>.instance.MarkersVisible = !m_freeCamera;
+                Singleton<GuideManager>.instance.TutorialDisabled = m_freeCamera;
+                Singleton<DisasterManager>.instance.MarkersVisible = !m_freeCamera;
+                Singleton<NetManager>.instance.RoadNamesVisible = !m_freeCamera;
+            }
+            if (m_cachedFreeCamera) m_camera.rect = kFullScreenRect;            
+            else m_camera.rect = kFullScreenWithoutMenuBarRect;            
+        */
         public static void HideUI()
         {
             var cameraController = GameObject.FindObjectOfType<CameraController>();

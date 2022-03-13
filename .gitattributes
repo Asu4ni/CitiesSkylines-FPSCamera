@@ -1,6 +1,6 @@
-*           text=auto
+*           text=auto eof=lf
 
-*.cs        text diff=csharp
+*.cs        text eol=lf diff=csharp
 *.cshtml    text diff=html
 *.csx       text diff=csharp
 *.sln       text eol=crlf merge=union

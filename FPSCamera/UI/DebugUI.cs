@@ -32,6 +32,8 @@ namespace FPSCamMod
             }
         }
 
+        private void Awake() => enabled = false;
+
         public void AppendMessage(string msg)
         {
             if (msgCount < msgLimit) ++msgCount;
@@ -51,8 +53,9 @@ namespace FPSCamMod
             var boxWidth = Mathf.Min(Screen.width / 5f, 400f);
             var boxHeight = Mathf.Min(Screen.height / 2f, 1000f);
 
-            GUI.color = new Color(0f, 0f, 0f, .8f);
+            GUI.color = new Color(0f, 0f, 0f, .9f);
             GUI.Box(new Rect(0f, boxHeight / 2f, boxWidth, boxHeight), "");
+            GUI.color = new Color(1f, 1f, 1f, 1f);
 
             var style = new GUIStyle();
             style.fontSize = 12;
@@ -60,7 +63,7 @@ namespace FPSCamMod
 
             float margin = 5f, curY = margin + boxHeight / 2f, curX = margin;
             boxWidth -= 2f * margin;
-            const int btnPerLine = 4;
+            const int btnPerLine = 3;
             float btnW = (boxWidth - margin * 2f) / btnPerLine, btnH = boxHeight / 16f;
             for (int i = 0; i < nameList.Count; ++i) {
                 if (GUI.Button(new Rect(curX, curY, btnW, btnH), nameList[i]))

@@ -142,7 +142,6 @@ namespace FPSCamMod
         private void PrepareWalkThru() { SwitchTarget4WalkThru(); }
         private void PrepareExitFreeCam()
         {
-            Log.Msg("FPSController: transition to exit FreeCam");
             targetFOV = oFieldOfView;
             targetSetting = originalSetting;
         }
@@ -323,9 +322,7 @@ namespace FPSCamMod
         private bool KeyDownHandler(KeyCode key)
         {
             bool used = false;
-            DebugUI.Panel.AppendMessage("pressed");
             if (key == KeyCode.Escape) {
-                DebugUI.Panel.AppendMessage("ESC detected");
                 if (configPanelUI.PanelExpanded) { configPanelUI.OnEsc(); used = true; }
                 if (isCamOn) { SwitchState(State.idle); used = true; }
             }
