@@ -23,7 +23,7 @@ namespace FPSCamMod
             };
         }
 
-        private UIButton CreateFollowBtn<Panel>() where Panel : UICustomControl
+        private UIButton CreateFollowBtn<Panel>() where Panel : WorldInfoPanel
         {
             var panel = UIView.library.Get<Panel>(typeof(Panel).Name);
             var button = panel.component.AddUIComponent(typeof(UIButton)) as UIButton;
@@ -42,8 +42,10 @@ namespace FPSCamMod
             button.focusedColor = new Color32(170, 170, 255, 255);
             button.hoveredColor = new Color32(200, 200, 255, 255);
             button.pressedColor = new Color32(220, 220, 255, 255);
-            button.eventClick += (component, param) => followCallBack((UUID)
-                                    Utils.ReadPrivate<Panel, InstanceID>(panel, "m_InstanceID"));
+            button.eventClick += (component, param) => {
+                followCallBack((UUID) Utils.ReadFields(panel).Get<InstanceID>("m_InstanceID"));
+                panel.Hide();
+            };
             button.AlignTo(panel.component, UIAlignAnchor.BottomRight);
             button.relativePosition += cameraButtonOffset;
             return button;

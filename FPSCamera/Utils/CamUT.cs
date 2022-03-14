@@ -33,6 +33,7 @@ namespace FPSCamMod
         public static bool operator ==(CamSetting a, CamSetting b) => a.Equals(b);
         public static bool operator !=(CamSetting a, CamSetting b) => !a.Equals(b);
         public override int GetHashCode() => position.GetHashCode() ^ rotation.GetHashCode();
+        public override string ToString() => $"pos: {position} rot: {rotation}";
     }
 
     public static class CamUT

@@ -75,6 +75,7 @@ namespace FPSCamMod
             if (Config.G.StickToFrontVehicle && vehicle.isReversed != wasReversed) {
                 Log.Msg($"vehicle(ID:{vehicleID}) changes direction");
                 vehicleID = vehicle.FrontVehicleID();
+                wasReversed = !wasReversed;
             }
 
             vehicle.PositionRotation(out Vector3 position, out Quaternion rotation);

@@ -5,20 +5,24 @@ namespace FPSCamMod
 {
     public static class Utils
     {
-        public static Q ReadPrivate<T, Q>(T o, string fieldName)
+        public class FieldReader<Type>
         {
-            var fields = typeof(T).GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-            FieldInfo field = null;
-
-            foreach (var f in fields) {
-                if (f.Name == fieldName) {
-                    field = f;
-                    break;
+            public FieldReader(Type instance) => this.instance = instance;
+            public Field Get<Field>(string fieldName)
+            {
+                var field = typeof(Type).GetField(fieldName,
+                                                  BindingFlags.Instance | BindingFlags.Static |
+                                                  BindingFlags.Public | BindingFlags.NonPublic);
+                if (field is null) {
+                    Log.Warn($"GetField fails: <{fieldName}> not of <{typeof(Type).Name}>");
+                    return default;
                 }
+                return (Field) field.GetValue(instance);
             }
-
-            return (Q) field.GetValue(o);
+            private Type instance;
         }
+        public static FieldReader<Type> ReadFields<Type>(Type instance)
+            => new FieldReader<Type>(instance);
 
         public static bool AlmostSame(float a, float b, float error = .05f)
                 => Math.Abs(b - a) < error;
@@ -38,5 +42,4 @@ namespace FPSCamMod
             else return value;
         }
     }
-
 }
