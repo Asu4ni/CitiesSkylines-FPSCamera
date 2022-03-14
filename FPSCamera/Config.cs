@@ -171,6 +171,9 @@ namespace FPSCamMod
         public readonly CfFloat MiddleVehicleFOffsetUp = new CfFloat(3f);
         [Config("CitizenFOffsetUp", "Cam fixed offset.up for citizen")]
         public readonly CfFloat CitizenFOffsetUp = new CfFloat(2f);
+
+        [Config("MaxExitingDuration", "Max duration for exiting fps cam")]
+        public readonly CfFloat MaxExitingDuration = new CfFloat(3f, 0f);
         /*-------------------------------------------------------------------*/
 
         // Return a ratio[0f, 1f] representing the proportion to reduce for a difference

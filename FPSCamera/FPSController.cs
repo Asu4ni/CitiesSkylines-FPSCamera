@@ -140,9 +140,15 @@ namespace FPSCamMod
         private void PrepareWalkThru() { SwitchTarget4WalkThru(); }
         private void PrepareExiting()
         {
-            targetFOV = oFieldOfView;
-            if (Config.G.SetToOriginalPos) targetSetting = originalSetting;
-            else CamControllerUT.LocateAt(CamSetting);
+            if (Config.G.SetToOriginalPos) {
+                exitingTimer = Config.G.MaxExitingDuration;
+                targetFOV = oFieldOfView;
+                targetSetting = originalSetting;
+            }
+            else {
+                exitingTimer = 0f;
+                CamControllerUT.LocateAt(CamSetting);
+            }
         }
 
         void ResetCamLocal()
@@ -328,6 +334,14 @@ namespace FPSCamMod
             return used;
         }
 
+        private bool GetFinishedAfterUpdateExiting()
+        {
+            exitingTimer -= Time.deltaTime;
+            return
+                (exitingTimer <= 0f ||
+                (Utils.AlmostSame(targetFOV, camFOV) && CamSetting == targetSetting));
+        }
+
         private void LateUpdate()
         {
             var controlOffset = GetControlOffsetAfterHandleInput();
@@ -342,8 +356,7 @@ namespace FPSCamMod
                 UpdateFollowCam(controlOffset);
                 UpdateWalkThru(); break;
             case State.exiting:
-                if (Utils.AlmostSame(targetFOV, camFOV)
-                    && CamSetting == targetSetting) SwitchState(State.idle);
+                if (GetFinishedAfterUpdateExiting()) SwitchState(State.idle);
                 break;
             }
 
@@ -392,7 +405,7 @@ namespace FPSCamMod
         // state
         private enum State : byte { idle, freeCam, exiting, follow, walkThru }
         private State state = State.idle;
-
+        private float exitingTimer = 0f;
 
         // state: follow
         private UUID idToFollow;
