@@ -195,7 +195,7 @@ namespace FPSCamMod
 
             if (!Config.G.ClickToSwitch4WalkThru) walkThruTimer -= Time.deltaTime;
             if (camToFollow is null || (Config.G.ClickToSwitch4WalkThru ?
-                                        ControlUT.MousePrimary : walkThruTimer <= 0.0f)) {
+                                        ControlUT.MousePrimary : walkThruTimer <= 0f)) {
                 Log.Msg("UpdateWalkThru: switching target");
                 if (!SwitchTarget4WalkThru()) {
                     SwitchState(State.idle);

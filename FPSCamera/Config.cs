@@ -32,22 +32,24 @@ namespace FPSCamMod
                 "back to where it left beforhand")]
         public readonly CfFlag SetToOriginalPos = new CfFlag(true);
 
-        [Config("SmoothTransition", "Smooth transition")]
+        [Config("SmoothTransition", "Smooth transition",
+                "When camera moves, rotates or zooms, the transition could be either" +
+                "smooth or instant. Enabling the option could make camera look lagging.")]
         public readonly CfFlag SmoothTransition = new CfFlag(true);
         [Config("TransitionSpeed", "Smooth transition speed")]
-        public readonly CfFloat TransitionSpeed = new CfFloat(5f, 1f, 9f);
+        public readonly CfFloat TransitionSpeed = new CfFloat(5f, min: 1f, max: 9f);
         [Config("GiveUpTransitionDistance", "Max distance to transition smoothly",
                 "When the camera target position is too far, smooth transition takes too long.\n" +
                 "This number sets the distance to give up the transition.")]
-        public readonly CfFloat GiveUpTransitionDistance = new CfFloat(500f, 100f, 2000f);
+        public readonly CfFloat GiveUpTransitionDistance = new CfFloat(500f, min: 100f, max: 2000f);
         [Config("DeltaPosMin", "Min movement for smooth transition")]
-        public readonly CfFloat DeltaPosMin = new CfFloat(.5f, .1f, 5f);
+        public readonly CfFloat DeltaPosMin = new CfFloat(.5f, min: .1f, max: 5f);
         [Config("DeltaPosMax", "Max movement for smooth transition")]
-        public readonly CfFloat DeltaPosMax = new CfFloat(30f, 5f, 100f);
+        public readonly CfFloat DeltaPosMax = new CfFloat(30f, min: 5f, max: 100f);
         [Config("DeltaRotateMin", "Min rotation for smooth transition", "unit: degree")]
-        public readonly CfFloat DeltaRotateMin = new CfFloat(.1f, .05f, 5f);
+        public readonly CfFloat DeltaRotateMin = new CfFloat(.1f, min: .05f, max: 5f);
         [Config("DeltaRotateMax", "Max rotation for smooth transition", "unit: degree")]
-        public readonly CfFloat DeltaRotateMax = new CfFloat(10f, 5f, 45f);
+        public readonly CfFloat DeltaRotateMax = new CfFloat(10f, min: 5f, max: 45f);
 
         // camera control
         [Config("KeyMoveForward", "Move/Offset forward")]
@@ -78,15 +80,15 @@ namespace FPSCamMod
         public readonly CfKey KeyCamReset = new CfKey(KeyCode.Backspace);
 
         [Config("MovementSpeed", "Movement/Offset speed")]
-        public readonly CfFloat MovementSpeed = new CfFloat(30f, 1f, 60f);
+        public readonly CfFloat MovementSpeed = new CfFloat(30f, min: 1f, max: 60f);
         [Config("SpeedUpFactor", "Speed-Up factor for movement/offset")]
-        public readonly CfFloat SpeedUpFactor = new CfFloat(4f, 1.5f, 10f);
+        public readonly CfFloat SpeedUpFactor = new CfFloat(4f, min: 1.5f, max: 10f);
 
         [Config("MaxVertRotate", "Max vertical viewing range",
                 "The maximum degree to rotate camera up & down.")]
-        public readonly CfFloat MaxVertRotate = new CfFloat(70f, 30f, 85f);
+        public readonly CfFloat MaxVertRotate = new CfFloat(70f, min: 30f, max: 85f);
         [Config("RotateSensitivity", "Camera rotation sensitivity")]
-        public readonly CfFloat RotateSensitivity = new CfFloat(4f, 1f, 10f);
+        public readonly CfFloat RotateSensitivity = new CfFloat(4f, min: 1f, max: 10f);
         [Config("InvertRotateHorizontal", "Invert horizontal rotation")]
         public readonly CfFlag InvertRotateHorizontal = new CfFlag(false);
         [Config("InvertRotateVertical", "Invert vertical rotation")]
@@ -96,7 +98,7 @@ namespace FPSCamMod
         [Config("EnableDOF", "Apply depth of field effect")]
         public readonly CfFlag EnableDOF = new CfFlag(false);
         [Config("FieldOfView", "Camera field of view", "Viewing range of the camera (degrees)")]
-        public readonly CfFloat CamFieldOfView = new CfFloat(45f, 10f, 75f);
+        public readonly CfFloat CamFieldOfView = new CfFloat(45f, min: 10f, max: 75f);
 
         // cursor
         [Config("KeyCursorToggle", "Cursor visibility toggle")]
@@ -109,15 +111,15 @@ namespace FPSCamMod
         // position offset
         [Config("VehicleCamOffset", "Camera offset while following vehicles")]
         public readonly CfOffset VehicleCamOffset = new CfOffset(
-            new CfFloat(0f, -20f, 40f),
-            new CfFloat(0f, -20f, 40f),
-            new CfFloat(0f, -30f, 30f)
+            new CfFloat(0f, min: -20f, max: 40f),
+            new CfFloat(0f, min: -20f, max: 40f),
+            new CfFloat(0f, min: -30f, max: 30f)
         );
         [Config("CitizenCamOffset", "Camera offset while following citizens")]
         public readonly CfOffset CitizenCamOffset = new CfOffset(
-            new CfFloat(0f, -20f, 40f),
-            new CfFloat(0f, -20f, 40f),
-            new CfFloat(0f, -30f, 30f)
+            new CfFloat(0f, min: -20f, max: 40f),
+            new CfFloat(0f, min: -20f, max: 40f),
+            new CfFloat(0f, min: -30f, max: 30f)
         );
 
         // free cam config
@@ -130,7 +132,7 @@ namespace FPSCamMod
                             = new ConfigData<GroundClipping>(GroundClipping.PreventClip);
         [Config("GroundLevelOffset", "Ground level offset",
                 "Vertical offset for ground level used for ground clipping option")]
-        public readonly CfFloat GroundLevelOffset = new CfFloat(0f, -2f, 10f);
+        public readonly CfFloat GroundLevelOffset = new CfFloat(0f, min: -2f, max: 10f);
 
         // follow config
         [Config("StickToFrontVehicle", "Alway follow the front vehicle")]
@@ -138,34 +140,33 @@ namespace FPSCamMod
         [Config("ShowInfoPanel", "Display Info panel while following")]
         public readonly CfFlag ShowInfoPanel4Follow = new CfFlag(true);
         [Config("MaxHoriRotate4Follow", "Max horizontal viewing range")]
-        public readonly CfFloat MaxHoriRotate4Follow = new CfFloat(45f, 5f, 160f);
+        public readonly CfFloat MaxHoriRotate4Follow = new CfFloat(45f, min: 5f, max: 160f);
         [Config("MaxVertRotate4Follow", "Max vertical viewing range")]
-        public readonly CfFloat MaxVertRotate4Follow = new CfFloat(30f, 5f, 85f);
+        public readonly CfFloat MaxVertRotate4Follow = new CfFloat(30f, min: 5f, max: 85f);
         [Config("InstantMoveMax", "Min distance for smooth transition",
                 "In Follow Mode, camera needs to move instantly with\n" +
                 "the target even when smooth transition is enabled.\n" +
                 "This number sets the minimum distance to apply smooth transition.")]
-        public readonly CfFloat InstantMoveMax = new CfFloat(15f, 5f, 50f);
+        public readonly CfFloat InstantMoveMax = new CfFloat(15f, min: 5f, max: 50f);
 
         // walkThru config
         [Config("ClickToSwitch", "Switch target manually (Mouse Click)")]
         public readonly CfFlag ClickToSwitch4WalkThru = new CfFlag(false);
         [Config("PeriodWalkThru", "Period (seconds) for each random target")]
-        public readonly CfFloat Period4WalkThru = new CfFloat(20f, 5f, 300f);
+        public readonly CfFloat Period4WalkThru = new CfFloat(20f, min: 5f, max: 300f);
 
         /*--------- configurable constants ----------------------------------*/
 
         [Config("CamUIOffset", "In-Game config panel position")]
         public readonly CfOffset CamUIOffset
                 = new CfOffset(new CfFloat(0f, 0f, 0f), new CfFloat(-1f), new CfFloat(-1f));
-        //                        always 0 (forward)  |    y-axis (up)     |    x-axis (right)
+        //                        always 0 (forward)  |    y-axis (up)  |    x-axis (right)
         // value == -1 : unset
 
         [Config("VehicleFOffsetUp", "Cam fixed offset.up for vehicle")]
         public readonly CfFloat VehicleFOffsetUp = new CfFloat(2f);
-
-        [Config("VehicleFOffsetUp", "Cam fixed offset.up for vehicle")]
-        public readonly CfFloat VehicleFOffsetForward = new CfFloat(2f);
+        [Config("VehicleFOffsetForward", "Cam fixed offset.forward for vehicle")]
+        public readonly CfFloat VehicleFOffsetForward = new CfFloat(3f);
         [Config("MiddleVehicleFOffsetUp", "Cam fixed offset.up for vehicle in the middle")]
         public readonly CfFloat MiddleVehicleFOffsetUp = new CfFloat(3f);
         [Config("CitizenFOffsetUp", "Cam fixed offset.up for citizen")]

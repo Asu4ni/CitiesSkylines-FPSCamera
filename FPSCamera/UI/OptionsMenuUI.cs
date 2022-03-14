@@ -16,6 +16,7 @@ namespace FPSCamMod
         private static void SetUp()
         {
             var mainPanel = UIutils.AddGroup("First Person Camera", helperPanel);
+            mainPanel.backgroundSprite = "";
             const float margin = 5f;
             {
                 var panel = UIutils.AddGroup("General Options", mainPanel);
