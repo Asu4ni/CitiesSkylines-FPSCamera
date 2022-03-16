@@ -17,6 +17,7 @@ namespace FPSCamMod
         {
             camWRef = new WeakReference(cam);
             elapsedTime = 0f;
+            lastBufferStrUpdateTime = -1f;
             enabled = true;
         }
 
@@ -26,11 +27,29 @@ namespace FPSCamMod
             if (cam is null) {
                 camWRef = null;
                 enabled = false;
+                lastBufferStrUpdateTime = -1f;
             }
             else {
                 elapsedTime += Time.deltaTime;
+                if (elapsedTime - lastBufferStrUpdateTime > bufferUpdateInterval) {
+                    status = GetFormattedStatus(cam.GetInstanceName(), cam.GetInstanceStatus());
+                    details = GetFormattedDetails(cam.GetDetails());
+                    lastBufferStrUpdateTime = elapsedTime;
+                }
             }
         }
+
+        private string GetFormattedDetails(FPSInstanceToFollow.Details details)
+        {
+            string str = "";
+            details.ForEach(pair => str += $"{pair.text} [{pair.field}]\n");
+            return str;
+        }
+
+        private string GetFormattedStatus(string name, string status)
+            => $"[Name] {name}\n[Status] {status}";
+
+
 
         private void OnGUI()
         {
@@ -43,7 +62,7 @@ namespace FPSCamMod
             GUI.Box(new Rect(0f, -10f, width, height + 10f), "");
             GUI.color = Color.white;
 
-            var speed = (cam is object ? cam.GetVelocity().magnitude : 0f)
+            var speed = (cam is object ? cam.GetSpeed() : 0f)
                         * (Config.G.UseMetricUnit ? 1.666f : 1.035f);
 
             var style = new GUIStyle();
@@ -55,11 +74,11 @@ namespace FPSCamMod
 
             var rect = new Rect(margin, 0, blockWidth - 2f * margin, height);
             style.alignment = TextAnchor.MiddleLeft;
-            GUI.Label(rect, cam?.GetDisplayInfoStr() ?? missingText, style);
+            GUI.Label(rect, status, style);
 
             rect.x += blockWidth * 2f;
             style.alignment = TextAnchor.MiddleRight;
-            GUI.Label(rect, $"[Destination]\n{cam?.GetDestinationStr() ?? missingText}", style);
+            GUI.Label(rect, details, style);
 
             rect.x -= blockWidth;
             style.alignment = TextAnchor.MiddleCenter;
@@ -74,8 +93,9 @@ namespace FPSCamMod
             );
         }
 
-        private const string missingText = "---";
         private WeakReference camWRef;
-        private float elapsedTime = 0f;
+        private string status = "", details = "";
+        private float elapsedTime = 0f, lastBufferStrUpdateTime = -1f;
+        private const float bufferUpdateInterval = .5f;
     }
 }

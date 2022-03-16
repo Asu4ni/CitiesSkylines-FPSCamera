@@ -58,23 +58,24 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FPSClass\FPSInstance.cs" />
     <Compile Include="UI\DebugUI.cs" />
     <Compile Include="UI\FollowModeUI.cs" />
     <Compile Include="UI\OptionsMenuUI.cs" />
     <Compile Include="UI\ConfigPanelUI.cs" />
     <Compile Include="UI\InfoPanelUI.cs" />
-    <Compile Include="Utils\CitizenUT.cs" />
+    <Compile Include="FPSClass\FPSCitizen.cs" />
     <Compile Include="Utils\CamControllerUT.cs" />
-    <Compile Include="Utils\VehicleUT.cs" />
+    <Compile Include="FPSClass\FPSVehicle.cs" />
     <Compile Include="Utils\ControlUT.cs" />
     <Compile Include="Utils\GameUT.cs" />
     <Compile Include="Utils\CamUT.cs" />
     <Compile Include="UI\UIutils.cs" />
-    <Compile Include="Utils\IdUT.cs" />
+    <Compile Include="FPSClass\UUID.cs" />
     <Compile Include="Utils\Utils.cs" />
-    <Compile Include="FPSCam\FPSCam.cs" />
-    <Compile Include="FPSCam\CitizenCam.cs" />
-    <Compile Include="FPSCam\VehicleCam.cs" />
+    <Compile Include="FPSClass\FPSCam.cs" />
+    <Compile Include="FPSClass\CitizenCam.cs" />
+    <Compile Include="FPSClass\VehicleCam.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="FPSController.cs" />
     <Compile Include="Log.cs" />

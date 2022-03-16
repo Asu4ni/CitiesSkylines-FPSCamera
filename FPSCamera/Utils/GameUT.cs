@@ -4,9 +4,6 @@ namespace FPSCamMod
 {
     public static class GameUT
     {
-        public static string GetBuildingName(BuildingID id)
-            => BuildingManager.instance.GetBuildingName(id._id, default);
-
         public static float GetTerrainLevel(Vector3 position)
             => TerrainManager.instance.SampleDetailHeight(position);
         public static float GetWaterLevel(Vector3 position)
@@ -77,15 +74,5 @@ namespace FPSCamMod
                 return null;
             }
         }
-    }
-
-    public class FPSInstance
-    {
-        public FPSInstance() { ID = UUID.Empty; }
-        public FPSInstance(UUID id) { ID = id; }
-
-        public bool isValid => InstanceManager.IsValid((InstanceID) ID);
-
-        public UUID ID { get; protected set; }
     }
 }

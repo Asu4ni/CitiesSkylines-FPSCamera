@@ -125,9 +125,9 @@ namespace FPSCamMod
         {
             switch (idToFollow.Type.switchValue) {
             case ObjectType.sCitizen:
-                camToFollow = new CitizenCam(idToFollow); break;
+                camToFollow = new CitizenCam(idToFollow.Citizen); break;
             case ObjectType.sVehicle:
-                camToFollow = new VehicleCam(idToFollow); break;
+                camToFollow = new VehicleCam(idToFollow.Vehicle); break;
             default:
                 Log.Warn($"Following UUID:{idToFollow} is not supported");
                 camToFollow = null;
@@ -161,8 +161,8 @@ namespace FPSCamMod
         {
             walkThruTimer = Config.G.Period4WalkThru;
             idToFollow = GetWalkThruTarget();
-            if (idToFollow.exists) PrepareFollowing();
-            return idToFollow.exists;
+            if (idToFollow.Exists) PrepareFollowing();
+            return idToFollow.Exists;
         }
         private UUID GetWalkThruTarget()
         {
@@ -172,10 +172,10 @@ namespace FPSCamMod
             var vehicleID = FPSVehicle.GetRandomID();
             var citizenID = FPSCitizen.GetRandomID();
 
-            if (vehicleID.exists && citizenID.exists)
-                return chooseCitizen ? (UUID) citizenID : vehicleID;
-            else if (vehicleID.exists) return vehicleID;
-            else if (citizenID.exists) return citizenID;
+            if (vehicleID.Exists && citizenID.Exists)
+                return chooseCitizen ? (UUID) citizenID : (UUID) vehicleID;
+            else if (vehicleID.Exists) return (UUID) vehicleID;
+            else if (citizenID.Exists) return (UUID) citizenID;
             Log.Msg("GetWalkThruTarget: nothing found");
             return UUID.Empty;
         }
@@ -216,8 +216,8 @@ namespace FPSCamMod
 
             if (camToFollow is object) {
                 controlOffset.deltaPos.y *= heightMovementFactor;
-                var setting = camToFollow.GetNextCamSetting();
-                if (camToFollow.isRunning) {
+                var setting = camToFollow.TryGetCamSetting();
+                if (camToFollow.IsOperating) {
                     targetSetting = setting;
                     userOffset.deltaPos += CamUT.GetRotation(userOffset.deltaEulerXY)
                                            * controlOffset.deltaPos;
