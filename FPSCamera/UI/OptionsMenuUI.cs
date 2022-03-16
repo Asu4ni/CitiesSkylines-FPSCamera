@@ -15,74 +15,80 @@ namespace FPSCamMod
         }
         private static void SetUp()
         {
-            var mainPanel = UIutils.AddGroup("First Person Camera", helperPanel);
+            var mainPanel = helperPanel.AsParent().AddGroup("First Person Camera");
+            var mainParent = mainPanel.AsParent();
             mainPanel.backgroundSprite = "";
             const float margin = 5f;
             {
-                var panel = UIutils.AddGroup("General Options", mainPanel);
+                var panel = mainParent.AddGroup("General Options");
+                var parent = panel.AsParent();
                 panel.autoLayout = false;
                 UIComponent comp;
                 var y = 0f;
-                comp = UIutils.AddCheckbox(Config.G.UseMetricUnit, panel, yPos: y);
+                comp = parent.AddCheckbox(Config.G.UseMetricUnit, yPos: y);
                 y += comp.height + margin;
-                comp = UIutils.AddCheckbox(Config.G.InvertRotateVertical, panel, yPos: y);
+                comp = parent.AddCheckbox(Config.G.InvertRotateVertical, yPos: y);
                 y += comp.height + margin;
-                comp = UIutils.AddCheckbox(Config.G.InvertRotateHorizontal, panel, yPos: y);
+                comp = parent.AddCheckbox(Config.G.InvertRotateHorizontal, yPos: y);
                 y += comp.height + margin;
-                comp = UIutils.AddSlider(Config.G.RotateSensitivity, panel, .25f,
+                comp = parent.AddSlider(Config.G.RotateSensitivity, .25f,
                                          yPos: y, width: panel.width, oneLine: true);
                 y += comp.height + margin;
-                comp = UIutils.AddSlider(Config.G.MaxVertRotate, panel, 1f, "F0",
+                comp = parent.AddSlider(Config.G.MaxVertRotate, 1f, "F0",
                                          yPos: y, width: panel.width, oneLine: true);
                 y += comp.height + margin;
                 panel.height = y;
-                UIutils.AddButton("ReloadConfig", "Reload Configurations", new Vector2(200f, 35f),
-                                   (_, p) => { Mod.LoadConfig(); Mod.ResetUI(); },
-                                   panel, panel.width - 240f, 0f);
-                UIutils.AddButton("ResetConfig", "Reset Configurations", new Vector2(200f, 35f),
-                                   (_, p) => Mod.ResetConfig(), panel, panel.width - 240f, 35f);
+                parent.AddButton("ReloadConfig", "Reload Configurations", new Vector2(200f, 35f),
+                                 (_, p) => { Mod.LoadConfig(); Mod.ResetUI(); },
+                                 panel.width - 240f, 0f);
+                parent.AddButton("ResetConfig", "Reset Configurations", new Vector2(200f, 35f),
+                                 (_, p) => Mod.ResetConfig(), panel.width - 240f, 35f);
             }
             {
-                var panel = UIutils.AddGroup("Free-Camera Mode Options", mainPanel);
-                UIutils.AddCheckbox(Config.G.ShowCursorWhileFreeCam, panel);
-                UIutils.AddSlider(Config.G.GroundLevelOffset, panel, .25f,
-                                  width: panel.width, oneLine: true);
-            }
-            {
-                var panel = UIutils.AddGroup("Follow/Walk-Through Mode Options", mainPanel);
-                UIutils.AddCheckbox(Config.G.ShowCursorWhileFollow, panel);
-                UIutils.AddSlider(Config.G.MaxVertRotate4Follow, panel, 1f, "F0",
-                                  width: panel.width, oneLine: true);
-                UIutils.AddSlider(Config.G.MaxHoriRotate4Follow, panel, 1f, "F0",
-                                  width: panel.width, oneLine: true);
-                UIutils.AddSlider(Config.G.InstantMoveMax, panel, 1f, "F0",
+                var panel = mainParent.AddGroup("Free-Camera Mode Options");
+                var parent = panel.AsParent();
+                parent.AddCheckbox(Config.G.ShowCursorWhileFreeCam);
+                parent.AddSlider(Config.G.GroundLevelOffset, .25f,
                                   width: panel.width, oneLine: true);
             }
             {
-                var panel = UIutils.AddGroup("Key Mapping", mainPanel);
-                var label = UIutils.AddLabel("KeyMappingComment",
-                                "* Press [ESC]: cancel |  * Press [Shift]+[X]: remove", panel);
+                var panel = mainParent.AddGroup("Follow/Walk-Through Mode Options");
+                var parent = panel.AsParent();
+                parent.AddCheckbox(Config.G.ShowCursorWhileFollow);
+                parent.AddSlider(Config.G.MaxVertRotate4Follow, 1f, "F0",
+                                  width: panel.width, oneLine: true);
+                parent.AddSlider(Config.G.MaxHoriRotate4Follow, 1f, "F0",
+                                  width: panel.width, oneLine: true);
+                parent.AddSlider(Config.G.InstantMoveMax, 1f, "F0",
+                                  width: panel.width, oneLine: true);
+            }
+            {
+                var panel = mainParent.AddGroup("Key Mapping");
+                var label = panel.AsParent().AddLabel("KeyMappingComment",
+                                "* Press [ESC]: cancel |  * Press [Shift]+[X]: remove");
                 panel.gameObject.AddComponent<KeyMappingUI>();
             }
             {
-                var panel = UIutils.AddGroup("Smooth Transition Options", mainPanel);
-                UIutils.AddSlider(Config.G.TransitionSpeed, panel, 1f, "F0",
+                var panel = mainParent.AddGroup("Smooth Transition Options");
+                var parent = panel.AsParent();
+                parent.AddSlider(Config.G.TransitionSpeed, 1f, "F0",
                                   width: panel.width, oneLine: true);
-                UIutils.AddSlider(Config.G.GiveUpTransitionDistance, panel, 50f, "F0",
+                parent.AddSlider(Config.G.GiveUpTransitionDistance, 50f, "F0",
                                   width: panel.width, oneLine: true);
-                UIutils.AddSlider(Config.G.DeltaPosMin, panel, .05f,
+                parent.AddSlider(Config.G.DeltaPosMin, .05f,
                                   width: panel.width, oneLine: true);
-                UIutils.AddSlider(Config.G.DeltaPosMax, panel, 1f, "F0",
+                parent.AddSlider(Config.G.DeltaPosMax, 1f, "F0",
                                   width: panel.width, oneLine: true);
-                UIutils.AddSlider(Config.G.DeltaRotateMin, panel, .05f,
+                parent.AddSlider(Config.G.DeltaRotateMin, .05f,
                                   width: panel.width, oneLine: true);
-                UIutils.AddSlider(Config.G.DeltaRotateMax, panel, 1f, "F0",
+                parent.AddSlider(Config.G.DeltaRotateMax, 1f, "F0",
                                   width: panel.width, oneLine: true);
             }
             {
-                var panel = UIutils.AddGroup("Camera Offsets", mainPanel);
-                UIutils.AddOffsetSliders(Config.G.VehicleCamOffset, panel, width: panel.width);
-                UIutils.AddOffsetSliders(Config.G.CitizenCamOffset, panel, width: panel.width);
+                var panel = mainParent.AddGroup("Camera Offsets");
+                var parent = panel.AsParent();
+                parent.AddOffsetSliders(Config.G.VehicleCamOffset, width: panel.width);
+                parent.AddOffsetSliders(Config.G.CitizenCamOffset, width: panel.width);
             }
         }
         public static void Destroy()
@@ -125,7 +131,7 @@ namespace FPSCamMod
 
         private void AddKeyMapping(CfKey config)
         {
-            var panel = UIutils.AddUI<UIPanel>("KeyBindingTemplate", component);
+            var panel = component.AsParent().AddUI<UIPanel>("KeyBindingTemplate");
 
             var btn = panel.Find<UIButton>("Binding");
             btn.eventKeyDown += new KeyPressHandler(KeyPressAction);

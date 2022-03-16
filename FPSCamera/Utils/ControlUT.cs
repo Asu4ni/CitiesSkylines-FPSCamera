@@ -1,4 +1,3 @@
-using ColossalFramework.UI;
 using UnityEngine;
 
 namespace FPSCamMod
@@ -26,13 +25,5 @@ namespace FPSCamMod
         public static bool KeyRotateR => Input.GetKey(Config.G.KeyRotateRight);
         public static bool KeyRotateU => Input.GetKey(Config.G.KeyRotateUp);
         public static bool KeyRotateD => Input.GetKey(Config.G.KeyRotateDown);
-
-        // key press is consumed if handler returns true
-        public static KeyPressHandler GetKeyDownHandler(System.Func<KeyCode, bool> handler)
-        {
-            return (comp, eventParam) => {
-                if (handler(eventParam.keycode)) eventParam.Use();
-            };
-        }
     }
 }

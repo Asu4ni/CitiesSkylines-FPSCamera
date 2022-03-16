@@ -3,34 +3,41 @@ using UnityEngine;
 
 namespace FPSCamMod
 {
-    internal static class UIutils
+    public static class UIutils
     {
         public static readonly Color32 textColor = new Color32(221, 220, 250, 255);
         public static readonly Color32 color = new Color32(165, 160, 240, 255);
         public static readonly Color32 bgColor = new Color32(55, 53, 160, 255);
         public static readonly Color32 textColorDisabled = new Color32(120, 120, 140, 255);
-        public const float margin = 15f;
+        public const float margin = 20f;
 
-        public static ColossalFramework.UI.UIView UIroot => UIView.GetAView();
+        public static UIView UIroot => UIView.GetAView();
+        public static UIParent UIrootParent => UIroot.AsParent();
 
-        public static Comp AddUI<Comp>(UIComponent parent = null) where Comp : UIComponent
-            => (parent is null ? UIroot.AddUIComponent(typeof(Comp)) :
-                                 parent.AddUIComponent<Comp>()) as Comp;
+        public static UIParent AsParent(this UIView view) => new UIParent(view);
+        public static UIParent AsParent(this UIComponent comp) => new UIParent(comp);
 
-        public static Comp AddUI<Comp>(string templateName, UIComponent parent = null)
+        public static Comp AddUI<Comp>(this UIParent parent) where Comp : UIComponent
+        {
+            if (parent.obj is UIView v) return v.AddUIComponent(typeof(Comp)) as Comp;
+            else if (parent.obj is UIComponent c) return c.AddUIComponent<Comp>() as Comp;
+            return null;
+        }
+        public static Comp AddUI<Comp>(this UIParent parent, string templateName)
             where Comp : UIComponent
         {
             var comp = UITemplateManager.GetAsGameObject(templateName);
-            return parent is null ? UIroot.AttachUIComponent(comp) as Comp :
-                                    parent.AttachUIComponent(comp) as Comp;
+            if (parent.obj is UIView v) return v.AttachUIComponent(comp) as Comp;
+            else if (parent.obj is UIComponent c) return c.AttachUIComponent(comp) as Comp;
+            return null;
         }
 
 
-        public static UILabel AddLabel(string name, string text, UIComponent parent = null,
+        public static UILabel AddLabel(this UIParent parent, string name, string text,
                                        float xPos = 0f, float yPos = 0f, string tooltip = "",
                                        float width = 0f, float height = 0f, float scale = 1f)
         {
-            var label = AddUI<UILabel>(parent);
+            var label = parent.AddUI<UILabel>();
             label.name = name; label.text = text; label.tooltip = tooltip;
             label.relativePosition = new Vector3(xPos, yPos);
             label.textColor = textColor; label.textScale = scale;
@@ -39,12 +46,12 @@ namespace FPSCamMod
             return label;
         }
 
-        public static UIButton AddButton(string name, string text, Vector2 size,
-                                         MouseEventHandler handler, UIComponent parent = null,
+        public static UIButton AddButton(this UIParent parent, string name, string text,
+                                         Vector2 size, MouseEventHandler handler,
                                          float xPos = 0f, float yPos = 0f, string tooltip = "",
                                          float textScale = 1f)
         {
-            var btn = AddUI<UIButton>("OptionsButtonTemplate", parent);
+            var btn = parent.AddUI<UIButton>("OptionsButtonTemplate");
             btn.name = name; btn.text = text; btn.textScale = textScale;
             btn.textHorizontalAlignment = UIHorizontalAlignment.Center;
             btn.autoSize = false; btn.size = size;
@@ -57,10 +64,10 @@ namespace FPSCamMod
             return btn;
         }
 
-        public static UICheckBox AddCheckbox(ConfigData<bool> config, UIComponent parent = null,
+        public static UICheckBox AddCheckbox(this UIParent parent, ConfigData<bool> config,
                                              float xPos = 0f, float yPos = 0f)
         {
-            var box = AddUI<UICheckBox>("OptionsCheckBoxTemplate", parent);
+            var box = parent.AddUI<UICheckBox>("OptionsCheckBoxTemplate");
             box.name = config.Name;
             box.text = config.Description; box.tooltip = config.Detail;
             box.relativePosition = new Vector3(xPos + margin, yPos);
@@ -71,15 +78,16 @@ namespace FPSCamMod
             return box;
         }
 
-        public static UIPanel AddSlider(CfFloat config, UIComponent parent = null,
+        public static UIPanel AddSlider(this UIParent parent, CfFloat config,
                                          float stepSize = .25f, string valueFormat = "F2",
                                          float xPos = 0f, float yPos = 0f, float width = 0f,
                                          string labelText = null, bool oneLine = false)
         {
-            var panel = AddUI<UIPanel>("OptionsSliderTemplate", parent);
+            var panel = parent.AddUI<UIPanel>("OptionsSliderTemplate");
             panel.name = config.Name;
             panel.relativePosition = new Vector3(xPos + margin, yPos);
             if (width > 0f) panel.width = width - margin * 2;
+            panel.autoLayout = false;
 
             var label = panel.Find<UILabel>("Label");
             label.width = panel.width;
@@ -87,6 +95,7 @@ namespace FPSCamMod
             label.tooltip = config.Detail;
             label.textColor = textColor;
             label.anchor = UIAnchorStyle.Left | UIAnchorStyle.Top;
+            label.relativePosition = Vector3.zero;
 
             var slider = panel.Find<UISlider>("Slider");
             slider.stepSize = slider.scrollWheelAmount = stepSize;
@@ -95,14 +104,13 @@ namespace FPSCamMod
 
             (slider.thumbObject as UISprite).spriteName = "SliderBudget";
             slider.backgroundSprite = "ScrollbarTrack";
-            panel.autoLayout = false;
             slider.height = 10f;
             slider.relativePosition = oneLine ?
                         new Vector3(panel.width / 2f, 10f) :
                         new Vector3(5f, label.relativePosition.y + label.height + 10f);
             slider.width = oneLine ? panel.width / 2f - 60f : panel.width - 60f;
 
-            var valueLabel = AddUI<UILabel>(panel);
+            var valueLabel = panel.AsParent().AddUI<UILabel>();
             valueLabel.text = slider.value.ToString(valueFormat);
             valueLabel.textColor = textColor;
             valueLabel.relativePosition =
@@ -119,29 +127,29 @@ namespace FPSCamMod
             return panel;
         }
 
-        public static UIPanel AddOffsetSliders(CfOffset config, UIComponent parent = null,
+        public static UIPanel AddOffsetSliders(this UIParent parent, CfOffset config,
                                         float stepSize = .25f, string valueFormat = "F2",
                                         float xPos = 0f, float yPos = 0f, float width = 400f)
         {
-            var panel = AddUI<UIPanel>(parent);
+            var panel = parent.AddUI<UIPanel>();
             panel.name = config.Name;
             panel.relativePosition = new Vector3(xPos + margin, yPos);
             panel.width = width - margin * 2;
 
-            var label = AddUI<UILabel>(panel);
+            var label = panel.AsParent().AddUI<UILabel>();
             label.width = panel.width;
             label.text = config.Description; label.tooltip = config.Detail;
             label.textColor = textColor;
             label.relativePosition = Vector3.zero;
 
             var y = label.relativePosition.y + label.height;
-            var slider = AddSlider(config.forward, panel, labelText: "Forward direction",
+            var slider = panel.AsParent().AddSlider(config.forward, labelText: "Forward direction",
                             xPos: margin, yPos: y, width: panel.width - margin, oneLine: true);
             y += slider.height;
-            slider = AddSlider(config.up, panel, labelText: "Up direction",
+            slider = panel.AsParent().AddSlider(config.up, labelText: "Up direction",
                             xPos: margin, yPos: y, width: panel.width - margin, oneLine: true);
             y += slider.height;
-            slider = AddSlider(config.right, panel, labelText: "Right direction",
+            slider = panel.AsParent().AddSlider(config.right, labelText: "Right direction",
                             xPos: margin, yPos: y, width: panel.width - margin, oneLine: true);
             y += slider.height;
 
@@ -150,12 +158,12 @@ namespace FPSCamMod
         }
 
         public static UIPanel AddDropDown<EnumType>(
-                                        ConfigData<EnumType> config, UIComponent parent = null,
+                                        this UIParent parent, ConfigData<EnumType> config,
                                         float xPos = 0f, float yPos = 0f,
                                         float width = 0f, float menuWidth = 0f)
         {
             const float padding = 5f;
-            var panel = AddUI<UIPanel>("OptionsDropdownTemplate", parent);
+            var panel = parent.AddUI<UIPanel>("OptionsDropdownTemplate");
             panel.name = config.Name;
             panel.autoLayout = false;
             panel.relativePosition = new Vector3(xPos + margin, yPos);
@@ -199,10 +207,10 @@ namespace FPSCamMod
             return panel;
         }
 
-        public static UIPanel AddPanel(string name, Vector2 size, UIComponent parent = null,
+        public static UIPanel AddPanel(this UIParent parent, string name, Vector2 size,
                                        float xPos = 0f, float yPos = 0f)
         {
-            var panel = AddUI<UIPanel>(parent);
+            var panel = parent.AddUI<UIPanel>();
             panel.name = name; panel.size = size;
             panel.color = bgColor;
             panel.relativePosition = new Vector3(xPos, yPos);
@@ -210,21 +218,36 @@ namespace FPSCamMod
             return panel;
         }
 
-        public static UIPanel AddGroup(string name, UIComponent parent = null)
+        public static UIPanel AddGroup(this UIParent parent, string name)
         {
-            var panel = AddUI<UIPanel>("OptionsGroupTemplate", parent);
+            var panel = parent.AddUI<UIPanel>("OptionsGroupTemplate");
             var label = panel.Find<UILabel>("Label");
             label.text = name; label.textColor = textColor;
             return panel.Find("Content") as UIPanel;
         }
 
-        public static UIDragHandle MakeDraggable(UIComponent component)
+        public static UIDragHandle MakeDraggable(this UIComponent comp,
+                System.Action actionDragStart = null, System.Action actionDragEnd = null)
         {
-            var dragComp = component.AddUIComponent<UIDragHandle>();
-            dragComp.target = component;
-            dragComp.width = component.width; dragComp.height = component.height;
-            dragComp.relativePosition = Vector3.zero;
+            var dragComp = comp.AsParent().AddUI<UIDragHandleFPS>();
+            dragComp.SetDraggedComponent(comp, actionDragStart, actionDragEnd);
             return dragComp;
+        }
+
+
+        // event is consumed if handler returns true
+        public static void SetKeyDownEvent(
+                      this UIComponent comp, System.Func<KeyCode, bool> handler)
+        {
+            comp.eventKeyDown += (_, eventParam) => {
+                if (handler(eventParam.keycode)) eventParam.Use();
+            };
+        }
+        public static void SetClickEvent(this UIComponent comp, System.Func<bool> handler)
+        {
+            comp.eventClick += (_, eventParam) => {
+                if (handler()) eventParam.Use();
+            };
         }
 
         // TODO: investigate
@@ -285,5 +308,60 @@ namespace FPSCamMod
 
             camera.rect = new Rect(0.0f, 0.105f, 1f, 0.895f);
         }
+    }
+
+    public struct UIParent
+    {
+        public UIParent(UIView view) { obj = view; }
+        public UIParent(UIComponent comp) { obj = comp; }
+        public readonly object obj;
+    }
+
+    public class UIDragHandleFPS : UIDragHandle
+    {
+        public void SetDraggedComponent(UIComponent compToDrag,
+                            System.Action actionDragStart, System.Action actionDragEnd)
+        {
+            target = compToDrag;
+            this.actionDragStart = actionDragStart; this.actionDragEnd = actionDragEnd;
+
+            width = compToDrag.width; height = compToDrag.height;
+            relativePosition = Vector3.zero;
+        }
+
+        protected override void OnMouseDown(UIMouseEventParameter eventParam)
+        {
+            state = State.couldDrag;
+            base.OnMouseDown(eventParam);
+        }
+
+        protected override void OnMouseMove(UIMouseEventParameter eventParam)
+        {
+            if (eventParam.buttons.IsFlagSet(UIMouseButton.Left) && state == State.couldDrag) {
+                actionDragStart();
+                state = State.dragging;
+            }
+            base.OnMouseMove(eventParam);
+        }
+
+        protected override void OnMouseUp(UIMouseEventParameter eventParam)
+        {
+            if (state == State.dragging) {
+                actionDragEnd();
+                state = State.idle;
+            }
+            base.OnMouseMove(eventParam);
+        }
+
+        protected override void OnClick(UIMouseEventParameter eventParam)
+        {
+            if (state == State.dragging) eventParam.Use();
+            base.OnClick(eventParam);
+        }
+
+        private System.Action actionDragStart, actionDragEnd;
+
+        private enum State { idle, couldDrag, dragging };
+        private State state = State.idle;
     }
 }

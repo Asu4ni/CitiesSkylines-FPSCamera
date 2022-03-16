@@ -314,8 +314,8 @@ namespace FPSCamMod
         {
             DestroyUI();
             configPanelUI = gameObject.AddComponent<ConfigPanelUI>();
-            configPanelUI.RegisterWalkThruCallBack(StartWalkThruMode);
-            configPanelUI.RegisterKeyDownEvent(ControlUT.GetKeyDownHandler(KeyDownHandler));
+            configPanelUI.SetWalkThruCallBack(StartWalkThruMode);
+            configPanelUI.SetKeyDownEvent(KeyDownHandler);
             followModeUI = gameObject.AddComponent<FollowModeUI>();
             if (ModLoad.IsInGameMode) {
                 infoPanelUI = gameObject.AddComponent<InfoPanelUI>();

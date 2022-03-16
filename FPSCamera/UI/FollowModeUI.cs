@@ -47,8 +47,9 @@ namespace FPSCamMod
                         * (Config.G.UseMetricUnit ? 1.666f : 1.035f);
 
             var style = new GUIStyle();
-            style.fontSize = (int) Mathf.Clamp(width * .015f, 8f, Mathf.Max(height * .2f, 12f));
+            style.fontSize = (int) Mathf.Clamp(width * .014f, 8f, Mathf.Max(height * .2f, 12f));
             style.normal.textColor = new Color(.9f, .9f, 1f);
+            style.wordWrap = true;
             var blockWidth = width / 3f;
             var margin = Mathf.Clamp(width * .01f, style.fontSize, style.fontSize * 4f);
 

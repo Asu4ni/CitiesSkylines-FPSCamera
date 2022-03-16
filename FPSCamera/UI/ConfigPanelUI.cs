@@ -9,21 +9,23 @@ namespace FPSCamMod
         private void Awake()
         {
             panelBtn = SetUpPanelButton();
-            UIutils.MakeDraggable(panelBtn);
 
-            toggleHintLabel = UIutils.AddLabel("FPSToggleHintLabel",
+            toggleHintLabel = UIutils.UIrootParent.AddLabel("FPSToggleHintLabel",
                                                 $"Press [{Config.G.KeyCamToggle}] to exit");
             toggleHintLabel.Hide();
 
-            mainPanel = UIutils.AddPanel("FPSConfigPanel", new Vector2(400f, 740f));
+            mainPanel = UIutils.UIrootParent.AddPanel("FPSConfigPanel", new Vector2(400f, 740f));
             PanelExpanded = false;
 
-            panelBtn.eventPositionChanged += (component, param) => {
-                Config.G.CamUIOffset.right.assign(panelBtn.relativePosition.x);
-                Config.G.CamUIOffset.up.assign(panelBtn.relativePosition.y);
-                Config.G.Save();
-            };
-            panelBtn.eventClick += (component, param) => {
+
+            panelBtn.MakeDraggable(
+                actionDragStart: () => PanelExpanded = false,
+                actionDragEnd: () => {
+                    Config.G.CamUIOffset.right.assign(panelBtn.relativePosition.x);
+                    Config.G.CamUIOffset.up.assign(panelBtn.relativePosition.y);
+                    Config.G.Save();
+                });
+            panelBtn.SetClickEvent(() => {
                 mainPanel.relativePosition = new Vector3(
                     panelBtn.absolutePosition.x > Screen.width / 2f ?
                         panelBtn.relativePosition.x - mainPanel.width + 10f :
@@ -34,56 +36,58 @@ namespace FPSCamMod
                         panelBtn.relativePosition.y - mainPanel.height + 15f
                 );
                 PanelExpanded = !PanelExpanded;
-            };
+                return true;
+            });
 
             const float margin = 5f;
             var y = margin * 3;
+            var panelParent = mainPanel.AsParent();
             UIComponent comp;
 #if DEBUG
-            comp = UIutils.AddCheckbox(DebugUI.Displayed, mainPanel, yPos: y);
+            comp = panelParent.AddCheckbox(DebugUI.Displayed, yPos: y);
             y += comp.height + margin;
 #endif
 
-            comp = UIutils.AddCheckbox(Config.G.HideUIwhenActivate, mainPanel, yPos: y);
+            comp = panelParent.AddCheckbox(Config.G.HideUIwhenActivate, yPos: y);
             y += comp.height + margin;
-            comp = UIutils.AddCheckbox(Config.G.EnableDOF, mainPanel, yPos: y);
+            comp = panelParent.AddCheckbox(Config.G.EnableDOF, yPos: y);
             y += comp.height + margin;
-            comp = UIutils.AddSlider(Config.G.CamFieldOfView, mainPanel, 1f, "F0",
-                                      yPos: y, width: mainPanel.width);
+            comp = panelParent.AddSlider(Config.G.CamFieldOfView, 1f, "F0",
+                                         yPos: y, width: mainPanel.width);
             y += comp.height + margin;
-            comp = UIutils.AddSlider(Config.G.MovementSpeed, mainPanel, 1f, "F0",
-                                      yPos: y, width: mainPanel.width);
+            comp = panelParent.AddSlider(Config.G.MovementSpeed, 1f, "F0",
+                                         yPos: y, width: mainPanel.width);
             y += comp.height + margin;
-            comp = UIutils.AddSlider(Config.G.SpeedUpFactor, mainPanel, .25f,
-                                      yPos: y, width: mainPanel.width);
+            comp = panelParent.AddSlider(Config.G.SpeedUpFactor, .25f,
+                                         yPos: y, width: mainPanel.width);
             y += comp.height + margin;
-            comp = UIutils.AddCheckbox(Config.G.SetToOriginalPos, mainPanel, yPos: y);
+            comp = panelParent.AddCheckbox(Config.G.SetToOriginalPos, yPos: y);
             y += comp.height + margin;
-            comp = UIutils.AddCheckbox(Config.G.SmoothTransition, mainPanel, yPos: y);
+            comp = panelParent.AddCheckbox(Config.G.SmoothTransition, yPos: y);
             y += comp.height + margin;
-            comp = UIutils.AddDropDown(Config.G.GroundClippingOption, mainPanel,
-                                        yPos: y, width: mainPanel.width);
+            comp = panelParent.AddDropDown(Config.G.GroundClippingOption,
+                                           yPos: y, width: mainPanel.width);
 
             if (ModLoad.IsInGameMode) {
                 y += comp.height + margin;
 
-                comp = UIutils.AddCheckbox(Config.G.StickToFrontVehicle, mainPanel, yPos: y);
+                comp = panelParent.AddCheckbox(Config.G.StickToFrontVehicle, yPos: y);
                 y += comp.height + margin;
-                comp = UIutils.AddCheckbox(Config.G.ShowInfoPanel4Follow, mainPanel, yPos: y);
+                comp = panelParent.AddCheckbox(Config.G.ShowInfoPanel4Follow, yPos: y);
                 y += comp.height + margin;
 
-                comp = UIutils.AddCheckbox(Config.G.ClickToSwitch4WalkThru, mainPanel, yPos: y);
+                comp = panelParent.AddCheckbox(Config.G.ClickToSwitch4WalkThru, yPos: y);
                 y += comp.height + margin;
-                comp = UIutils.AddSlider(Config.G.Period4WalkThru, mainPanel, 1f, "F0",
-                                          yPos: y, width: mainPanel.width);
+                comp = panelParent.AddSlider(Config.G.Period4WalkThru, 1f, "F0",
+                                             yPos: y, width: mainPanel.width);
                 y += comp.height + margin;
 
                 var btnSize = new Vector2(200f, 40f);
                 mainPanel.height = y + btnSize.y + margin * (1 + 3);
-                walkThruBtn = UIutils.AddButton("WalkThruButton", "Start Walk-Through", btnSize,
-                                                (a, b) => walkThruCallBack(), mainPanel,
-                                                 (mainPanel.width - btnSize.x) / 2,
-                                                 mainPanel.height - btnSize.y - margin * 3);
+                walkThruBtn = panelParent.AddButton("WalkThruButton", "Start Walk-Through",
+                                                    btnSize, (a, b) => walkThruCallBack(),
+                                                    (mainPanel.width - btnSize.x) / 2,
+                                                    mainPanel.height - btnSize.y - margin * 3);
             }
             else mainPanel.height = y + 20f;
         }
@@ -112,7 +116,7 @@ namespace FPSCamMod
 
         private UIButton SetUpPanelButton()
         {
-            var btn = UIutils.AddUI<UIButton>();
+            var btn = UIutils.UIrootParent.AddUI<UIButton>();
 
             btn.name = "FPSCamPanelSwitchBtn";
             btn.width = 50;
@@ -183,9 +187,9 @@ namespace FPSCamMod
             set => _walkThruCallBack = value;
         }
 
-        internal void RegisterWalkThruCallBack(System.Action callBackAction)
+        internal void SetWalkThruCallBack(System.Action callBackAction)
             => walkThruCallBack = callBackAction;
-        internal void RegisterKeyDownEvent(KeyPressHandler handler)
-            => panelBtn.eventKeyDown += handler;
+        internal void SetKeyDownEvent(System.Func<KeyCode, bool> handler)
+            => panelBtn.SetKeyDownEvent(handler);
     }
 }
