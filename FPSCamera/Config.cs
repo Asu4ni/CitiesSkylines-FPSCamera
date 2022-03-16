@@ -106,7 +106,7 @@ namespace FPSCamMod
         [Config("ShowCursorWhileFreeCam", "Show cursor in Free-Camera Mode")]
         public readonly CfFlag ShowCursorWhileFreeCam = new CfFlag(false);
         [Config("ShowCursorWhileFollow", "Show cursor in Follow/Walk-Through Mode")]
-        public readonly CfFlag ShowCursorWhileFollow = new CfFlag(true);
+        public readonly CfFlag ShowCursorWhileFollow = new CfFlag(false);
 
         // position offset
         [Config("VehicleCamOffset", "Camera offset while following vehicles")]
