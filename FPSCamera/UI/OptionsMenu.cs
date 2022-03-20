@@ -1,21 +1,21 @@
-using ColossalFramework.UI;
-using ICities;
-using UnityEngine;
-
-namespace FPSCamMod
+namespace FPSCamera.UI
 {
-    using CfKey = ConfigData<KeyCode>;
+    using ColossalFramework.UI;
+    using ICities;
+    using UnityEngine;
 
-    public static class OptionsMenuUI
+    using CfKey = ConfigData<UnityEngine.KeyCode>;
+
+    public class OptionsMenu : MonoBehaviour
     {
         public static void Generate(UIHelperBase uiHelper)
         {
-            helperPanel = (uiHelper as UIHelper).self as UIScrollablePanel;
+            _helperPanel = (uiHelper as UIHelper)?.self as UIScrollablePanel;
             SetUp();
         }
         private static void SetUp()
         {
-            var mainPanel = helperPanel.AsParent().AddGroup("First Person Camera");
+            var mainPanel = _helperPanel.AsParent().AddGroup(mainGroupName);
             var mainParent = mainPanel.AsParent();
             mainPanel.backgroundSprite = "";
             const float margin = 5f;
@@ -23,9 +23,9 @@ namespace FPSCamMod
                 var panel = mainParent.AddGroup("General Options");
                 var parent = panel.AsParent();
                 panel.autoLayout = false;
-                UIComponent comp;
                 var y = 0f;
-                comp = parent.AddCheckbox(Config.G.UseMetricUnit, yPos: y);
+                UIComponent comp
+                     = parent.AddCheckbox(Config.G.UseMetricUnit, yPos: y);
                 y += comp.height + margin;
                 comp = parent.AddCheckbox(Config.G.InvertRotateVertical, yPos: y);
                 y += comp.height + margin;
@@ -38,11 +38,14 @@ namespace FPSCamMod
                                          yPos: y, width: panel.width, oneLine: true);
                 y += comp.height + margin;
                 panel.height = y;
-                parent.AddButton("ReloadConfig", "Reload Configurations", new Vector2(200f, 35f),
-                                 (_, p) => { Mod.LoadConfig(); Mod.ResetUI(); },
-                                 panel.width - 240f, 0f);
-                parent.AddButton("ResetConfig", "Reset Configurations", new Vector2(200f, 35f),
-                                 (_, p) => Mod.ResetConfig(), panel.width - 240f, 35f);
+                parent.AddTextButton("ReloadConfig", "Reload Configurations",
+                                     new Utils.Size2D(200f, 35f),
+                                     (_, p) => { Mod.LoadConfig(); Mod.ResetUI(); },
+                                     xPos: panel.width - 240f, yPos: 0f);
+                parent.AddTextButton("ResetConfig", "Reset Configurations",
+                                     new Utils.Size2D(200f, 35f),
+                                     (_, p) => Mod.ResetConfig(),
+                                     xPos: panel.width - 240f, yPos: 35f);
             }
             {
                 var panel = mainParent.AddGroup("Free-Camera Mode Options");
@@ -55,6 +58,8 @@ namespace FPSCamMod
                 var panel = mainParent.AddGroup("Follow/Walk-Through Mode Options");
                 var parent = panel.AsParent();
                 parent.AddCheckbox(Config.G.ShowCursorWhileFollow);
+                parent.AddSlider(Config.G.FollowPanelHeightScale, .05f,
+                                  width: panel.width, oneLine: true);
                 parent.AddSlider(Config.G.MaxVertRotate4Follow, 1f, "F0",
                                   width: panel.width, oneLine: true);
                 parent.AddSlider(Config.G.MaxHoriRotate4Follow, 1f, "F0",
@@ -93,21 +98,30 @@ namespace FPSCamMod
         }
         public static void Destroy()
         {
-            if (helperPanel != null) {
-                var optionPanel = helperPanel.Find("OptionsGroupTemplate(Clone)");
-                helperPanel.RemoveUIComponent(optionPanel);
-                Object.Destroy(optionPanel);
+            if (_helperPanel != null) {
+                if (_helperPanel.Find(Helper.NameWithPrefix(mainGroupName)) is UIComponent c) {
+                    _helperPanel.RemoveUIComponent(c);
+                    Object.Destroy(c);
+                }
+                else Log.Err("Cannot find the UI element when trying to destroy OptionsMenu");
             }
         }
-        public static void Rebuild() { if (helperPanel != null) { Destroy(); SetUp(); } }
+        public static void Rebuild() { waitForRebuild = true; }
+        private void LateUpdate()
+        {
+            if (waitForRebuild && _helperPanel != null) {
+                Destroy(); SetUp();
+                waitForRebuild = false;
+            }
+        }
 
-        private static UIScrollablePanel helperPanel;
+        private static UIScrollablePanel _helperPanel;
+        private const string mainGroupName = "First Person Camera";
+        private static bool waitForRebuild = false;
     }
 
     public class KeyMappingUI : UICustomControl
     {
-        private CfKey configWaiting;
-
         private void Awake()
         {
             AddKeyMapping(Config.G.KeyCamToggle);
@@ -131,50 +145,52 @@ namespace FPSCamMod
 
         private void AddKeyMapping(CfKey config)
         {
-            var panel = component.AsParent().AddUI<UIPanel>("KeyBindingTemplate");
+            var panel = component.AsParent().AddTemplate<UIPanel>(
+                                    "KeyBindingTemplate", config.Name);
 
             var btn = panel.Find<UIButton>("Binding");
             btn.eventKeyDown += new KeyPressHandler(KeyPressAction);
             btn.eventMouseDown += new MouseEventHandler(MouseEventAction);
             btn.text = config.ToString();
-            btn.textColor = UIutils.textColor;
+            btn.textColor = Helper.TextColor;
             btn.objectUserData = config;
 
             var label = panel.Find<UILabel>("Name");
             label.text = config.Description; label.tooltip = config.Detail;
-            label.textColor = UIutils.textColor;
+            label.textColor = Helper.TextColor;
         }
 
         private void KeyPressAction(UIComponent comp, UIKeyEventParameter p)
         {
-            if (configWaiting is object) {
-                p.Use();
-                UIView.PopModal();
+            if (_configWaiting is null) return;
+            if (!(p.source is UIButton btn)) return;
 
-                var btn = p.source as UIButton;
-                var key = p.keycode;
-                if (p.shift && key == KeyCode.X) configWaiting.assign(KeyCode.None);
-                else if (key != KeyCode.Escape) configWaiting.assign(key);
+            p.Use();
+            UIView.PopModal();
 
-                btn.text = configWaiting.ToString();
-                Config.G.Save();
-                Log.Msg($"Config: assign \"{configWaiting}\" to [{configWaiting.Name}]");
-                configWaiting = null;
-            }
+            var key = p.keycode;
+            if (p.shift && key == KeyCode.X) _configWaiting.assign(KeyCode.None);
+            else if (key != KeyCode.Escape) _configWaiting.assign(key);
+
+            btn.text = _configWaiting.ToString();
+            Config.G.Save();
+            Log.Msg($"Config: assign \"{_configWaiting}\" to [{_configWaiting.Name}]");
+            _configWaiting = null;
         }
 
         private void MouseEventAction(UIComponent comp, UIMouseEventParameter p)
         {
-            if (configWaiting is null) {
-                p.Use();
+            if (_configWaiting is object) return;
+            if (!(p.source is UIButton btn)) return;
 
-                var btn = p.source as UIButton;
-                configWaiting = (CfKey) btn.objectUserData;
+            p.Use();
 
-                btn.text = "(Press a key)";
-                btn.Focus();
-                UIView.PushModal(btn);
-            }
+            _configWaiting = (CfKey) btn.objectUserData;
+            btn.text = "(Press a key)";
+            btn.Focus();
+            UIView.PushModal(btn);
         }
+
+        private CfKey _configWaiting;
     }
 }

@@ -58,26 +58,28 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FPSClass\FPSInstance.cs" />
-    <Compile Include="UI\DebugUI.cs" />
-    <Compile Include="UI\FollowModeUI.cs" />
-    <Compile Include="UI\OptionsMenuUI.cs" />
-    <Compile Include="UI\ConfigPanelUI.cs" />
-    <Compile Include="UI\InfoPanelUI.cs" />
-    <Compile Include="FPSClass\FPSCitizen.cs" />
-    <Compile Include="Utils\CamControllerUT.cs" />
-    <Compile Include="FPSClass\FPSVehicle.cs" />
-    <Compile Include="Utils\ControlUT.cs" />
-    <Compile Include="Utils\GameUT.cs" />
-    <Compile Include="Utils\CamUT.cs" />
-    <Compile Include="UI\UIutils.cs" />
-    <Compile Include="FPSClass\UUID.cs" />
-    <Compile Include="Utils\Utils.cs" />
-    <Compile Include="FPSClass\FPSCam.cs" />
-    <Compile Include="FPSClass\CitizenCam.cs" />
-    <Compile Include="FPSClass\VehicleCam.cs" />
+    <Compile Include="Game\Cam.cs" />
+    <Compile Include="Transform.cs" />
+    <Compile Include="Wrapper\Object.cs" />
+    <Compile Include="Wrapper\VehicleDerived.cs" />
+    <Compile Include="UI\Debug.cs" />
+    <Compile Include="UI\Panel4FollowInfo.cs" />
+    <Compile Include="UI\OptionsMenu.cs" />
+    <Compile Include="UI\MainPanel.cs" />
+    <Compile Include="UI\FollowButtons.cs" />
+    <Compile Include="Wrapper\Human.cs" />
+    <Compile Include="Wrapper\Vehicle.cs" />
+    <Compile Include="Game\CamController.cs" />
+    <Compile Include="Game\Control.cs" />
+    <Compile Include="Game\Map.cs" />
+    <Compile Include="UI\Helper.cs" />
+    <Compile Include="Wrapper\ID.cs" />
+    <Compile Include="Utils.cs" />
+    <Compile Include="Cam\Base.cs" />
+    <Compile Include="Cam\Pedestrian.cs" />
+    <Compile Include="Cam\Vehicle.cs" />
     <Compile Include="Config.cs" />
-    <Compile Include="FPSController.cs" />
+    <Compile Include="Controller.cs" />
     <Compile Include="Log.cs" />
     <Compile Include="Mod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -91,11 +93,4 @@
 del "%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(SolutionName)\$(TargetFileName)"
 xcopy /y "$(TargetPath)" "%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(SolutionName)"</PostBuildEvent>
   </PropertyGroup>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

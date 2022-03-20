@@ -1,8 +1,7 @@
-using ICities;
-using UnityEngine;
-
-namespace FPSCamMod
+namespace FPSCamera
 {
+    using ICities;
+
     public class Mod : IUserMod
     {
         public static string name = "First Person Camera v2.0";
@@ -10,7 +9,12 @@ namespace FPSCamMod
         public string Description => "View your city from a different perspective";
 
         public void OnSettingsUI(UIHelperBase helper)
-        { OptionsMenuUI.Generate(helper); }
+        {
+            UI.OptionsMenu.Generate(helper);
+            var comp = (helper as UIHelper)?.self as ColossalFramework.UI.UIComponent;
+            optionsMenu = comp.gameObject.AddComponent<UI.OptionsMenu>();
+            optionsMenu.name = "FPS_Options";
+        }
 
         public void OnEnabled()
         {
@@ -20,7 +24,8 @@ namespace FPSCamMod
         public void OnDisabled()
         {
             Log.Msg("Mod disabled.");
-            OptionsMenuUI.Destroy();
+            if (optionsMenu != null) UnityEngine.Object.Destroy(optionsMenu);
+            UI.OptionsMenu.Destroy();
         }
 
         internal static void LoadConfig()
@@ -36,10 +41,12 @@ namespace FPSCamMod
         }
         internal static void ResetUI()
         {
-            OptionsMenuUI.Rebuild();
-            var fps = Object.FindObjectOfType<FPSController>();
-            if (fps is object) fps.ResetUI();
+            UI.OptionsMenu.Rebuild();
+            var fps = UnityEngine.Object.FindObjectOfType<Controller>();
+            if (fps != null) fps.ResetUI();
         }
+
+        private UI.OptionsMenu optionsMenu;
     }
 
     public class ModLoad : LoadingExtensionBase
@@ -51,16 +58,16 @@ namespace FPSCamMod
             Log.Msg("Level loaded in: " + mode.ToString());
             IsInGameMode = mode == LoadMode.LoadGame || mode == LoadMode.NewGame;
 
-            CamControllerUT.Init();
-            fpsController = CamControllerUT.AddCustomController<FPSController>();
+            Game.CamController.Init();
+            _controller = Game.CamController.AddCustomController<Controller>();
         }
 
         public override void OnLevelUnloading()
         {
             Log.Msg("Level unloaded");
-            Object.Destroy(fpsController);
+            UnityEngine.Object.Destroy(_controller);
         }
 
-        private FPSController fpsController;
+        private Controller _controller;
     }
 }

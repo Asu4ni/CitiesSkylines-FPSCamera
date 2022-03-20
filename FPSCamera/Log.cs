@@ -1,13 +1,12 @@
 using ColossalFramework.UI;
 using System.IO;
 using System.Reflection;
-using UnityEngine;
 
-namespace FPSCamMod
+namespace FPSCamera
 {
     internal static class Log
     {
-        private static FileLog silentLogger = new FileLog();
+        private static readonly FileLog silentLogger = new FileLog();
 #if DEBUG
         private static DialogLog logger = new DialogLog();
 #else
@@ -67,9 +66,9 @@ namespace FPSCamMod
         private static readonly string logTag
                 = $"[{Assembly.GetExecutingAssembly().GetName().Name}] ";
 
-        public void Msg(string msg) { Debug.Log(logTag + msg); }
-        public void Warn(string msg) { Debug.LogWarning(logTag + msg); }
-        public void Err(string msg) { Debug.LogError(logTag + msg); }
+        public void Msg(string msg) { UnityEngine.Debug.Log(logTag + msg); }
+        public void Warn(string msg) { UnityEngine.Debug.LogWarning(logTag + msg); }
+        public void Err(string msg) { UnityEngine.Debug.LogError(logTag + msg); }
     }
 
     internal class DialogLog : ILog

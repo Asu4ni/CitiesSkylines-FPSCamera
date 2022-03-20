@@ -1,10 +1,10 @@
-using UnityEngine;
-
-namespace FPSCamMod
+namespace FPSCamera.Game
 {
-    public static class ControlUT
+    using UnityEngine;
+
+    public static class Control
     {
-        public static bool MousePrimary => Input.GetMouseButtonDown(0);
+        public static bool MouseSecond => Input.GetMouseButtonDown(1);
 
         public static float MouseMoveHori => Input.GetAxis("Mouse X");  // +/-: right/left
         public static float MouseMoveVert => Input.GetAxis("Mouse Y");  // +/-: up/down
@@ -25,5 +25,13 @@ namespace FPSCamMod
         public static bool KeyRotateR => Input.GetKey(Config.G.KeyRotateRight);
         public static bool KeyRotateU => Input.GetKey(Config.G.KeyRotateUp);
         public static bool KeyRotateD => Input.GetKey(Config.G.KeyRotateDown);
+
+        public static bool KeyESC => Input.GetKeyDown(KeyCode.Escape);
+
+        public static void ShowCursor(bool visibility = true)
+            => Cursor.visible = visibility;
+        public static void HideCursor() => ShowCursor(false);
+
+        public static float DurationFromLastFrame => Time.deltaTime;
     }
 }
