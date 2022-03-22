@@ -13,7 +13,7 @@ namespace FPSCamera.Game
         }
 
         public static CustomController AddCustomController<CustomController>()
-                                        where CustomController : UnityEngine.MonoBehaviour
+                                        where CustomController : Behavior
             => _controller.gameObject.AddComponent<CustomController>();
 
         public static UnityEngine.Camera GetCamera() => GetComponent<UnityEngine.Camera>();

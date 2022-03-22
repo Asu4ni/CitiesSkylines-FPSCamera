@@ -6,7 +6,7 @@ namespace FPSCamera
     using CamController = Game.CamController;
     using Control = Game.Control;
 
-    public class Controller : UnityEngine.MonoBehaviour
+    public class Controller : Game.Behavior
     {
         public void StartFreeCam()
         {
@@ -25,12 +25,14 @@ namespace FPSCamera
             SwitchState(State.WalkThru);
         }
 
-        private void Start()
+        protected override void _Init()
         {
-            _camGame = new Game.Cam(CamController.GetCamera());
-
             _state = State.Idle;
             ResetUI();
+        }
+        protected override void _SetUp()
+        {
+            _camGame = new Game.Cam(CamController.GetCamera());
         }
 
         private void StopFollowing()
@@ -315,7 +317,7 @@ namespace FPSCamera
                         _positioning.AlmostEquals(_targetPositioning));
         }
 
-        private void LateUpdate()
+        protected override void _UpdateLate()
         {
             var controlOffset = GetControlOffsetAfterHandleInput();
             if (isIdle) return;
@@ -362,8 +364,6 @@ namespace FPSCamera
             _camGame.Positioning = _positioning;
             _camGame.FoV = _fieldOfView;
         }
-
-        private void OnDestroy() => DestroyUI();
 
         private Game.Cam _camGame;
 

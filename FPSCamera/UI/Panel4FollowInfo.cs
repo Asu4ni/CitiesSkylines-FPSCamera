@@ -2,17 +2,27 @@ namespace FPSCamera.UI
 {
     using UnityEngine;
 
-    internal class Panel4FollowInfo : MonoBehaviour
+    public class Panel4FollowInfo : Game.UnityGUI
     {
-        internal void SetAssociatedCam(Cam.Base cam)
+        public void SetAssociatedCam(Cam.Base cam)
         {
             _camWRef = new System.WeakReference(cam);
             _elapsedTime = 0f;
             _lastBufferStrUpdateTime = -1f;
             enabled = true;
         }
+        public string GetLeftString() => _left;
+        public string GetMidString() => _mid;
+        public string GetRightString() => _right;
 
-        private void LateUpdate()
+        protected override void _Init()
+        {
+            _elapsedTime = 0f;
+            _lastBufferStrUpdateTime = -1f;
+            _left = ""; _mid = ""; _right = "";
+        }
+
+        protected override void _UpdateLate()
         {
             if (_camWRef?.Target is Cam.Base cam && cam.IsOperating) {
                 _elapsedTime += Game.Control.DurationFromLastFrame;
@@ -44,7 +54,7 @@ namespace FPSCamera.UI
             => $"{speed * (Config.G.UseMetricUnit ? 1.666f : 1.035f),5:F1} " +
                 $"{(Config.G.UseMetricUnit ? "k" : "m")}ph";
 
-        private void OnGUI()
+        protected override void _UnityGUI()
         {
             var width = (float) Screen.width;
             var height = (Screen.height * .15f).Clamp(100f, 800f)
@@ -83,12 +93,12 @@ namespace FPSCamera.UI
                       $"Time: {((uint) _elapsedTime) / 60:00}:{((uint) _elapsedTime) % 60:00}");
         }
 
-        private System.WeakReference _camWRef;
-        private float _elapsedTime = 0f, _lastBufferStrUpdateTime = -1f;
-
-        private string _left = "", _mid = "", _right = "";
-
         private const float bufferUpdateInterval = .25f;
         private const float scaleToFontRatio = 12f;
+
+        private System.WeakReference _camWRef;
+        private float _elapsedTime, _lastBufferStrUpdateTime;
+
+        private string _left, _mid, _right;
     }
 }

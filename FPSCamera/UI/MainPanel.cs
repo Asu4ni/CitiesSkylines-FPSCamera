@@ -4,9 +4,9 @@ namespace FPSCamera.UI
     using UnityEngine;
 
     // TODO: incorporate UnifiedUI
-    internal class MainPanel : MonoBehaviour
+    internal class MainPanel : Game.Behavior
     {
-        private void Awake()
+        protected override void _Init()
         {
             _panelBtn = SetUpPanelButton();
 
@@ -135,7 +135,7 @@ namespace FPSCamera.UI
             set { _mainPanel.isVisible = value; if (value) _panelBtn.Focus(); }
         }
 
-        private void LateUpdate()
+        protected override void _UpdateLate()
         {
             // fade out label
             var color = _hintLabel.color;
@@ -143,13 +143,6 @@ namespace FPSCamera.UI
                 --color.a;
                 _hintLabel.color = color;
             }
-        }
-        private void OnDestroy()
-        {
-            if (_panelBtn != null) Destroy(_panelBtn);
-            if (_hintLabel != null) Destroy(_hintLabel);
-            if (_mainPanel != null) Destroy(_mainPanel);
-            // walkThruBtn is attached to mainPanel
         }
 
         private UIButton _panelBtn;

@@ -58,7 +58,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Game\Cam.cs" />
     <Compile Include="Transform.cs" />
     <Compile Include="Wrapper\Object.cs" />
     <Compile Include="Wrapper\VehicleDerived.cs" />
@@ -69,6 +68,8 @@
     <Compile Include="UI\FollowButtons.cs" />
     <Compile Include="Wrapper\Human.cs" />
     <Compile Include="Wrapper\Vehicle.cs" />
+    <Compile Include="Game\Cam.cs" />
+    <Compile Include="Game\Behavior.cs" />
     <Compile Include="Game\CamController.cs" />
     <Compile Include="Game\Control.cs" />
     <Compile Include="Game\Map.cs" />

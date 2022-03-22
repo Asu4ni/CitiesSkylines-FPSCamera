@@ -6,7 +6,7 @@ namespace FPSCamera.UI
 
     using CfKey = ConfigData<UnityEngine.KeyCode>;
 
-    public class OptionsMenu : MonoBehaviour
+    public class OptionsMenu : Game.Behavior
     {
         public static void Generate(UIHelperBase uiHelper)
         {
@@ -107,7 +107,9 @@ namespace FPSCamera.UI
             }
         }
         public static void Rebuild() { waitForRebuild = true; }
-        private void LateUpdate()
+
+        protected override void _Init() { }
+        protected override void _UpdateLate()
         {
             if (waitForRebuild && _helperPanel != null) {
                 Destroy(); SetUp();
@@ -115,8 +117,9 @@ namespace FPSCamera.UI
             }
         }
 
-        private static UIScrollablePanel _helperPanel;
         private const string mainGroupName = "First Person Camera";
+
+        private static UIScrollablePanel _helperPanel;
         private static bool waitForRebuild = false;
     }
 

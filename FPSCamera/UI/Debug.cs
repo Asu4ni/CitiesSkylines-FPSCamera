@@ -4,7 +4,7 @@ namespace FPSCamera.UI
     using System.Collections.Generic;
     using UnityEngine;
 
-    internal class Debug : MonoBehaviour
+    internal class Debug : Game.UnityGUI
     {
         internal class DisplayFlag : ConfigData<bool>
         {
@@ -29,7 +29,7 @@ namespace FPSCamera.UI
             get => _panel ?? (_panel = Helper.Root.gameObject.AddComponent<Debug>());
         }
 
-        private void Awake() => enabled = false;
+        protected override void _Init() => enabled = false;
 
         public void AppendMessage(string msg)
         {
@@ -41,11 +41,7 @@ namespace FPSCamera.UI
         public void RegisterAction(string actionName, System.Action action)
         { _nameList.Add(actionName); _actionList.Add(action); }
 
-        private void LateUpdate()
-        {
-        }
-
-        private void OnGUI()
+        protected override void _UnityGUI()
         {
             var screen = Helper.ScreenSize;
             var boxWidth = Mathf.Min(screen.width / 5f, 400f);
