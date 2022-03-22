@@ -1,71 +1,39 @@
 namespace FPSCamera.Cam
 {
     using FPSCamera.Transform;
-    using Wrapper;
+
+    public interface ICamUsingTimer
+    {
+        void ElapseTime(float seconds);
+        float GetElapsedTime();
+    }
 
     public abstract class Base
     {
-        protected Base() { state = State.Normal; }
+        public bool IsOperating => !(_state is Finish);
 
-        public bool IsOperating => state != State.Finished;
+        public abstract bool Validate(); // call first before using the other methods.
 
         public abstract Positioning GetPositioning();
-
         public abstract float GetSpeed();
-        public abstract string GetName();
-        public abstract string GetStatus();
-        public abstract Utils.Infos GetInfos();
-
-        protected enum State { Normal, Idle, Finished }
-        protected State state;
-
-    }
-
-    public abstract class Follow<TID, TObject> : Base
-           where TID : ID where TObject : class, IObjectToFollow
-    {
-        public Follow(TID id)
+        public virtual Utils.Infos GetGeoInfos()
         {
-            _id = id;
-            if (Target is null) state = State.Finished;
+            Utils.Infos infos = new Utils.Infos();
+            if (!(GetPositioning() is Positioning positioning)) return infos;
+            var pos = positioning.position;
+
+            // TODO: add Infos such as RayCast road
+
+            return infos;
         }
 
-        public virtual TObject Target => Object.OfIfValid(_id) as TObject;
+        public abstract void InputOffset(Offset _offsetInput);
+        public abstract void InputReset();
 
-        public sealed override Positioning GetPositioning()
-        {
-            if (!EnsureState()) {
-                Log.Msg($"{typeof(TObject).Name}(ID:{_id}) disappears");
-                return null;
-            }
-            return _GetPositioning();
-        }
-        protected abstract Positioning _GetPositioning();
+        protected abstract class State { }
+        protected class Normal : State { }
+        protected class Finish : State { }
 
-
-        public sealed override string GetName() => EnsureState() ? _GetName() : "(error)";
-        protected virtual string _GetName() => Target.Name;
-
-        public sealed override float GetSpeed() => EnsureState() ? _GetSpeed() : float.NaN;
-        protected virtual float _GetSpeed() => Target.GetSpeed();
-
-        public sealed override string GetStatus()
-            => EnsureState() ? _GetStatus() : "(error)";
-        protected virtual string _GetStatus() => Target.GetStatus();
-
-        public sealed override Utils.Infos GetInfos()
-            => EnsureState() ? _GetInfos() : new Utils.Infos { ["Error"] = "Target missing" };
-        protected virtual Utils.Infos _GetInfos() => Target.GetInfos();
-
-        private bool EnsureState()
-        {
-            if (state == State.Finished) return false;
-            if (Target is null) {
-                state = State.Finished;
-                return false;
-            }
-            return true;
-        }
-        protected TID _id;
+        protected State _state = new Normal();
     }
 }

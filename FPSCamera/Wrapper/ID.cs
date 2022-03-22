@@ -16,6 +16,7 @@ namespace FPSCamera.Wrapper
             }
         }
         public override string ToString() => implID.ToString();
+        public bool IsValid => InstanceManager.IsValid(implID);
 
         public readonly InstanceID implID;
         protected ID(InstanceID id) { implID = id; }

@@ -3,42 +3,46 @@ namespace FPSCamera.Cam
     using Transform;
     using Wrapper;
 
-    public class VehicleCam : Follow<VehicleID, Wrapper.Vehicle>
+    public class VehicleCam : FollowCam<VehicleID, Vehicle>
     {
-        public VehicleCam(VehicleID vehicleID) : base(vehicleID)
+        public VehicleCam(VehicleID vehicleID, System.Func<Offset, Offset> handler)
+                    : base(vehicleID, handler)
         {
-            if (Config.G.StickToFrontVehicle)
-                _id = Target.GetFrontVehicleID();
-
-            var vehicle = Target;
-            if (vehicle.IsValid) {
-                Log.Msg($"start following vehicle(ID:{_id})");
-                _wasReversed = vehicle.IsReversed;
-            }
-            else {
+            if (!IsOperating) {
                 Log.Warn($"vehicle(ID:{_id}) to follow does not exist");
-                state = State.Finished;
+                return;
             }
+            if (Config.G.StickToFrontVehicle &&
+                !_SwitchTarget(_target.GetFrontVehicleID())) {
+                Log.Warn($"vehicle(ID:{_id}) to follow does not exist");
+                return;
+            }
+            Log.Msg($"following vehicle(ID:{_id})");
+            _wasReversed = _target.IsReversed;
         }
 
-        protected override Positioning _GetPositioning()
+        public override bool Validate()
         {
-            var vehicle = Target;
-            if (Config.G.StickToFrontVehicle && vehicle.IsReversed != _wasReversed) {
-                Log.Msg($"vehicle(ID:{_id}) changes direction");
-                _id = vehicle.GetFrontVehicleID();
-                _wasReversed = !_wasReversed;
-            }
+            if (!base.Validate()) return false;
 
-            return vehicle.GetPositioning().Apply(new LocalMovement
+            if (_target.IsReversed != _wasReversed) {
+                Log.Msg($"vehicle(ID:{_id}) changes direction");
+                _wasReversed = !_wasReversed;
+                if (Config.G.StickToFrontVehicle &&
+                    !_SwitchTarget(_target.GetFrontVehicleID())) return false;
+            }
+            return true;
+        }
+
+        protected override Offset _LocalOffset
+            => new Offset(new LocalMovement
             {
                 forward = Config.G.VehicleCamOffset.forward +
-                          Config.G.VehicleFOffsetForward + vehicle.GetAttachOffsetFront(),
+                          Config.G.VehicleFOffsetForward + _target.GetAttachOffsetFront(),
                 up = Config.G.VehicleCamOffset.up + Config.G.VehicleFOffsetUp +
-                     (vehicle.IsMiddle ? Config.G.MiddleVehicleFOffsetUp : 0f),
+                            (_target.IsMiddle ? Config.G.MiddleVehicleFOffsetUp : 0f),
                 right = Config.G.VehicleCamOffset.right
-            });
-        }
+            }, DeltaAttitude.None);
 
         private bool _wasReversed;
     }

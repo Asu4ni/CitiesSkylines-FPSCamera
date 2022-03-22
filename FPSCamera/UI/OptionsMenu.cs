@@ -31,10 +31,10 @@ namespace FPSCamera.UI
                 y += comp.height + margin;
                 comp = parent.AddCheckbox(Config.G.InvertRotateHorizontal, yPos: y);
                 y += comp.height + margin;
-                comp = parent.AddSlider(Config.G.RotateSensitivity, .25f,
+                comp = parent.AddSlider(Config.G.RotateSensitivity,
                                          yPos: y, width: panel.width, oneLine: true);
                 y += comp.height + margin;
-                comp = parent.AddSlider(Config.G.MaxVertRotate, 1f, "F0",
+                comp = parent.AddSlider(Config.G.KeyRotateFactor, .5f, "F1",
                                          yPos: y, width: panel.width, oneLine: true);
                 y += comp.height + margin;
                 panel.height = y;
@@ -51,8 +51,10 @@ namespace FPSCamera.UI
                 var panel = mainParent.AddGroup("Free-Camera Mode Options");
                 var parent = panel.AsParent();
                 parent.AddCheckbox(Config.G.ShowCursorWhileFreeCam);
+                parent.AddSlider(Config.G.MaxVertRotate, 1f, "F0",
+                                 width: panel.width, oneLine: true);
                 parent.AddSlider(Config.G.GroundLevelOffset, .25f,
-                                  width: panel.width, oneLine: true);
+                                 width: panel.width, oneLine: true);
             }
             {
                 var panel = mainParent.AddGroup("Follow/Walk-Through Mode Options");
@@ -93,7 +95,7 @@ namespace FPSCamera.UI
                 var panel = mainParent.AddGroup("Camera Offsets");
                 var parent = panel.AsParent();
                 parent.AddOffsetSliders(Config.G.VehicleCamOffset, width: panel.width);
-                parent.AddOffsetSliders(Config.G.CitizenCamOffset, width: panel.width);
+                parent.AddOffsetSliders(Config.G.PedestrianCamOffset, width: panel.width);
             }
         }
         public static void Destroy()

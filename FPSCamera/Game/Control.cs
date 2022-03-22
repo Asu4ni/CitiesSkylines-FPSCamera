@@ -4,29 +4,45 @@ namespace FPSCamera.Game
 
     public static class Control
     {
-        public static bool MouseSecond => Input.GetMouseButtonDown(1);
 
         public static float MouseMoveHori => Input.GetAxis("Mouse X");  // +/-: right/left
         public static float MouseMoveVert => Input.GetAxis("Mouse Y");  // +/-: up/down
         public static float MouseScroll => Input.GetAxisRaw("Mouse ScrollWheel");  // +/i: up/down
 
-        public static bool KeyCamToggle => Input.GetKeyDown(Config.G.KeyCamToggle);
-        public static bool KeyCamReset => Input.GetKeyDown(Config.G.KeyCamReset);
-        public static bool KeyFaster => Input.GetKey(Config.G.KeySpeedUp);
-        public static bool KeySwitchCursor => Input.GetKey(Config.G.KeyCursorToggle);
+        public static bool MouseTriggered(MouseButton btn)
+            => Input.GetMouseButtonDown(btn.ToCode());
+        public static bool KeyTriggered(Key key) => Input.GetKeyDown(key.ToCode());
+        public static bool KeyPressed(Key key) => Input.GetKey(key.ToCode());
 
-        public static bool KeyForward => Input.GetKey(Config.G.KeyMoveForward);
-        public static bool KeyBackward => Input.GetKey(Config.G.KeyMoveBackward);
-        public static bool KeyLeft => Input.GetKey(Config.G.KeyMoveLeft);
-        public static bool KeyRight => Input.GetKey(Config.G.KeyMoveRight);
-        public static bool KeyUp => Input.GetKey(Config.G.KeyMoveUp);
-        public static bool KeyDown => Input.GetKey(Config.G.KeyMoveDown);
-        public static bool KeyRotateL => Input.GetKey(Config.G.KeyRotateLeft);
-        public static bool KeyRotateR => Input.GetKey(Config.G.KeyRotateRight);
-        public static bool KeyRotateU => Input.GetKey(Config.G.KeyRotateUp);
-        public static bool KeyRotateD => Input.GetKey(Config.G.KeyRotateDown);
+        public enum MouseButton : int { Primary = 0, Secondary = 1, Middle = 2 }
+        public enum Key
+        {
+            CamToggle, CamReset, Faster, CursorToggle, Forward, Backward, Left, Right, Up, Down,
+            RotateL, RotateR, RotateU, RotateD, Esc
+        }
+        private static int ToCode(this MouseButton btn) => (int) btn;
+        private static KeyCode ToCode(this Key key)
+        {
+            switch (key) {
+            case Key.CamToggle: return Config.G.KeyCamToggle;
+            case Key.CamReset: return Config.G.KeyCamReset;
+            case Key.Faster: return Config.G.KeySpeedUp;
+            case Key.CursorToggle: return Config.G.KeyCursorToggle;
 
-        public static bool KeyESC => Input.GetKeyDown(KeyCode.Escape);
+            case Key.Forward: return Config.G.KeyMoveForward;
+            case Key.Backward: return Config.G.KeyMoveBackward;
+            case Key.Left: return Config.G.KeyMoveLeft;
+            case Key.Right: return Config.G.KeyMoveRight;
+            case Key.Up: return Config.G.KeyMoveUp;
+            case Key.Down: return Config.G.KeyMoveDown;
+            case Key.RotateL: return Config.G.KeyRotateLeft;
+            case Key.RotateR: return Config.G.KeyRotateRight;
+            case Key.RotateU: return Config.G.KeyRotateUp;
+            case Key.RotateD: return Config.G.KeyRotateDown;
+            case Key.Esc: return KeyCode.Escape;
+            }
+            return KeyCode.None;
+        }
 
         public static void ShowCursor(bool visibility = true)
             => Cursor.visible = visibility;
@@ -34,4 +50,6 @@ namespace FPSCamera.Game
 
         public static float DurationFromLastFrame => Time.deltaTime;
     }
+
+
 }

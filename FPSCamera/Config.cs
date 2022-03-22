@@ -98,7 +98,9 @@ namespace FPSCamera
                 "The maximum degree to rotate camera up & down.")]
         public readonly CfFloat MaxVertRotate = new CfFloat(70f, min: 30f, max: 85f);
         [Config("RotateSensitivity", "Camera rotation sensitivity")]
-        public readonly CfFloat RotateSensitivity = new CfFloat(4f, min: 1f, max: 10f);
+        public readonly CfFloat RotateSensitivity = new CfFloat(5f, min: 1f, max: 10f);
+        [Config("KeyRotateFactor", "Rotation speed using keys")]
+        public readonly CfFloat KeyRotateFactor = new CfFloat(8f, min: 1f, max: 32f);
         [Config("InvertRotateHorizontal", "Invert horizontal rotation")]
         public readonly CfFlag InvertRotateHorizontal = new CfFlag(false);
         [Config("InvertRotateVertical", "Invert vertical rotation")]
@@ -107,7 +109,7 @@ namespace FPSCamera
         // camera config
         [Config("EnableDOF", "Apply depth of field effect")]
         public readonly CfFlag EnableDof = new CfFlag(false);
-        [Config("FieldOfView", "Camera field of view", "Viewing range of the camera (degrees)")]
+        [Config("FieldOfView", "Camera Field of View", "Viewing range of the camera (degrees)")]
         public readonly CfFloat CamFieldOfView = new CfFloat(45f, min: 10f, max: 75f);
 
         // cursor
@@ -125,8 +127,8 @@ namespace FPSCamera
             new CfFloat(0f, min: -20f, max: 40f),
             new CfFloat(0f, min: -30f, max: 30f)
         );
-        [Config("CitizenCamOffset", "Camera offset while following citizens")]
-        public readonly CfOffset CitizenCamOffset = new CfOffset(
+        [Config("PedestrianCamOffset", "Camera offset while following pedestrians")]
+        public readonly CfOffset PedestrianCamOffset = new CfOffset(
             new CfFloat(0f, min: -20f, max: 40f),
             new CfFloat(0f, min: -20f, max: 40f),
             new CfFloat(0f, min: -30f, max: 30f)
@@ -173,14 +175,17 @@ namespace FPSCamera
         //                        always 0 (forward)  |    y-axis (up)  |    x-axis (right)
         // value == -1 : unset
 
+        [Config("FoViewScrollfactor", "Field of View scaling factor by scrolling")]
+        public readonly CfFloat FoViewScrollfactor = new CfFloat(1.05f, 1.01f, 2f);
+
         [Config("VehicleFOffsetUp", "Cam fixed offset.up for vehicle")]
         public readonly CfFloat VehicleFOffsetUp = new CfFloat(2f);
         [Config("VehicleFOffsetForward", "Cam fixed offset.forward for vehicle")]
         public readonly CfFloat VehicleFOffsetForward = new CfFloat(3f);
         [Config("MiddleVehicleFOffsetUp", "Cam fixed offset.up for vehicle in the middle")]
         public readonly CfFloat MiddleVehicleFOffsetUp = new CfFloat(3f);
-        [Config("CitizenFOffsetUp", "Cam fixed offset.up for citizen")]
-        public readonly CfFloat CitizenFOffsetUp = new CfFloat(2f);
+        [Config("PedestrianFOffsetUp", "Cam fixed offset.up for pedestrians")]
+        public readonly CfFloat PedestrianFOffsetUp = new CfFloat(2f);
 
         [Config("MaxExitingDuration", "Max duration for exiting fps cam")]
         public readonly CfFloat MaxExitingDuration = new CfFloat(5f, 0f);

@@ -138,7 +138,8 @@ namespace FPSCamera.UI
             label.relativePosition = new Vector3(0f, Margin / 2);
 
             var slider = panel.Find<UISlider>("Slider");
-            slider.stepSize = slider.scrollWheelAmount = stepSize;
+            slider.stepSize = stepSize;
+            slider.scrollWheelAmount = stepSize * (1f + 1f / 8192); // for precision error
             slider.minValue = config.Min; slider.maxValue = config.Max;
             slider.value = config;
 

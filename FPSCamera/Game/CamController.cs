@@ -20,7 +20,7 @@ namespace FPSCamera.Game
 
         public static void SetDepthOfField(bool enabled) => _camDoF.enabled = enabled;
 
-        public static void Enable()
+        public static void Restore()
         {
             _controller.enabled = true;
 

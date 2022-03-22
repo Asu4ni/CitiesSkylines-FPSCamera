@@ -6,9 +6,12 @@ namespace FPSCamera.UI
     // TODO: incorporate UnifiedUI
     internal class MainPanel : Game.Behavior
     {
+        public UIPanel GetPanel() => _mainPanel;
+        public UIButton GetWalkThruButton() => _walkThruBtn;
+
         protected override void _Init()
         {
-            _panelBtn = SetUpPanelButton();
+            _panelBtn = _SetUpPanelButton();
 
             _hintLabel = Helper.RootParent.AddLabel("ToggleHintLabel",
                                                     $"Press [{Config.G.KeyCamToggle}] to exit");
@@ -30,11 +33,6 @@ namespace FPSCamera.UI
             var panelParent = _mainPanel.AsParent();
 
             UIComponent comp;
-#if DEBUG
-            comp = panelParent.AddCheckbox(Debug.Displayed, yPos: y);
-            y += comp.height + margin;
-#endif
-
             comp = panelParent.AddCheckbox(Config.G.HideUIwhenActivate, yPos: y);
             y += comp.height + margin;
             comp = panelParent.AddCheckbox(Config.G.EnableDof, yPos: y);
@@ -72,7 +70,7 @@ namespace FPSCamera.UI
                 var btnSize = new Utils.Size2D(200f, 40f);
                 _mainPanel.height = y + btnSize.height + margin * (1 + 3);
                 _walkThruBtn = panelParent.AddTextButton("WalkThruButton", "Start Walk-Through",
-                                                btnSize, (a, b) => walkThruCallBack(),
+                                                btnSize, (a, b) => _walkThruCallBack?.Invoke(),
                                                 (_mainPanel.width - btnSize.width) / 2,
                                                 _mainPanel.height - btnSize.height - margin * 3);
             }
@@ -81,14 +79,11 @@ namespace FPSCamera.UI
 
 
         public void OnCamDeactivate()
-        {
-            _hintLabel.Hide();
-            if (_walkThruBtn is object) _walkThruBtn.Enable();
-        }
+        { _hintLabel.Hide(); }
         public void OnCamActivate()
         {
             PanelExpanded = false;
-            if (_walkThruBtn != null) _walkThruBtn.Disable();
+            _panelBtn.Focus();  // TODO: temp fix for Esc pressing
 
             _hintLabel.color = new Color32(255, 255, 255, 255);
             _hintLabel.AlignTo(_panelBtn, UIAlignAnchor.BottomRight);
@@ -98,10 +93,18 @@ namespace FPSCamera.UI
                         -_panelBtn.width : _hintLabel.width + 3f,
                     (_hintLabel.height - _panelBtn.height) / 2f + 3f);
             _hintLabel.Show();
-            _panelBtn.Focus();
         }
 
-        private UIButton SetUpPanelButton()
+        public void OnEsc() => PanelExpanded = false;
+        public bool PanelExpanded {
+            get => _mainPanel.isVisible;
+            set { _mainPanel.isVisible = value; }
+        }
+
+        public void SetWalkThruCallBack(System.Action callBackAction)
+            => _walkThruCallBack = callBackAction;
+
+        private UIButton _SetUpPanelButton()
         {
             float x = Config.G.CamUIOffset.right, y = Config.G.CamUIOffset.up;
             if (x < 0f || y < 0f) {
@@ -129,12 +132,6 @@ namespace FPSCamera.UI
             return btn;
         }
 
-        internal void OnEsc() => PanelExpanded = false;
-        internal bool PanelExpanded {
-            get => _mainPanel.isVisible;
-            set { _mainPanel.isVisible = value; if (value) _panelBtn.Focus(); }
-        }
-
         protected override void _UpdateLate()
         {
             // fade out label
@@ -151,18 +148,5 @@ namespace FPSCamera.UI
         private UIButton _walkThruBtn;
 
         private System.Action _walkThruCallBack;
-        private System.Action walkThruCallBack {
-            get {
-                if (_walkThruCallBack is null)
-                    Log.Err("walkThruCallBack from FPSCamUI has not been registered");
-                return _walkThruCallBack;
-            }
-            set => _walkThruCallBack = value;
-        }
-
-        internal void SetWalkThruCallBack(System.Action callBackAction)
-            => walkThruCallBack = callBackAction;
-        internal void SetKeyDownEvent(System.Func<KeyCode, bool> action)
-            => _panelBtn.eventKeyDown += Helper.GetKeyDownHandler((k, _) => action(k));
     }
 }

@@ -36,7 +36,7 @@ namespace FPSCamera.UI
         protected override void _Destruct()
         {
             foreach (var p in _infoPanels)
-                if (p.panel != null) Destroy(p.panel);
+                if (p.panel != null) Destroy(p.followButton);
             base._Destruct();
         }
 
@@ -58,8 +58,8 @@ namespace FPSCamera.UI
             _infoPanels.Add(new InfoPanel(panel, btn, filter));
         }
 
-        internal void OnCamDeactivate() { foreach (var p in _infoPanels) p.followButton.Enable(); }
-        internal void OnCamActivate() { foreach (var p in _infoPanels) p.followButton.Disable(); }
+        public void Enable() { foreach (var p in _infoPanels) p.followButton.Enable(); }
+        public void Disable() { foreach (var p in _infoPanels) p.followButton.Disable(); }
 
         private static ID _GetID(WorldInfoPanel panel)
             => ID.FromGame(Utils.ReadFields(panel).Get<InstanceID>("m_InstanceID"));

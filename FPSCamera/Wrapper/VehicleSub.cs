@@ -19,7 +19,7 @@
         public override void _MoreDetails(ref Utils.Infos details)
         {
             details["Transit/" + _typeName] = GetTransitLineID() is TransitID id ?
-                    TransitLine.GetName(id) : "(external connection)";
+                    TransitLine.GetName(id) : "(irregular)";
 
             GetLoadAndCapacity(out int load, out int capacity);
             details["Passenger"] = $"{load,4} /{capacity,4}";
@@ -42,17 +42,30 @@
         }
         private readonly string _typeName;
     }
+    public class Taxi : ServiceVehicle
+    {
+        public Taxi(VehicleID id) : base(id, "taxi") { }
+
+        public override void _MoreDetails(ref Utils.Infos details)
+        {
+            base._MoreDetails(ref details);
+
+            if (details.Find((_info) => _info.field == "Load") is Utils.Info info)
+                info = new Utils.Info("Work Shift", info.text);
+        }
+    }
 
     public class PersonalVehicle : Vehicle
     {
         public PersonalVehicle(VehicleID id) : base(id) { }
+        public HumanID GetDriverID() => GetOwnerID() as HumanID;
     }
     public class Bicycle : PersonalVehicle
     {
         public Bicycle(VehicleID id) : base(id) { }
         public override string GetStatus()
             => GetOwnerID() is HumanID hid ?
-                   (OfIfValid(hid) as Pedestrian)?.GetStatus() : null;
+                   (Of(hid) as Pedestrian)?.GetStatus() : null;
     }
 
     public class MissionVehicle : Vehicle

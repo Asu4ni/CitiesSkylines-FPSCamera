@@ -11,7 +11,7 @@ namespace FPSCamera
         /* -------- Data Structure ------------------------------------------------------------- */
 
         // Key: attribute name, Value: attribute value
-        public class Infos : System.Collections.Generic.List<Info>
+        public class Infos : List<Info>
         {
             public string this[string field] { set => Add(new Info(field, value)); }
         }

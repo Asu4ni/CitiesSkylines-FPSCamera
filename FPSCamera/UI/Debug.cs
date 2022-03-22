@@ -6,30 +6,11 @@ namespace FPSCamera.UI
 
     internal class Debug : Game.UnityGUI
     {
-        internal class DisplayFlag : ConfigData<bool>
-        {
-            public static implicit operator bool(DisplayFlag _) => Enabled;
-            public DisplayFlag() : base(false)
-            {
-                _set("DisplayDebugPanel", "Show Debug Panel", "");
-            }
-            public override bool assign(bool value) { return Enabled = value; }
-            public override string ToString() => Enabled.ToString();
-            public override bool AssignByParsing(string str)
-                => Enabled = base.AssignByParsing(str);
-
-            private static bool Enabled {
-                get => Panel.enabled;
-                set => Panel.enabled = value;
-            }
-        }
-        internal static readonly DisplayFlag Displayed = new DisplayFlag();
-
         public static Debug Panel {
             get => _panel ?? (_panel = Helper.Root.gameObject.AddComponent<Debug>());
         }
 
-        protected override void _Init() => enabled = false;
+        protected override void _Init() => enabled = true;
 
         public void AppendMessage(string msg)
         {

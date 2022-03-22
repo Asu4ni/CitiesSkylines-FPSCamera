@@ -1,5 +1,6 @@
 namespace FPSCamera.Wrapper
 {
+    using System.Collections.Generic;
     using System.Linq;
     using Transform;
 
@@ -33,6 +34,9 @@ namespace FPSCamera.Wrapper
     {
         public override string Name => manager.GetCitizenName(id.implIndex);
 
+        public bool IsEnteringVehicle => _Is(CitizenInstance.Flags.EnteringVehicle);
+        public bool IsHangingAround => _Is(CitizenInstance.Flags.HangAround);
+
         public Positioning GetPositioning()
         {
             _instance.GetSmoothPosition(pedestrianID.implIndex,
@@ -61,11 +65,11 @@ namespace FPSCamera.Wrapper
             string occupation;
             if (IsTourist) occupation = "(tourist)";
             else {
-                occupation = OfIfValid(WorkBuildingID) is Building workBuilding ?
+                occupation = Of(WorkBuildingID) is Building workBuilding ?
                                  (IsStudent ? "student at: " : "worker at: ") + workBuilding.Name :
                                  "(unemployed)";
 
-                details["Home"] = OfIfValid(HomeBuildingID) is Building homeBuilding ?
+                details["Home"] = Of(HomeBuildingID) is Building homeBuilding ?
                                       homeBuilding.Name : "(homeless)";
             }
             details["Occupation"] = occupation;
@@ -73,15 +77,11 @@ namespace FPSCamera.Wrapper
             return details;
         }
 
-        public static PedestrianID GetRandomID()
+        public static IEnumerable<Pedestrian> GetIf(System.Func<Pedestrian, bool> filter)
         {
-            var indices = Enumerable.Range(0, manager.m_instanceCount)
-                                    .Select(n => (ushort) n).Where(i =>
-                                        OfIfValid(PedestrianID.FromGame(i)) is Pedestrian p &&
-                                        !p._Is(CitizenInstance.Flags.HangAround) &&
-                                        OfIfValid(p.RiddenVehicleID) is null);
-
-            return PedestrianID.FromGame(indices.GetRandomOne());
+            return Enumerable.Range(1, manager.m_instanceCount)
+                    .Select(i => Of(PedestrianID.FromGame((ushort) i)) as Pedestrian)
+                    .Where(p => p is Pedestrian && filter(p));
         }
 
         private static CitizenInstance _GetCitizenInstance(PedestrianID pid)

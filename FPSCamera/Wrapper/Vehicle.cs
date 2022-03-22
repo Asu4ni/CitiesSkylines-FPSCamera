@@ -1,5 +1,6 @@
 namespace FPSCamera.Wrapper
 {
+    using System.Collections.Generic;
     using System.Linq;
     using Transform;
 
@@ -20,8 +21,8 @@ namespace FPSCamera.Wrapper
             var status = vehicle._VAI.GetLocalizedStatus(
                                 vehicle._vid.implIndex, ref vehicle._vehicle, out var implID);
             switch (ID.FromGame(implID)) {
-            case BuildingID bid: status += Building.GetName(bid); break;
-            case HumanID hid: status += Of(hid).Name; break;
+            case BuildingID bid: status += " " + Building.GetName(bid); break;
+            case HumanID hid: status += " " + Of(hid).Name; break;
             }
             return status;
         }
@@ -64,13 +65,11 @@ namespace FPSCamera.Wrapper
         public void GetLoadAndCapacity(out int load, out int capacity)
             => _VAI.GetBufferStatus(_vid.implIndex, ref _vehicle, out _, out load, out capacity);
 
-        public static VehicleID GetRandomID()
+        public static IEnumerable<Vehicle> GetIf(System.Func<Vehicle, bool> filter)
         {
-            var indices = Enumerable.Range(0, manager.m_vehicleCount)
-                    .Select(n => (ushort) n).Where(
-                        i => OfIfValid(VehicleID.FromGame(i)) is Vehicle v
-                    );
-            return VehicleID.FromGame(indices.GetRandomOne());
+            return Enumerable.Range(1, manager.m_vehicleCount)
+                    .Select(i => Of(VehicleID.FromGame((ushort) i)) as Vehicle)
+                    .Where(v => v is Vehicle && filter(v));
         }
 
         internal static Vehicle _Of(VehicleID id)
@@ -84,7 +83,6 @@ namespace FPSCamera.Wrapper
             case PassengerPlaneAI pPlaneAi___: return new TransitVehicle(id, "Flight");
             case PassengerBlimpAI pBlimpAi___: return new TransitVehicle(id, "Blimp");
             case CableCarAI cableCarAi_______: return new TransitVehicle(id, "Gondola");
-            case TaxiAI taxiAi_______________: return new TransitVehicle(id, "Taxi");
             case TrolleybusAI trolleybusAi___: return new TransitVehicle(id, "Trolleybus");
             case PassengerFerryAI pFerryAi___: return new TransitVehicle(id, "Ferry");
             case PassengerShipAI pShipAi_____: return new TransitVehicle(id, "Ship");
@@ -110,9 +108,9 @@ namespace FPSCamera.Wrapper
             case PostVanAI postVanAi_________: return new ServiceVehicle(id, "Postal");
             case SnowTruckAI snowTruckAi_____: return new ServiceVehicle(id, "Snow Plowing");
             case WaterTruckAI waterTruckAi___: return new ServiceVehicle(id, "Water Pumping");
+            case TaxiAI taxiAi_______________: return new Taxi(id);
 
             case PrivatePlaneAI pPlaneAi:
-            case CarTrailerAI carTrailerAi:
             case PassengerCarAI pCarAi_______: return new PersonalVehicle(id);
             case BicycleAI bicycleAi_________: return new Bicycle(id);
 
@@ -120,7 +118,7 @@ namespace FPSCamera.Wrapper
             case FishingBoatAI fishingBoatAi_: return new MissionVehicle(id);
 
             default:
-                Log.Warn($"Vehicle(ID:{id} of type [{ai.GetType().Name}] is not recognized.");
+                Log.Msg($"Vehicle(ID:{id} of type [{ai.GetType().Name}] is not recognized.");
                 return null;
             }
         }
@@ -132,15 +130,15 @@ namespace FPSCamera.Wrapper
 
         private static global::Vehicle _GetVehicle(VehicleID id)
             => manager.m_vehicles.m_buffer[id.implIndex];
-        private bool _Is(global::Vehicle.Flags flags) => (_vehicle.m_flags & flags) != 0;
-        private bool _IsOfService(ItemClass.Service service)
+        protected bool _Is(global::Vehicle.Flags flags) => (_vehicle.m_flags & flags) != 0;
+        protected bool _IsOfService(ItemClass.Service service)
             => _vehicle.Info.GetService() == service;
 
-        private VehicleInfo _VInfo => _vehicle.Info;
-        private VehicleAI _VAI => _VInfo.m_vehicleAI;
+        protected VehicleInfo _VInfo => _vehicle.Info;
+        protected VehicleAI _VAI => _VInfo.m_vehicleAI;
 
-        private readonly VehicleID _vid;
-        private global::Vehicle _vehicle;
+        protected readonly VehicleID _vid;
+        protected global::Vehicle _vehicle;
 
         private static readonly VehicleManager manager = VehicleManager.instance;
     }

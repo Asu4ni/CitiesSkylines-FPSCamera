@@ -19,8 +19,7 @@
 [list]
 [*] After clicking on any citizen, tourist, or driving vehicles, click on the button with a camera icon at the bottom right of the Info panel to enter Follow Mode.
 [*] The camera follows the view of the selected person/vehicle.
-[*] As in Free-Camera Mode, use keys to move around.
-[*] In order to look around (rotate camera), move the mouse while holding down "Left Ctrl".
+[*] As in Free-Camera Mode, use keys and mouse to move/look around.
 [*] Use "Esc" or "BackQuote" to exit the mode.
 [/list]
 

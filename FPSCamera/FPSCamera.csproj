@@ -77,8 +77,11 @@
     <Compile Include="Wrapper\ID.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="Cam\Base.cs" />
+    <Compile Include="Cam\FreeCam.cs" />
+    <Compile Include="Cam\FollowCam.cs" />
     <Compile Include="Cam\PedestrianCam.cs" />
     <Compile Include="Cam\VehicleCam.cs" />
+    <Compile Include="Cam\WalkThruCam.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="Controller.cs" />
     <Compile Include="Log.cs" />
