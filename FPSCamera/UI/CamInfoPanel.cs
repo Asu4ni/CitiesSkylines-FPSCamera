@@ -2,7 +2,7 @@ namespace FPSCamera.UI
 {
     using UnityEngine;
 
-    public class Panel4FollowInfo : Game.UnityGUI
+    public class CamInfoPanel : Game.UnityGUI
     {
         public void SetAssociatedCam(Cam.Base cam)
         {
@@ -29,7 +29,7 @@ namespace FPSCamera.UI
                 if (_elapsedTime - _lastBufferStrUpdateTime > bufferUpdateInterval) {
                     _left = _GetFormattedStatus(cam.GetName(), cam.GetStatus());
                     _mid = _GetSpeed(cam.GetSpeed());
-                    _right = _GetFormattedDetails(cam.GetDetails());
+                    _right = _GetFormattedDetails(cam.GetInfos());
                     _lastBufferStrUpdateTime = _elapsedTime;
                 }
             }
@@ -39,7 +39,7 @@ namespace FPSCamera.UI
             }
         }
 
-        private static string _GetFormattedDetails(Cam.Details details)
+        private static string _GetFormattedDetails(Utils.Infos details)
         {
             string str = "";
             details.ForEach(pair => str += $"[{pair.field}] {pair.text}\n");
@@ -51,8 +51,9 @@ namespace FPSCamera.UI
             => $"[Name] {name}\n[Status] {status}";
 
         private static string _GetSpeed(float speed)
-            => $"{speed * (Config.G.UseMetricUnit ? 1.666f : 1.035f),5:F1} " +
-                $"{(Config.G.UseMetricUnit ? "k" : "m")}ph";
+            => string.Format("{0,5:F1} {1}ph",
+                Config.G.UseMetricUnit ? Game.Map.ToKilometer(speed) : Game.Map.ToMile(speed),
+                Config.G.UseMetricUnit ? "k" : "m");
 
         protected override void _UnityGUI()
         {
@@ -65,7 +66,7 @@ namespace FPSCamera.UI
             GUI.color = new Color(.92f, .91f, 1f, 1f);
 
             var style = new GUIStyle();
-            style.fontSize = (int) (height * .12f);
+            style.fontSize = (int) (height * fontRatio);
             style.normal.textColor = new Color(.9f, .9f, 1f);
             style.wordWrap = true;
             var blockWidth = width / 3f;
@@ -94,7 +95,7 @@ namespace FPSCamera.UI
         }
 
         private const float bufferUpdateInterval = .25f;
-        private const float scaleToFontRatio = 12f;
+        private const float fontRatio = .12f;
 
         private System.WeakReference _camWRef;
         private float _elapsedTime, _lastBufferStrUpdateTime;

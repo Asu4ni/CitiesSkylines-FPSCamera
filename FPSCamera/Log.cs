@@ -16,12 +16,12 @@ namespace FPSCamera
         public static void Msg(string msg) { silentLogger.Msg(msg); }
         public static void Warn(string msg)
         {
-            if (ModLoad.IsInGameMode) logger.Warn(msg);
+            if (Mod.IsInGameMode) logger.Warn(msg);
             else silentLogger.Warn(msg);
         }
         public static void Err(string msg)
         {
-            if (ModLoad.IsInGameMode) logger.Err(msg);
+            if (Mod.IsInGameMode) logger.Err(msg);
             else silentLogger.Err(msg);
         }
 

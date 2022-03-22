@@ -33,6 +33,8 @@ namespace FPSCamera
         public readonly CfKey KeyCamToggle = new CfKey(KeyCode.BackQuote);
         [Config("HideUI", "Hide UI when activated")]
         public readonly CfFlag HideUIwhenActivate = new CfFlag(false);
+        [Config("DisplayInfoPanel", "Display Cam Info panel")]
+        public readonly CfFlag DisplayInfoPanel = new CfFlag(true);
         [Config("UseMetricUnit", "Use metric units")]
         public readonly CfFlag UseMetricUnit = new CfFlag(true);
         [Config("SetToOriginalPos", "Set camera back when toggle off",
@@ -145,8 +147,6 @@ namespace FPSCamera
         // follow config
         [Config("StickToFrontVehicle", "Always follow the front vehicle")]
         public readonly CfFlag StickToFrontVehicle = new CfFlag(true);
-        [Config("ShowInfoPanel", "Display Info panel while following")]
-        public readonly CfFlag DisplayInfo4Follow = new CfFlag(true);
         [Config("FollowPanelHeightScale", "Scaling for height of Info Display Panel")]
         public readonly CfFloat FollowPanelHeightScale = new CfFloat(1f, min: .5f, max: 2f);
         [Config("MaxHoriRotate4Follow", "Max horizontal viewing range")]

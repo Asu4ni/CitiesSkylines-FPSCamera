@@ -25,26 +25,38 @@ namespace FPSCamera
             SwitchState(State.WalkThru);
         }
 
-        protected override void _Init()
-        {
-            _state = State.Idle;
-            ResetUI();
-        }
-        protected override void _SetUp()
-        {
-            _camGame = new Game.Cam(CamController.GetCamera());
-        }
-
-        private void StopFollowing()
-        {
-            _camToFollow = null;
-            _uiFollowInfoPanel.enabled = false;
-        }
-
         private bool isIdle => _state == State.Idle;
         private bool isFreeCam => _state == State.FreeCam;
         private bool isFollowing => _state == State.Follow || _state == State.WalkThru;
         private bool isCamOn => _state == State.FreeCam || isFollowing;
+
+        private void EnableFPSCam()
+        {
+            Log.Msg("start FPS camera");
+
+            _uiMainPanel.OnCamActivate();
+            _uiFollowButtons?.OnCamActivate();
+            if (Config.G.HideUIwhenActivate) UI.Helper.HideUI();
+
+            _positioning = _originalPositioning = _camGame.Positioning;
+            _fieldOfView = _originalFieldOfView = _camGame.FoV;
+            ResetCamLocal();
+
+            _camGame.NearClipPlane = 1f;
+            CamController.SetDepthOfField(Config.G.EnableDof);
+            CamController.Disable();
+        }
+        private void DisableFPSCam()
+        {
+            Log.Msg("stop FPS camera");
+
+            _uiMainPanel.OnCamDeactivate();
+            _uiFollowButtons?.OnCamDeactivate();
+            if (Config.G.HideUIwhenActivate) UI.Helper.ShowUI();
+
+            Control.ShowCursor();
+            CamController.Enable();
+        }
 
         /*  state transitions:
          *  
@@ -84,52 +96,24 @@ namespace FPSCamera
             _state = newState;
         }
 
-        private void EnableFPSCam()
-        {
-            Log.Msg("start FPS camera");
-
-            _uiMainPanel.OnCamActivate();
-            _uiInfoPanelExtend?.OnCamActivate();
-            if (Config.G.HideUIwhenActivate) UI.Helper.HideUI();
-
-            _positioning = _originalPositioning = _camGame.Positioning;
-            _fieldOfView = _originalFieldOfView = _camGame.FoV;
-            ResetCamLocal();
-
-            _camGame.NearClipPlane = 1f;
-            CamController.SetDepthOfField(Config.G.EnableDof);
-            CamController.Disable();
-        }
-        private void DisableFPSCam()
-        {
-            Log.Msg("stop FPS camera");
-
-            _uiMainPanel.OnCamDeactivate();
-            _uiInfoPanelExtend?.OnCamDeactivate();
-            if (Config.G.HideUIwhenActivate) UI.Helper.ShowUI();
-
-            Control.ShowCursor();
-            CamController.Enable();
-        }
-
         private void PrepareFreeCam() { }
         private void PrepareFollowing()
         {
             switch (_idToFollow) {
             case HumanID humanID:
                 if (Object.Of(humanID) is Pedestrian p)
-                    _camToFollow = new Cam.Pedestrian(p.pedestrianID);
+                    _camToFollow = new Cam.PedestrianCam(p.pedestrianID);
                 else return; break;
             case PedestrianID pedID:
-                _camToFollow = new Cam.Pedestrian(pedID); break;
+                _camToFollow = new Cam.PedestrianCam(pedID); break;
             case VehicleID vehicleID:
-                _camToFollow = new Cam.Vehicle(vehicleID); break;
+                _camToFollow = new Cam.VehicleCam(vehicleID); break;
             default:
                 Log.Warn($"Following UUID:{_idToFollow} is not supported");
                 _camToFollow = null;
                 return;
             }
-            _uiFollowInfoPanel.SetAssociatedCam(_camToFollow);
+            _uiCamInfoPanel.SetAssociatedCam(_camToFollow);
             ResetCamLocal();
         }
         private void PrepareWalkThru() { SwitchTarget4WalkThru(); }
@@ -144,6 +128,12 @@ namespace FPSCamera
                 _exitingTimer = 0f;
                 CamController.LocateAt(_positioning);
             }
+        }
+
+        private void StopFollowing()
+        {
+            _camToFollow = null;
+            _uiCamInfoPanel.enabled = false;
         }
 
         void ResetCamLocal()
@@ -206,7 +196,7 @@ namespace FPSCamera
                         new Range(-Config.G.MaxVertRotate4Follow, Config.G.MaxVertRotate4Follow));
                 if (_camToFollow.GetPositioning() is Positioning followPositioning) {
                     _targetPositioning = followPositioning.Apply(_userOffset);
-                    _uiFollowInfoPanel.enabled = Config.G.DisplayInfo4Follow;
+                    _uiCamInfoPanel.enabled = Config.G.DisplayInfoPanel;
                 }
                 else _camToFollow = null;
             }
@@ -282,8 +272,8 @@ namespace FPSCamera
         private void DestroyUI()
         {
             if (_uiMainPanel != null) Destroy(_uiMainPanel);
-            if (_uiFollowInfoPanel != null) Destroy(_uiFollowInfoPanel);
-            if (_uiInfoPanelExtend != null) Destroy(_uiInfoPanelExtend);
+            if (_uiCamInfoPanel != null) Destroy(_uiCamInfoPanel);
+            if (_uiFollowButtons != null) Destroy(_uiFollowButtons);
         }
         internal void ResetUI()
         {
@@ -291,10 +281,10 @@ namespace FPSCamera
             _uiMainPanel = gameObject.AddComponent<UI.MainPanel>();
             _uiMainPanel.SetWalkThruCallBack(StartWalkThruMode);
             _uiMainPanel.SetKeyDownEvent(KeyDownHandler);
-            _uiFollowInfoPanel = gameObject.AddComponent<UI.Panel4FollowInfo>();
-            if (ModLoad.IsInGameMode) {
-                _uiInfoPanelExtend = gameObject.AddComponent<UI.FollowButtons>();
-                _uiInfoPanelExtend.registerFollowCallBack(StartFollow);
+            _uiCamInfoPanel = gameObject.AddComponent<UI.CamInfoPanel>();
+            if (Mod.IsInGameMode) {
+                _uiFollowButtons = gameObject.AddComponent<UI.FollowButtons>();
+                _uiFollowButtons.registerFollowCallBack(StartFollow);
             }
         }
 
@@ -317,6 +307,15 @@ namespace FPSCamera
                         _positioning.AlmostEquals(_targetPositioning));
         }
 
+        protected override void _Init()
+        {
+            _state = State.Idle;
+            ResetUI();
+        }
+        protected override void _SetUp()
+        {
+            _camGame = new Game.Cam(CamController.GetCamera());
+        }
         protected override void _UpdateLate()
         {
             var controlOffset = GetControlOffsetAfterHandleInput();
@@ -369,8 +368,8 @@ namespace FPSCamera
 
         // UI
         private UI.MainPanel _uiMainPanel;
-        private UI.Panel4FollowInfo _uiFollowInfoPanel;
-        private UI.FollowButtons _uiInfoPanelExtend;
+        private UI.CamInfoPanel _uiCamInfoPanel;
+        private UI.FollowButtons _uiFollowButtons;
 
         // local camera properties
         private Offset _userOffset;

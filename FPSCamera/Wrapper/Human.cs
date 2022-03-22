@@ -33,7 +33,7 @@ namespace FPSCamera.Wrapper
     {
         public override string Name => manager.GetCitizenName(id.implIndex);
 
-        public Positioning GetCamPositioning()
+        public Positioning GetPositioning()
         {
             _instance.GetSmoothPosition(pedestrianID.implIndex,
                                         out var position, out var rotation);
@@ -54,9 +54,9 @@ namespace FPSCamera.Wrapper
             }
             return status;
         }
-        public Cam.Details GetDetails()
+        public Utils.Infos GetInfos()
         {
-            Cam.Details details = new Cam.Details();
+            Utils.Infos details = new Utils.Infos();
 
             string occupation;
             if (IsTourist) occupation = "(tourist)";

@@ -8,9 +8,9 @@ namespace FPSCamera.Wrapper
     public interface IObjectToFollow : IObject
     {
         float GetSpeed();
+        Transform.Positioning GetPositioning();
+        Utils.Infos GetInfos();
         string GetStatus();
-        Transform.Positioning GetCamPositioning();
-        Cam.Details GetDetails();
     }
 
     public abstract class Object : IObject

@@ -5,6 +5,12 @@ namespace FPSCamera.Game
 
     public static class Map
     {
+        public static float ToKilometer(this float gameDistance)
+            => gameDistance * 5f / 3f;
+
+        public static float ToMile(this float gameDistance)
+            => gameDistance.ToKilometer() * .621371f;
+
         public static float GetTerrainLevel(Position position)
             => TerrainManager.instance.SampleDetailHeight(position.AsGamePosition);
         public static float GetWaterLevel(Position position)

@@ -8,7 +8,20 @@ namespace FPSCamera
 
     public static class Utils
     {
-        /* --------------- Code -------------------------------------------------------- */
+        /* -------- Data Structure ------------------------------------------------------------- */
+
+        // Key: attribute name, Value: attribute value
+        public class Infos : System.Collections.Generic.List<Info>
+        {
+            public string this[string field] { set => Add(new Info(field, value)); }
+        }
+        public struct Info
+        {
+            public readonly string field, text;
+            public Info(string field, string text) { this.field = field; this.text = text; }
+        }
+
+        /* -------- Code ----------------------------------------------------------------------- */
 
         public class FieldReader<Target>
         {
@@ -29,7 +42,7 @@ namespace FPSCamera
         public static FieldReader<Target> ReadFields<Target>(Target target)
             => new FieldReader<Target>(target);
 
-        /* --------------- Field Name Attribute ---------------------------------------- */
+        /* -------- Field Name Attribute ------------------------------------------------------- */
 
         [AttributeUsage(System.AttributeTargets.Field)]
         public class FieldNameAttribute : Attribute
@@ -77,7 +90,7 @@ namespace FPSCamera
                         (IFieldWithName field, FieldNameAttribute attr) => field._set(attr.name));
 
 
-        /* --------------- Math -------------------------------------------------------- */
+        /* -------- Math ----------------------------------------------------------------------- */
 
         public static bool AlmostEqual(this float a, float b, float error = 1 / 32f)
             => Math.Abs(b - a) < error;
@@ -151,7 +164,8 @@ namespace FPSCamera
             return value + modulusRange.min;
         }
 
-        /* --------------- Random ------------------------------------------------------ */
+        /* -------- Random --------------------------------------------------------------------- */
+
         public static T GetRandomOne<T>(this IEnumerable<T> enumerable)
         {
             var list = enumerable.ToList();

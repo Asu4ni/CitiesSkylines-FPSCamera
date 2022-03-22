@@ -9,12 +9,12 @@ namespace FPSCamera.Cam
 
         public bool IsOperating => state != State.Finished;
 
-        public abstract Transform.Positioning GetPositioning();
+        public abstract Positioning GetPositioning();
 
         public abstract float GetSpeed();
         public abstract string GetName();
         public abstract string GetStatus();
-        public abstract Details GetDetails();
+        public abstract Utils.Infos GetInfos();
 
         protected enum State { Normal, Idle, Finished }
         protected State state;
@@ -53,9 +53,9 @@ namespace FPSCamera.Cam
             => EnsureState() ? _GetStatus() : "(error)";
         protected virtual string _GetStatus() => Target.GetStatus();
 
-        public sealed override Details GetDetails()
-            => EnsureState() ? _GetDetails() : new Details { ["Error"] = "Target missing" };
-        protected virtual Details _GetDetails() => Target.GetDetails();
+        public sealed override Utils.Infos GetInfos()
+            => EnsureState() ? _GetInfos() : new Utils.Infos { ["Error"] = "Target missing" };
+        protected virtual Utils.Infos _GetInfos() => Target.GetInfos();
 
         private bool EnsureState()
         {
@@ -67,16 +67,5 @@ namespace FPSCamera.Cam
             return true;
         }
         protected TID _id;
-    }
-
-    // Key: attribute name, Value: attribute value
-    public class Details : System.Collections.Generic.List<Detail>
-    {
-        public string this[string field] { set => Add(new Detail(field, value)); }
-    }
-    public struct Detail
-    {
-        public readonly string field, text;
-        public Detail(string field, string text) { this.field = field; this.text = text; }
     }
 }

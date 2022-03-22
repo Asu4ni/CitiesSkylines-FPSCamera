@@ -3,9 +3,9 @@ namespace FPSCamera.Cam
     using Transform;
     using Wrapper;
 
-    internal class Vehicle : Follow<VehicleID, Wrapper.Vehicle>
+    public class VehicleCam : Follow<VehicleID, Wrapper.Vehicle>
     {
-        public Vehicle(VehicleID vehicleID) : base(vehicleID)
+        public VehicleCam(VehicleID vehicleID) : base(vehicleID)
         {
             if (Config.G.StickToFrontVehicle)
                 _id = Target.GetFrontVehicleID();
@@ -30,7 +30,7 @@ namespace FPSCamera.Cam
                 _wasReversed = !_wasReversed;
             }
 
-            return vehicle.GetCamPositioning().Apply(new LocalMovement
+            return vehicle.GetPositioning().Apply(new LocalMovement
             {
                 forward = Config.G.VehicleCamOffset.forward +
                           Config.G.VehicleFOffsetForward + vehicle.GetAttachOffsetFront(),

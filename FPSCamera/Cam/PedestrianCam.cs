@@ -3,9 +3,9 @@ namespace FPSCamera.Cam
     using Transform;
     using Wrapper;
 
-    internal class Pedestrian : Follow<PedestrianID, Wrapper.Pedestrian>
+    public class PedestrianCam : Follow<PedestrianID, Wrapper.Pedestrian>
     {
-        public Pedestrian(PedestrianID pedID) : base(pedID)
+        public PedestrianCam(PedestrianID pedID) : base(pedID)
         {
             if (IsOperating)
                 Log.Msg($"start following pedestrian(ID:{_id})");
@@ -19,7 +19,7 @@ namespace FPSCamera.Cam
             if (state == State.Normal && pedestrian.RiddenVehicleID is VehicleID vehicleID) {
                 Log.Msg($"pedestrian(ID:{_id}) entered a vehicle");
                 state = State.Idle;
-                _camVehicle = new Vehicle(vehicleID);
+                _camVehicle = new VehicleCam(vehicleID);
             }
 
             if (_camVehicle is object) {
@@ -31,7 +31,7 @@ namespace FPSCamera.Cam
                 state = State.Normal;
             }
 
-            return pedestrian.GetCamPositioning().Apply(new LocalMovement
+            return pedestrian.GetPositioning().Apply(new LocalMovement
             {
                 forward = Config.G.CitizenCamOffset.forward,
                 up = Config.G.CitizenCamOffset.up + Config.G.CitizenFOffsetUp,
@@ -49,16 +49,16 @@ namespace FPSCamera.Cam
                 status += $" | ON {_camVehicle.GetName()}: " + $"{_camVehicle.GetStatus()}";
             return status;
         }
-        protected override Details _GetDetails()
+        protected override Utils.Infos _GetInfos()
         {
-            var details = Target.GetDetails();
+            var details = Target.GetInfos();
             if (state == State.Idle && _camVehicle is object)
-                foreach (var pair in _camVehicle.GetDetails())
+                foreach (var pair in _camVehicle.GetInfos())
                     details["v/" + pair.field] = pair.text;
 
             return details;
         }
 
-        private Vehicle _camVehicle = null;
+        private VehicleCam _camVehicle = null;
     }
 }

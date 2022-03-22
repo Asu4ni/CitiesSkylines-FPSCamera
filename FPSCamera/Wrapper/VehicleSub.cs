@@ -4,7 +4,7 @@
     {
         public CargoVehicle(VehicleID id) : base(id) { }
 
-        public override void _MoreDetails(ref Cam.Details details)
+        public override void _MoreDetails(ref Utils.Infos details)
         {
             GetLoadAndCapacity(out int load, out int capacity);
             details["Load"] = capacity > 0 ? ((float) load / capacity).ToString("P1")
@@ -16,7 +16,7 @@
     {
         public TransitVehicle(VehicleID id, string typeName) : base(id) { _typeName = typeName; }
 
-        public override void _MoreDetails(ref Cam.Details details)
+        public override void _MoreDetails(ref Utils.Infos details)
         {
             details["Transit/" + _typeName] = GetTransitLineID() is TransitID id ?
                     TransitLine.GetName(id) : "(external connection)";
@@ -33,7 +33,7 @@
     {
         public ServiceVehicle(VehicleID id, string typeName) : base(id) { _typeName = typeName; }
 
-        public override void _MoreDetails(ref Cam.Details details)
+        public override void _MoreDetails(ref Utils.Infos details)
         {
             details["Service"] = _typeName;
 
@@ -51,10 +51,8 @@
     {
         public Bicycle(VehicleID id) : base(id) { }
         public override string GetStatus()
-        => GetOwnerID() is HumanID hid ?
-                   (OfIfValid(hid) as Pedestrian)?.GetStatus() ?? "" : "";
-
-
+            => GetOwnerID() is HumanID hid ?
+                   (OfIfValid(hid) as Pedestrian)?.GetStatus() : null;
     }
 
     public class MissionVehicle : Vehicle

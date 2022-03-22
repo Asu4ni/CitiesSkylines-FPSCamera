@@ -8,7 +8,7 @@ namespace FPSCamera.UI
     {
         public static readonly Color32 TextColor = new Color32(221, 220, 250, 255);
         public static readonly Color32 Color = new Color32(165, 160, 240, 250);
-        public static readonly Color32 BgColor = new Color32(55, 53, 160, 240);
+        public static readonly Color32 BgColor = new Color32(55, 53, 160, 245);
         public static readonly Color32 ColorDisabled = new Color32(42, 40, 80, 220);
         public static readonly Color32 TextColorDisabled = new Color32(122, 120, 140, 255);
         public const float Margin = 20f;

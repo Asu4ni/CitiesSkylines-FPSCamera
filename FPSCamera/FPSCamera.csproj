@@ -60,9 +60,9 @@
   <ItemGroup>
     <Compile Include="Transform.cs" />
     <Compile Include="Wrapper\Object.cs" />
-    <Compile Include="Wrapper\VehicleDerived.cs" />
+    <Compile Include="Wrapper\VehicleSub.cs" />
     <Compile Include="UI\Debug.cs" />
-    <Compile Include="UI\Panel4FollowInfo.cs" />
+    <Compile Include="UI\CamInfoPanel.cs" />
     <Compile Include="UI\OptionsMenu.cs" />
     <Compile Include="UI\MainPanel.cs" />
     <Compile Include="UI\FollowButtons.cs" />
@@ -77,8 +77,8 @@
     <Compile Include="Wrapper\ID.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="Cam\Base.cs" />
-    <Compile Include="Cam\Pedestrian.cs" />
-    <Compile Include="Cam\Vehicle.cs" />
+    <Compile Include="Cam\PedestrianCam.cs" />
+    <Compile Include="Cam\VehicleCam.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="Controller.cs" />
     <Compile Include="Log.cs" />

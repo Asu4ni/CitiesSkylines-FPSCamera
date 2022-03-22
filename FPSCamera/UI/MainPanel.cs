@@ -55,12 +55,12 @@ namespace FPSCamera.UI
             comp = panelParent.AddDropDown(Config.G.GroundClippingOption,
                                            yPos: y, width: _mainPanel.width);
 
-            if (ModLoad.IsInGameMode) {
+            if (Mod.IsInGameMode) {
                 y += comp.height + margin;
 
                 comp = panelParent.AddCheckbox(Config.G.StickToFrontVehicle, yPos: y);
                 y += comp.height + margin;
-                comp = panelParent.AddCheckbox(Config.G.DisplayInfo4Follow, yPos: y);
+                comp = panelParent.AddCheckbox(Config.G.DisplayInfoPanel, yPos: y);
                 y += comp.height + margin;
 
                 comp = panelParent.AddCheckbox(Config.G.ClickToSwitch4WalkThru, yPos: y);

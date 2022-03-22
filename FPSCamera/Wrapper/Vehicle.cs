@@ -7,12 +7,13 @@ namespace FPSCamera.Wrapper
     {
         public override string Name => manager.GetVehicleName(GetHeadVehicleID().implIndex);
 
-        public Positioning GetCamPositioning()
+        public Positioning GetPositioning()
         {
             _vehicle.GetSmoothPosition(_vid.implIndex, out var position, out var rotation);
             return new Positioning(Position.FromGame(position), Angle.FromGame(rotation));
         }
         public float GetSpeed() => _vehicle.GetSmoothVelocity(_vid.implIndex).magnitude;
+
         public virtual string GetStatus()
         {
             var vehicle = _Of(GetHeadVehicleID());
@@ -25,9 +26,9 @@ namespace FPSCamera.Wrapper
             return status;
         }
 
-        public Cam.Details GetDetails()
+        public Utils.Infos GetInfos()
         {
-            Cam.Details details = new Cam.Details();
+            Utils.Infos details = new Utils.Infos();
 
             var vehicle = _Of(GetHeadVehicleID());
             switch (vehicle.GetOwnerID()) {
@@ -40,7 +41,7 @@ namespace FPSCamera.Wrapper
             vehicle._MoreDetails(ref details);
             return details;
         }
-        public virtual void _MoreDetails(ref Cam.Details details) { }
+        public virtual void _MoreDetails(ref Utils.Infos details) { }
 
         public bool IsSpawned => _Is(global::Vehicle.Flags.Spawned);
         public bool IsReversed => _Is(global::Vehicle.Flags.Reversed);
