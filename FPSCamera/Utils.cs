@@ -92,7 +92,7 @@ namespace FPSCamera
 
         /* -------- Math ----------------------------------------------------------------------- */
 
-        public static bool AlmostEqual(this float a, float b, float error = 1 / 32f)
+        public static bool AlmostEquals(this float a, float b, float error = 1 / 32f)
             => Math.Abs(b - a) < error;
 
         public static T GetNextOfSmoothTrans<T>(this T value, T target,

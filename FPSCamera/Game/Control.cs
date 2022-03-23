@@ -44,12 +44,23 @@ namespace FPSCamera.Game
             return KeyCode.None;
         }
 
+        public static void ShowUI(bool show = true)
+        {
+            ColossalFramework.UI.UIView.Show(show);
+            NotificationManager.instance.NotificationsVisible = show;
+            GameAreaManager.instance.BordersVisible = show;
+            DistrictManager.instance.NamesVisible = show;
+            PropManager.instance.MarkersVisible = show;
+            GuideManager.instance.TutorialDisabled = show;
+            DisasterManager.instance.MarkersVisible = show;
+            NetManager.instance.RoadNamesVisible = show;
+        }
+        public static void HideUI() => ShowUI(false);
+
         public static void ShowCursor(bool visibility = true)
             => Cursor.visible = visibility;
         public static void HideCursor() => ShowCursor(false);
 
         public static float DurationFromLastFrame => Time.deltaTime;
     }
-
-
 }

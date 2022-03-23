@@ -27,7 +27,6 @@ namespace FPSCamera.Game
                    Tool.RayCastRoad(new Vector2(position.x, position.y - offset));
         }
 
-        // TODO: investigate, sample point around for smoothness
         public static float GetMinHeightAt(Position position)
         {
             const float defaultOffset = 2f;

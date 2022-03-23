@@ -23,8 +23,8 @@ namespace FPSCamera.UI
             _panelBtn.MakeDraggable(
                 actionDragStart: () => PanelExpanded = false,
                 actionDragEnd: () => {
-                    Config.G.CamUIOffset.right.assign(_panelBtn.relativePosition.x);
-                    Config.G.CamUIOffset.up.assign(_panelBtn.relativePosition.y);
+                    Config.G.MainPanelBtnPos.right.assign(_panelBtn.relativePosition.x);
+                    Config.G.MainPanelBtnPos.up.assign(_panelBtn.relativePosition.y);
                     Config.G.Save();
                 });
 
@@ -106,7 +106,7 @@ namespace FPSCamera.UI
 
         private UIButton _SetUpPanelButton()
         {
-            float x = Config.G.CamUIOffset.right, y = Config.G.CamUIOffset.up;
+            float x = Config.G.MainPanelBtnPos.right, y = Config.G.MainPanelBtnPos.up;
             if (x < 0f || y < 0f) {
                 UIComponent escbutton = Helper.Root.FindUIComponent("Esc");
                 x = escbutton.relativePosition.x;

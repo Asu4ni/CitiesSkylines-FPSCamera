@@ -169,12 +169,14 @@ namespace FPSCamera
 
         /*--------- configurable constants ----------------------------------*/
 
-        [Config("CamUIOffset", "In-Game config panel position")]
-        public readonly CfOffset CamUIOffset
+        [Config("MainPanelBtnPos", "In-Game main panel button position")]
+        public readonly CfOffset MainPanelBtnPos
                 = new CfOffset(new CfFloat(0f, 0f, 0f), new CfFloat(-1f), new CfFloat(-1f));
         //                        always 0 (forward)  |    y-axis (up)  |    x-axis (right)
         // value == -1 : unset
 
+        [Config("CamNearClipPlane", "Camera Near clip plane")]
+        public readonly CfFloat CamNearClipPlane = new CfFloat(1f, min: .125f, max: 64f);
         [Config("FoViewScrollfactor", "Field of View scaling factor by scrolling")]
         public readonly CfFloat FoViewScrollfactor = new CfFloat(1.05f, 1.01f, 2f);
 
@@ -191,11 +193,11 @@ namespace FPSCamera
         public readonly CfFloat MaxExitingDuration = new CfFloat(5f, 0f);
         /*-------------------------------------------------------------------*/
 
-        // Return a ratio[0f, 1f] representing the proportion to reduce for a difference
-        //  *reduce ratio per unit(.1 sec): speed / (max + 1)
-        //  *retain ratio per unit: 1f - ReduceRatioUnit       *units: elapsedTime / .1f
-        //  *retain ratio: RetainRatioUnit^units         *reduce ratio: 1f - RetainRatio
-        public float GetReduceFactor(float elapsedTime)
+        // Return a ratio[0f, 1f] representing the proportion to advance to the target
+        //  *advance ratio per unit(.1 sec): speed / (max + 1)
+        //  *retain ratio per unit: 1f - AdvanceRatioPUnit   *units: elapsedTime / .1f
+        //  *retain ratio: RetainRatioPUnit ^ units          *advance ratio: 1f - RetainRatio
+        public float GetAdvanceFactor(float elapsedTime)
             => 1f - (float) Math.Pow(1f - TransitionSpeed / (TransitionSpeed.Max + 1f),
                                      elapsedTime / .1f);
 

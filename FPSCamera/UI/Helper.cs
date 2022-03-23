@@ -13,7 +13,7 @@ namespace FPSCamera.UI
         public static readonly Color32 TextColorDisabled = new Color32(122, 120, 140, 255);
         public const float Margin = 20f;
 
-        public static Size ScreenSize => Size.FromGame(Utils.ReadFields<UIView>(Root)
+        public static Size ScreenSize => Size.FromGame(Utils.ReadFields(Root)
                                                 .Get<Vector2>("m_CachedScreenResolution"));
 
         public static UIView Root => UIView.GetAView();
@@ -284,65 +284,6 @@ namespace FPSCamera.UI
             => (comp, eventParam) => {
                 if (action(comp)) eventParam.Use();
             };
-
-        // TODO: investigate
-        /*  if (m_freeCamera != m_cachedFreeCamera) {
-                m_cachedFreeCamera = m_freeCamera;
-                UIView.Show(UIView.HasModalInput() || !m_freeCamera);
-                Singleton<NotificationManager>.instance.NotificationsVisible = !m_freeCamera;
-                Singleton<GameAreaManager>.instance.BordersVisible = !m_freeCamera;
-                Singleton<DistrictManager>.instance.NamesVisible = !m_freeCamera;
-                Singleton<PropManager>.instance.MarkersVisible = !m_freeCamera;
-                Singleton<GuideManager>.instance.TutorialDisabled = m_freeCamera;
-                Singleton<DisasterManager>.instance.MarkersVisible = !m_freeCamera;
-                Singleton<NetManager>.instance.RoadNamesVisible = !m_freeCamera;
-            }
-            if (m_cachedFreeCamera) m_camera.rect = kFullScreenRect;            
-            else m_camera.rect = kFullScreenWithoutMenuBarRect;            
-        */
-        public static void HideUI()
-        {
-            var cameraController = Object.FindObjectOfType<CameraController>();
-            var camera = cameraController.gameObject.GetComponent<Camera>();
-            camera.GetComponent<OverlayEffect>().enabled = false;
-            bool cachedEnabled = cameraController.enabled;
-            var cameras = Object.FindObjectsOfType<Camera>();
-            foreach (var cam in cameras) {
-                if (cam.name == "UIView") {
-                    cam.enabled = false;
-                    break;
-                }
-            }
-            camera.rect = new Rect(0.0f, 0.0f, 1f, 1f);
-
-            // For some reason, the cameracontroller's not picking this up before it's disabled...
-            cameraController.enabled = true;
-            cameraController.m_freeCamera = true;
-            cameraController.enabled = cachedEnabled;
-        }
-
-        public static void ShowUI()
-        {
-            var cameraController = Object.FindObjectOfType<CameraController>();
-            var camera = cameraController.gameObject.GetComponent<Camera>();
-            camera.GetComponent<OverlayEffect>().enabled = true;
-            bool cachedEnabled = cameraController.enabled;
-
-            var cameras = Object.FindObjectsOfType<Camera>();
-            foreach (var cam in cameras) {
-                if (cam.name == "UIView") {
-                    cam.enabled = true;
-                    break;
-                }
-            }
-
-            // For some reason, the cameracontroller's not picking this up before it's disabled...
-            cameraController.enabled = true;
-            cameraController.m_freeCamera = false;
-            cameraController.enabled = cachedEnabled;
-
-            camera.rect = new Rect(0.0f, 0.105f, 1f, 0.895f);
-        }
 
         public static string NameWithPrefix(string name) => namePrefix + name;
 

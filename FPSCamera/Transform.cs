@@ -38,7 +38,7 @@
 
         public float x, y, up;
 
-        public bool AlmostNone => SqrDistance.AlmostEqual(0f);
+        public bool AlmostNone => SqrDistance.AlmostEquals(0f);
         public float SqrDistance => x * x + y * y + up * up;
         public float Distance => (float) System.Math.Sqrt(SqrDistance);
 
@@ -166,7 +166,7 @@
         public static Rotation None => new Rotation(Quaternion.identity);
 
         // quaternion.w = cos(theta) = 1 when theta = 0
-        public bool AlmostNone => _rotation.w.AlmostEqual(1f, 1f / 16384);
+        public bool AlmostNone => _rotation.w.AlmostEquals(1f, 1f / 16384);
 
         public static Rotation operator -(Rotation r)
             => new Rotation(Quaternion.Inverse(r._rotation));
