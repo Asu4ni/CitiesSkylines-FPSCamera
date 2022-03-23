@@ -147,7 +147,7 @@ namespace FPSCamera.UI
             slider.backgroundSprite = "ScrollbarTrack";
             slider.height = 10f;
             slider.relativePosition = oneLine ?
-                        new Vector3(panel.width / 2f, label.relativePosition.y + 10f) :
+                        new Vector3(panel.width / 2f, label.relativePosition.y + 5f) :
                         new Vector3(5f, label.relativePosition.y + label.height + 10f);
             slider.width = oneLine ? panel.width / 2f - 60f : panel.width - 60f;
 
@@ -159,7 +159,7 @@ namespace FPSCamera.UI
                                 slider.relativePosition.y - 2f);
 
             panel.autoSize = false;
-            panel.height = slider.relativePosition.y + slider.height + 10f;
+            panel.height = slider.relativePosition.y + slider.height + 5f;
 
             slider.eventValueChanged += (_, value) => {
                 Config.G.Save(config.assign(value));

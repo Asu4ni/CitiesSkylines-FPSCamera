@@ -96,7 +96,7 @@ namespace FPSCamera
 
         [Config("MaxVertRotate", "Max vertical viewing range",
                 "The maximum degree to rotate camera up & down.")]
-        public readonly CfFloat MaxVertRotate = new CfFloat(70f, min: 30f, max: 85f);
+        public readonly CfFloat MaxVertRotate = new CfFloat(70f, min: 30f, max: 90f);
         [Config("RotateSensitivity", "Camera rotation sensitivity")]
         public readonly CfFloat RotateSensitivity = new CfFloat(5f, min: 1f, max: 10f);
         [Config("KeyRotateFactor", "Rotation speed using keys")]

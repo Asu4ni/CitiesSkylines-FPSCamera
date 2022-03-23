@@ -37,7 +37,7 @@ namespace FPSCamera.UI
                 comp = parent.AddSlider(Config.G.KeyRotateFactor, .5f, "F1",
                                          yPos: y, width: panel.width, oneLine: true);
                 y += comp.height + margin;
-                panel.height = y;
+                panel.height = y + margin * 2f;
                 parent.AddTextButton("ReloadConfig", "Reload Configurations",
                                      new Utils.Size2D(200f, 35f),
                                      (_, p) => { Mod.LoadConfig(); Mod.ResetUI(); },
