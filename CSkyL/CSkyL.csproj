@@ -36,6 +36,12 @@
     <Reference Include="Assembly-CSharp-firstpass">
       <HintPath>..\..\..\..\..\SteamLibrary\steamapps\common\Cities_Skylines\Cities_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
+    <Reference Include="CitiesHarmony.API, Version=2.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\FPSCamera\packages\CitiesHarmony.API.2.1.0\lib\net35\CitiesHarmony.API.dll</HintPath>
+    </Reference>
+    <Reference Include="CitiesHarmony.Harmony, Version=2.0.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\FPSCamera\packages\CitiesHarmony.Harmony.2.2.0\lib\net35\CitiesHarmony.Harmony.dll</HintPath>
+    </Reference>
     <Reference Include="ColossalManaged">
       <HintPath>..\..\..\..\..\SteamLibrary\steamapps\common\Cities_Skylines\Cities_Data\Managed\ColossalManaged.dll</HintPath>
     </Reference>
@@ -57,6 +63,7 @@
     <Compile Include="Game\Object\Object.cs" />
     <Compile Include="Game\Object\Vehicle.cs" />
     <Compile Include="Game\Object\VehicleSub.cs" />
+    <Compile Include="Patcher.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="Log.cs" />
     <Compile Include="Transform.cs" />
@@ -75,6 +82,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -122,7 +122,14 @@ namespace FPSCamera.UI
             _hintLabel.position = _HintLabelPosition;
         }
 
-        public void OnEsc() => _mainPanel.Visible = false;
+        public bool OnEsc()
+        {
+            if (_mainPanel.Visible) {
+                _mainPanel.Visible = false;
+                return true;
+            }
+            return false;
+        }
 
         public void SetWalkThruCallBack(System.Action callBackAction)
             => _walkThruCallBack = callBackAction;

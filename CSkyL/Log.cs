@@ -55,7 +55,7 @@ namespace CSkyL
 
         public void Msg(string msg) { output("[info] " + msg); }
         public void Warn(string msg) { output("[warn] " + msg); }
-        public void Err(string msg) { output("[err!] " + msg); }
+        public void Err(string msg) { output(" [err] " + msg); }
 
         private void output(string str)
         {

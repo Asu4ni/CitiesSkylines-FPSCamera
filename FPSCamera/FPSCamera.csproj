@@ -40,6 +40,12 @@
       <HintPath>..\..\..\..\..\SteamLibrary\steamapps\common\Cities_Skylines\Cities_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="CitiesHarmony.API, Version=2.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\CitiesHarmony.API.2.1.0\lib\net35\CitiesHarmony.API.dll</HintPath>
+    </Reference>
+    <Reference Include="CitiesHarmony.Harmony, Version=2.0.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\CitiesHarmony.Harmony.2.2.0\lib\net35\CitiesHarmony.Harmony.dll</HintPath>
+    </Reference>
     <Reference Include="ColossalManaged">
       <HintPath>..\..\..\..\..\SteamLibrary\steamapps\common\Cities_Skylines\Cities_Data\Managed\ColossalManaged.dll</HintPath>
       <Private>False</Private>
@@ -75,10 +81,12 @@
     <Compile Include="UI\FollowButtons.cs" />
     <Compile Include="UI\OptionsMenu.cs" />
     <Compile Include="UI\Debug.cs" />
+    <Compile Include="Patch\EscHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CSkyL\CSkyL.csproj">

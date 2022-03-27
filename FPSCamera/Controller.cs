@@ -17,6 +17,7 @@ namespace FPSCamera
             Log.Msg("Starting FreeCam mode");
             _SetCam(new Cam.FreeCam(_camUnity.Positioning));
         }
+
         public void StartFollow(CSkyL.Game.ID.ObjectID idToFollow)
         {
             Log.Msg("Starting Follow mode");
@@ -45,6 +46,16 @@ namespace FPSCamera
             _uiCamInfoPanel.enabled = false;
 
             _state = State.Exiting;
+        }
+
+        public bool OnEsc()
+        {
+            if (_uiMainPanel.OnEsc()) return true;
+            if (_camMod is object) {
+                StopFPSCam();
+                return true;
+            }
+            return false;
         }
 
         private void _SetCam(Cam.Base newCam)

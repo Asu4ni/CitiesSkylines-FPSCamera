@@ -1,6 +1,7 @@
 namespace FPSCamera
 {
     using ICities;
+    using System.Reflection;
     using CamController = CSkyL.Game.CamController;
     using Log = CSkyL.Log;
 
@@ -17,8 +18,9 @@ namespace FPSCamera
         {
             Log.Logger = new CSkyL.FileLog(nameShort);
             Log.Msg("Mod: enabled - v" +
-                    System.Reflection.Assembly.GetExecutingAssembly().GetName().Version);
+                    Assembly.GetExecutingAssembly().GetName().Version);
 
+            CSkyL.Harmony.Patcher.PatchOnReady(Assembly.GetExecutingAssembly());
             LoadConfig();
 
             if (CamController.I is CamController c) {
@@ -33,6 +35,7 @@ namespace FPSCamera
                 _controller.Destroy();
                 Log.Msg("Controller: remove old version");
             }
+            CSkyL.Harmony.Patcher.TryUnpatch(Assembly.GetExecutingAssembly());
             Log.Msg("Mod disabled.");
         }
 
