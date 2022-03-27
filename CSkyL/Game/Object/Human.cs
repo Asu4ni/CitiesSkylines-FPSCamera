@@ -1,8 +1,9 @@
-namespace FPSCamera.Wrapper
+namespace CSkyL.Game.Object
 {
+    using CSkyL.Game.ID;
+    using CSkyL.Transform;
     using System.Collections.Generic;
     using System.Linq;
-    using Transform;
 
     public class Human : Object<HumanID>
     {
@@ -10,9 +11,9 @@ namespace FPSCamera.Wrapper
 
         public bool IsTourist => _Is(Citizen.Flags.Tourist);
         public bool IsStudent => _Is(Citizen.Flags.Student);
-        public VehicleID RiddenVehicleID => VehicleID.FromGame(_citizen.m_vehicle);
-        public BuildingID WorkBuildingID => BuildingID.FromGame(_citizen.m_workBuilding);
-        public BuildingID HomeBuildingID => BuildingID.FromGame(_citizen.m_homeBuilding);
+        public VehicleID RiddenVehicleID => VehicleID._FromIndex(_citizen.m_vehicle);
+        public BuildingID WorkBuildingID => BuildingID._FromIndex(_citizen.m_workBuilding);
+        public BuildingID HomeBuildingID => BuildingID._FromIndex(_citizen.m_homeBuilding);
 
         protected bool _Is(Citizen.Flags flags) => (_citizen.m_flags & flags) != 0;
 
@@ -26,7 +27,7 @@ namespace FPSCamera.Wrapper
         private static Citizen _GetCitizen(HumanID hid)
             => manager.m_citizens.m_buffer[hid.implIndex];
         private static PedestrianID _GetPedestrianID(HumanID hid)
-            => PedestrianID.FromGame(_GetCitizen(hid).m_instance);
+            => PedestrianID._FromIndex(_GetCitizen(hid).m_instance);
         private static readonly CitizenManager manager = CitizenManager.instance;
     }
 
@@ -41,7 +42,7 @@ namespace FPSCamera.Wrapper
         {
             _instance.GetSmoothPosition(pedestrianID.implIndex,
                                         out var position, out var rotation);
-            return new Positioning(Position.FromGame(position), Angle.FromGame(rotation));
+            return new Positioning(Position._FromVec(position), Angle._FromQuat(rotation));
         }
         public float GetSpeed() => _instance.GetLastFrameData().m_velocity.magnitude;
         public string GetStatus()
@@ -49,7 +50,7 @@ namespace FPSCamera.Wrapper
             var _c = _citizen;
             var status = _instance.Info.m_citizenAI.GetLocalizedStatus(
                                 pedestrianID.implIndex, ref _c, out var implID);
-            switch (ID.FromGame(implID)) {
+            switch (ObjectID._FromIID(implID)) {
             case BuildingID bid: status += Building.GetName(bid); break;
             case NodeID nid:
                 if (Node.GetTransitLineID(nid) is TransitID tid)
@@ -80,14 +81,14 @@ namespace FPSCamera.Wrapper
         public static IEnumerable<Pedestrian> GetIf(System.Func<Pedestrian, bool> filter)
         {
             return Enumerable.Range(1, manager.m_instanceCount)
-                    .Select(i => Of(PedestrianID.FromGame((ushort) i)) as Pedestrian)
+                    .Select(i => Of(PedestrianID._FromIndex((ushort) i)) as Pedestrian)
                     .Where(p => p is Pedestrian && filter(p));
         }
 
         private static CitizenInstance _GetCitizenInstance(PedestrianID pid)
             => manager.m_instances.m_buffer[pid.implIndex];
         private static HumanID _GetHumanID(PedestrianID pid)
-            => HumanID.FromGame(_GetCitizenInstance(pid).m_citizen);
+            => HumanID._FromIndex(_GetCitizenInstance(pid).m_citizen);
 
         internal static Pedestrian _Of(PedestrianID id)
             => _GetHumanID(id) is HumanID hid ? new Pedestrian(id, hid) : null;

@@ -1,7 +1,7 @@
-namespace FPSCamera.Game
+namespace CSkyL.Game
 {
     using UnityEngine;
-    using Position = FPSCamera.Transform.Position;
+    using Position = Transform.Position;
 
     public static class Map
     {
@@ -12,14 +12,14 @@ namespace FPSCamera.Game
             => gameDistance.ToKilometer() * .621371f;
 
         public static float GetTerrainLevel(Position position)
-            => TerrainManager.instance.SampleDetailHeight(position.AsGamePosition);
+            => TerrainManager.instance.SampleDetailHeight(position._AsVec);
         public static float GetWaterLevel(Position position)
-            => TerrainManager.instance.WaterLevel(position.AsGameGroundPosition);
+            => TerrainManager.instance.WaterLevel(position._AsVec2);
 
         public static string RayCastRoad(Position position)
         {
             const float offset = 5f;
-            var pos = position.AsGameGroundPosition;
+            var pos = position._AsVec2;
             return Tool.RayCastRoad(new Vector2(position.x, position.y)) ??
                    Tool.RayCastRoad(new Vector2(position.x, position.y + offset)) ??
                    Tool.RayCastRoad(new Vector2(position.x + offset, position.y)) ??

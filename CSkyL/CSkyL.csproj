@@ -1,17 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{72C99E7C-C11B-4669-90ED-0944DE5B9085}</ProjectGuid>
+    <ProjectGuid>{6BB1C7F9-F48A-4735-BBBD-ED6B113DC275}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>FPSCamera</RootNamespace>
-    <AssemblyName>FPSCamera</AssemblyName>
+    <RootNamespace>CSkyL</RootNamespace>
+    <AssemblyName>CSkyL</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -33,59 +32,51 @@
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
       <HintPath>..\..\..\..\..\SteamLibrary\steamapps\common\Cities_Skylines\Cities_Data\Managed\Assembly-CSharp.dll</HintPath>
-      <Private>False</Private>
     </Reference>
-    <Reference Include="Assembly-CSharp-firstpass, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Assembly-CSharp-firstpass">
       <HintPath>..\..\..\..\..\SteamLibrary\steamapps\common\Cities_Skylines\Cities_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="ColossalManaged">
       <HintPath>..\..\..\..\..\SteamLibrary\steamapps\common\Cities_Skylines\Cities_Data\Managed\ColossalManaged.dll</HintPath>
-      <Private>False</Private>
     </Reference>
-    <Reference Include="ICities, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="ICities">
       <HintPath>..\..\..\..\..\SteamLibrary\steamapps\common\Cities_Skylines\Cities_Data\Managed\ICities.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="UnityEngine">
       <HintPath>..\..\..\..\..\SteamLibrary\steamapps\common\Cities_Skylines\Cities_Data\Managed\UnityEngine.dll</HintPath>
-      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Mod.cs" />
-    <Compile Include="Controller.cs" />
-    <Compile Include="Config.cs" />
-    <Compile Include="UnityCam.cs" />
-    <Compile Include="Cam\Base.cs" />
-    <Compile Include="Cam\FreeCam.cs" />
-    <Compile Include="Cam\FollowCam.cs" />
-    <Compile Include="Cam\PedestrianCam.cs" />
-    <Compile Include="Cam\VehicleCam.cs" />
-    <Compile Include="Cam\WalkThruCam.cs" />
-    <Compile Include="UI\Utils\Style.cs" />
-    <Compile Include="UI\Utils\Setting.cs" />
-    <Compile Include="UI\MainPanel.cs" />
-    <Compile Include="UI\CamInfoPanel.cs" />
-    <Compile Include="UI\FollowButtons.cs" />
-    <Compile Include="UI\OptionsMenu.cs" />
-    <Compile Include="UI\Debug.cs" />
+    <Compile Include="Game\Object\Human.cs" />
+    <Compile Include="Game\Object\Object.cs" />
+    <Compile Include="Game\Object\Vehicle.cs" />
+    <Compile Include="Game\Object\VehicleSub.cs" />
+    <Compile Include="Utils.cs" />
+    <Compile Include="Log.cs" />
+    <Compile Include="Transform.cs" />
+    <Compile Include="Game\Utils.cs" />
+    <Compile Include="Game\Behavior.cs" />
+    <Compile Include="Game\Cam.cs" />
+    <Compile Include="Game\CamController.cs" />
+    <Compile Include="Game\Control.cs" />
+    <Compile Include="Game\Map.cs" />
+    <Compile Include="Game\ObjectID.cs" />
+    <Compile Include="UI\Helper.cs" />
+    <Compile Include="UI\Element.cs" />
+    <Compile Include="UI\InfoPanel.cs" />
+    <Compile Include="UI\Style.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\CSkyL\CSkyL.csproj">
-      <Project>{6bb1c7f9-f48a-4735-bbbd-ed6b113dc275}</Project>
-      <Name>CSkyL</Name>
-    </ProjectReference>
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>mkdir "%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(SolutionName)"

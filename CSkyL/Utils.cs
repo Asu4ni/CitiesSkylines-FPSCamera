@@ -1,28 +1,12 @@
-using System.Linq;
-
-namespace FPSCamera
+namespace CSkyL
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Reflection;
 
-    public static class Utils
+    public static class Lang
     {
-        /* -------- Data Structure ------------------------------------------------------------- */
-
-        // Key: attribute name, Value: attribute value
-        public class Infos : List<Info>
-        {
-            public string this[string field] { set => Add(new Info(field, value)); }
-        }
-        public struct Info
-        {
-            public readonly string field, text;
-            public Info(string field, string text) { this.field = field; this.text = text; }
-        }
-
-        /* -------- Code ----------------------------------------------------------------------- */
-
         public class FieldReader<Target>
         {
             public FieldReader(Target target) => _target = target;
@@ -44,7 +28,7 @@ namespace FPSCamera
 
         /* -------- Field Name Attribute ------------------------------------------------------- */
 
-        [AttributeUsage(System.AttributeTargets.Field)]
+        [AttributeUsage(AttributeTargets.Field)]
         public class FieldNameAttribute : Attribute
         {
             public readonly string name;
@@ -88,48 +72,59 @@ namespace FPSCamera
         public static void LoadFieldNameAttribute<T>()
             => LoadFieldNameAttribute<FieldNameAttribute, T>(
                         (IFieldWithName field, FieldNameAttribute attr) => field._set(attr.name));
+    }
 
-
-        /* -------- Math ----------------------------------------------------------------------- */
-
+    public static class Math
+    {
         public static bool AlmostEquals(this float a, float b, float error = 1 / 32f)
-            => Math.Abs(b - a) < error;
+            => System.Math.Abs(b - a) < error;
 
-        public static T GetNextOfSmoothTrans<T>(this T value, T target,
-                                float advanceFactor, Range rangeOfChange,
+        public static T AdvanceToTarget<T>(this T value, T target,
+                                float advanceRatio, Range rangeOfChange,
                                 Diff<T> difference, LinearInterpolation<T> interpolation)
         {
-            Log.Assert(rangeOfChange.min >= 0, "GetNextOfSmoothTrans: rangeOfChange must >= 0");
+            Log.Assert(rangeOfChange.min >= 0, "AdvanceToTarget: rangeOfChange must >= 0");
 
             var diff = difference(value, target);
             if (diff < rangeOfChange.min) return target;
 
-            advanceFactor = diff * advanceFactor > rangeOfChange.max ? rangeOfChange.max / diff :
-                            diff * advanceFactor < rangeOfChange.min ? rangeOfChange.min / diff :
-                            advanceFactor;
-            return interpolation(value, target, advanceFactor);
+            advanceRatio = diff * advanceRatio > rangeOfChange.max ? rangeOfChange.max / diff :
+                            diff * advanceRatio < rangeOfChange.min ? rangeOfChange.min / diff :
+                            advanceRatio;
+            return interpolation(value, target, advanceRatio);
         }
         public delegate float Diff<in T>(T a, T b);
         public delegate T LinearInterpolation<T>(T a, T b, float t);
 
-        public static float GetNextOfSmoothTrans(this float value, float target,
-            float advanceFactor, Range rangeOfChange)
-            => GetNextOfSmoothTrans(value, target, advanceFactor, rangeOfChange,
-                 (a, b) => Math.Abs(a - b), (a, b, t) => a + (b - a) * t);
+        public static float AdvanceToTarget(this float value, float target,
+            float advanceRatio, Range rangeOfChange)
+            => AdvanceToTarget(value, target, advanceRatio, rangeOfChange,
+                 (a, b) => System.Math.Abs(a - b), (a, b, t) => a + (b - a) * t);
 
-        public struct Size2D
+        public struct Vec2D
         {
-            public Size2D(float width, float height)
-            {
-                this.width = float.IsNaN(width) || width < 0f ? 0f : width;
-                this.height = float.IsNaN(height) || height < 0f ? 0f : height;
-            }
-            public static implicit operator UnityEngine.Vector2(Size2D size)
-                => new UnityEngine.Vector2(size.width, size.height);
-            public static Size2D FromGame(UnityEngine.Vector2 size)
-                => new Size2D(size.x, size.y);
+            public float x { get => _x; set => _x = value; }
+            public float y { get => _y; set => _y = value; }
 
-            public float width, height;
+            public float width {
+                get => _x < 0f ? 0f : _x;
+                set => _x = value < 0f ? 0f : value;
+            }
+            public float height {
+                get => _y < 0f ? 0f : _y;
+                set => _y = value < 0f ? 0f : value;
+            }
+
+            public static Vec2D Position(float x, float y)
+                => new Vec2D { x = x, y = y };
+            public static Vec2D Size(float width, float height)
+                => new Vec2D { width = width, height = height };
+
+            internal UnityEngine.Vector2 _AsVec2 => new UnityEngine.Vector2(_x, _y);
+            internal static Vec2D _FromVec2(UnityEngine.Vector2 v)
+                => new Vec2D { _x = v.x, _y = v.y };
+
+            private float _x, _y;
         }
 
         public struct Range
@@ -164,20 +159,18 @@ namespace FPSCamera
             return value + modulusRange.min;
         }
 
-        /* -------- Random --------------------------------------------------------------------- */
-
         public static T GetRandomOne<T>(this IEnumerable<T> enumerable)
         {
             var list = enumerable.ToList();
-            return list.Any() ? list[random.Next(list.Count)] : default;
+            return list.Any() ? list[_random.Next(list.Count)] : default;
         }
 
         public static bool RandomTrue(double probability = .5)
-            => random.NextDouble() < probability;
+            => _random.NextDouble() < probability;
 
-        private static Random random {
-            get => _random ?? (_random = new Random(Environment.TickCount));
+        private static Random _random {
+            get => __random ?? (__random = new Random(Environment.TickCount));
         }
-        private static Random _random;
+        private static Random __random;
     }
 }

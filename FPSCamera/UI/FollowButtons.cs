@@ -1,87 +1,89 @@
 namespace FPSCamera.UI
 {
-    using ColossalFramework.UI;
+    using CSkyL.Game.ID;
+    using CSkyL.UI;
     using System;
     using System.Collections.Generic;
-    using UnityEngine;
-    using ID = Wrapper.ID;
+    using InfoPanel = CSkyL.UI.InfoPanel;
 
-    internal class FollowButtons : Game.Behavior
+    public class FollowButtons : CSkyL.Game.Behavior
     {
-        private static readonly Vector3 btnOffset = new Vector3(-4f, -20f, 0f);
-        private static readonly Utils.Size2D btnSize = new Utils.Size2D(30f, 30f);
-
-        internal void registerFollowCallBack(System.Action<ID> callBackAction)
+        public void registerFollowCallBack(Action<ObjectID> callBackAction)
         { followCallBack = callBackAction; }
 
         protected override void _Init()
         {
-            _infoPanels = new List<InfoPanel>();
+            _panelSets = new List<PanelSet>();
 
-            System.Func<ID, bool> always = (_) => true;
-
-            CreateFollowBtn<CitizenVehicleWorldInfoPanel>((id) => !(id is Wrapper.ParkedCarID));
-            CreateFollowBtn<CityServiceVehicleWorldInfoPanel>(always);
-            CreateFollowBtn<PublicTransportVehicleWorldInfoPanel>(always);
-            CreateFollowBtn<CitizenWorldInfoPanel>(always);
-            CreateFollowBtn<TouristWorldInfoPanel>(always);
+            Func<ObjectID, bool> always = (_) => true;
+            CSkyL.UI.Style.Current = Style.basic;
+            CreateFollowBtn(InfoPanel.Citizen.I, always);
+            CreateFollowBtn(InfoPanel.Tourist.I, always);
+            CreateFollowBtn(InfoPanel.PersonalVehicle.I, (id) => !(id is ParkedCarID));
+            CreateFollowBtn(InfoPanel.TransportVehicle.I, always);
+            CreateFollowBtn(InfoPanel.ServiceVehicle.I, always);
         }
 
         protected override void _UpdateLate()
         {
-            foreach (var p in _infoPanels)
-                p.followButton.isVisible = _GetID(p.panel) is ID id && p.filter(id);
+            foreach (var p in _panelSets)
+                p.followButton.Visible = p.panel.GetObjectID() is ObjectID id && p.filter(id);
         }
 
         protected override void _Destruct()
         {
-            foreach (var p in _infoPanels)
-                if (p.panel != null) Destroy(p.followButton);
+            foreach (var p in _panelSets)
+                if (p.panel != null) p.followButton.Destroy();
             base._Destruct();
         }
 
-        private void CreateFollowBtn<Panel>(System.Func<ID, bool> filter)
-                                            where Panel : WorldInfoPanel
+        private void CreateFollowBtn(InfoPanel.Base infoPanel, Func<ObjectID, bool> filter)
         {
-            var panel = UIView.library.Get<Panel>(typeof(Panel).Name);
-            var btn = panel.component.AsParent().AddSpriteButton("StartFollow", btnSize,
-                          Helper.GetClickHandler((_) => {
-                              if (_GetID(panel) is ID id && filter(id)) {
-                                  followCallBack(id);
-                                  panel.Hide();
-                                  return true;
-                              }
-                              return false;
-                          }), "Start Follow Mode", scale: .8f);
-            btn.AlignTo(panel.component, UIAlignAnchor.BottomRight);
-            btn.relativePosition += btnOffset;
-            _infoPanels.Add(new InfoPanel(panel, btn, filter));
+            CSkyL.UI.Style.Current.scale = .8f;
+            var btn = infoPanel.Add<SpriteButton>(new Properties
+            {
+                name = infoPanel.GetType().Name + "_StartFollow",
+                tooltip = "Start Follow Mode",
+                width = _btnSize, height = _btnSize,
+                x = _btnOffsetX, y = _btnOffsetY, align = Properties.Align.BottomRight,
+                sprite = "InfoPanelIconFreecamera"
+            });
+            CSkyL.UI.Style.Current = Style.basic;
+
+            btn.SetTriggerAction(() => {
+                if (infoPanel.GetObjectID() is ObjectID id && filter(id)) {
+                    followCallBack(id);
+                    infoPanel.Visible = false;
+                }
+            });
+            _panelSets.Add(new PanelSet(infoPanel, btn, filter));
         }
 
-        public void Enable() { foreach (var p in _infoPanels) p.followButton.Enable(); }
-        public void Disable() { foreach (var p in _infoPanels) p.followButton.Disable(); }
+        public void Enable() { foreach (var p in _panelSets) p.followButton.Enable(); }
+        public void Disable() { foreach (var p in _panelSets) p.followButton.Disable(); }
 
-        private static ID _GetID(WorldInfoPanel panel)
-            => ID.FromGame(Utils.ReadFields(panel).Get<InstanceID>("m_InstanceID"));
-
-        struct InfoPanel
+        struct PanelSet
         {
-            public readonly WorldInfoPanel panel;
-            public readonly UIButton followButton;
-            public readonly System.Func<ID, bool> filter;
-            public InfoPanel(WorldInfoPanel panel, UIButton followButton, Func<ID, bool> filter)
+            public readonly InfoPanel.Base panel;
+            public readonly SpriteButton followButton;
+            public readonly Func<ObjectID, bool> filter;
+            public PanelSet(InfoPanel.Base panel, SpriteButton followButton,
+                            Func<ObjectID, bool> filter)
             { this.panel = panel; this.followButton = followButton; this.filter = filter; }
         }
 
-        private List<InfoPanel> _infoPanels;
-        private System.Action<ID> _followCallBack;
-        private System.Action<ID> followCallBack {
+        private List<PanelSet> _panelSets;
+        private Action<ObjectID> _followCallBack;
+        private Action<ObjectID> followCallBack {
             get {
                 if (_followCallBack is null)
-                    Log.Err("followCallBack from GamePanelExtender has not been registered");
+                    CSkyL.Log.Err("followCallBack from GamePanelExtender has not been registered");
                 return _followCallBack;
             }
             set => _followCallBack = value;
         }
+
+        private static readonly float _btnOffsetX = -4f, _btnOffsetY = -20f;
+        private static readonly float _btnSize = 30f;
     }
 }

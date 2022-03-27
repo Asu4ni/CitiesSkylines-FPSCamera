@@ -1,7 +1,7 @@
-﻿using FPSCamera.Transform;
-
-namespace FPSCamera.Cam
+﻿namespace FPSCamera.Cam
 {
+    using CSkyL.Transform;
+
     public class FreeCam : Base
     {
         public override bool Validate() => true;
@@ -9,17 +9,17 @@ namespace FPSCamera.Cam
 
         public override float GetSpeed()
             => _lastPosition.DistanceTo(_positioning.position)
-                       / Game.Control.DurationFromLastFrame;
+                       / CSkyL.Game.Utils.TimeSinceLastFrame;
 
         public override void InputOffset(Offset inputOffset)
         {
             _lastPosition = _positioning.position;
             _positioning = _positioning.Apply(inputOffset);
-            _positioning.angle = _positioning.angle.Clamp(
-                    pitchRange: new Utils.Range(-Config.G.MaxVertRotate, Config.G.MaxVertRotate));
+            _positioning.angle = _positioning.angle.Clamp(pitchRange:
+                    new CSkyL.Math.Range(-Config.G.MaxPitchDeg4Free, Config.G.MaxPitchDeg4Free));
 
             if (Config.G.GroundClippingOption != Config.GroundClipping.None) {
-                var minHeight = Game.Map.GetMinHeightAt(_positioning.position)
+                var minHeight = CSkyL.Game.Map.GetMinHeightAt(_positioning.position)
                                             + Config.G.GroundLevelOffset;
                 if (Config.G.GroundClippingOption == Config.GroundClipping.SnapToGround
                             || _positioning.position.up < minHeight)

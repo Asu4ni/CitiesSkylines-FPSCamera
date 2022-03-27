@@ -1,9 +1,16 @@
-﻿namespace FPSCamera.Game
+﻿namespace CSkyL.Game
 {
     using BFlags = System.Reflection.BindingFlags;
 
+    public interface IRequireDestroyed
+    {
+        void Destroy();
+    }
+
     public abstract class Behavior : UnityEngine.MonoBehaviour
     {
+        public void Destroy() => Destroy(this);
+
         private void Awake() { _Init(); }
         protected abstract void _Init();
 
@@ -19,9 +26,18 @@
         private void OnDestroy() { _Destruct(); }
         protected virtual void _Destruct()
         {
+            Log.Msg($"Destroying - {GetType().Name}");
             foreach (var field in GetType().GetFields(
-                                    BFlags.Public | BFlags.NonPublic | BFlags.Instance))
-                if (field.GetValue(this) is UnityEngine.MonoBehaviour b) Destroy(b);
+                                    BFlags.Public | BFlags.NonPublic | BFlags.Instance)) {
+                switch (field.GetValue(this)) {
+                case UnityEngine.MonoBehaviour mono:
+                    Log.Msg($" -- field to destroy - {field.Name}");
+                    Destroy(mono); break;
+                case IRequireDestroyed obj:
+                    Log.Msg($" -- field to destroy - {field.Name}");
+                    obj.Destroy(); break;
+                }
+            }
         }
     }
 

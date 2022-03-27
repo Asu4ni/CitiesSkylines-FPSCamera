@@ -1,7 +1,7 @@
-﻿namespace FPSCamera.Transform
+﻿namespace CSkyL.Transform
 {
     using Quaternion = UnityEngine.Quaternion;
-    using Range = Utils.Range;
+    using Range = Math.Range;
     using Vector = UnityEngine.Vector3;
     using Vector2 = UnityEngine.Vector2;
 
@@ -19,15 +19,15 @@
             => new Displacement { x = target.x - x, y = target.y - y, up = target.up - up };
         public float DistanceTo(Position target) => DisplacementTo(target).Distance;
 
-        public Position GetNextOfSmoothTrans(Position target,
-                                float advanceFactor, Range rangeOfChange)
-            => this.GetNextOfSmoothTrans(target, advanceFactor, rangeOfChange,
+        public Position AdvanceToTarget(Position target,
+                                float advanceRatio, Range rangeOfChange)
+            => this.AdvanceToTarget(target, advanceRatio, rangeOfChange,
                 (a, b) => (a.DisplacementTo(b)).Distance,
                 (a, b, t) => a.Move(a.DisplacementTo(b) * t));
 
-        public Vector2 AsGameGroundPosition => new Vector2(x, y);
-        public Vector AsGamePosition => new Vector(x, up, y);
-        public static Position FromGame(Vector position)
+        internal Vector2 _AsVec2 => new Vector2(x, y);
+        internal Vector _AsVec => new Vector(x, up, y);
+        internal static Position _FromVec(Vector position)
             => new Position { x = position.x, y = position.z, up = position.y };
 
         public override string ToString() => $"[x: {x}, y: {y}, u: {up}]";
@@ -104,9 +104,9 @@
             var pitch = pitchRange is Range pr ? pitchDegree.Clamp(pr) : pitchDegree;
             return new Angle(yaw, pitch);
         }
-        public Angle GetNextOfSmoothTrans(Angle target,
-                            float advanceFactor, Range rangeOfChange)
-            => this.GetNextOfSmoothTrans(target, advanceFactor, rangeOfChange,
+        public Angle AdvanceToTarget(Angle target,
+                            float advanceRatio, Range rangeOfChange)
+            => this.AdvanceToTarget(target, advanceRatio, rangeOfChange,
                                          (a, b) => Quaternion.Angle(a._AsQuat, b._AsQuat),
                                          (a, b, t) => _FromQuat(Quaternion.Slerp(
                                                             a._AsQuat, b._AsQuat, t)));
@@ -122,9 +122,7 @@
          *   x |    vertical    | right /  left | initial front | [-180, 180]
          *   y |  left-to-right | down  /   up  |  horizontal   | [ 0, 90 ] *free [-90, 90]
          */
-        public Vector2 AsGameAngle => new Vector2(yawDegree, -pitchDegree);
-        public Quaternion AsGameRotation => _AsQuat;
-        public static Angle FromGame(Quaternion rotation) => _FromQuat(rotation);
+        internal Vector2 _AsVec2 => new Vector2(yawDegree, -pitchDegree);
 
         internal Quaternion _AsQuat => Quaternion.Euler(-pitchDegree, yawDegree, 0f);
         internal static Angle _FromQuat(Quaternion quaternion)

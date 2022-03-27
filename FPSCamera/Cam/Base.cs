@@ -1,6 +1,7 @@
 namespace FPSCamera.Cam
 {
-    using FPSCamera.Transform;
+    using CSkyL.Game;
+    using CSkyL.Transform;
 
     public interface ICamUsingTimer
     {

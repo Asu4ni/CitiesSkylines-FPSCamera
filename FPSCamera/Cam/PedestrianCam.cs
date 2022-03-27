@@ -1,7 +1,10 @@
 namespace FPSCamera.Cam
 {
-    using Transform;
-    using Wrapper;
+    using CSkyL.Game;
+    using CSkyL.Game.ID;
+    using CSkyL.Game.Object;
+    using CSkyL.Transform;
+    using Log = CSkyL.Log;
 
     public class PedestrianCam : FollowCamWithCam<PedestrianID, Pedestrian, VehicleCam>
     {
@@ -9,7 +12,7 @@ namespace FPSCamera.Cam
                     : base(pedID, handler)
         {
             if (IsOperating)
-                Log.Msg($"following pedestrian(ID:{_id})");
+                Log.Msg($" -- following pedestrian(ID:{_id})");
             else
                 Log.Warn($"pedestrian(ID:{_id}) to follow does not exist");
         }
@@ -44,10 +47,16 @@ namespace FPSCamera.Cam
 
         protected override bool _ReadyToSwitchToOtherCam
             => _target.RiddenVehicleID is VehicleID && !_target.IsEnteringVehicle;
-        protected override bool _ReadyToSwitchBack => !_ReadyToSwitchToOtherCam;
+        protected override bool _ReadyToSwitchBack {
+            get {
+                if (_ReadyToSwitchToOtherCam) return false;
+                Log.Msg($" -- pedestrian(ID:{_id}) left the vehicle");
+                return true;
+            }
+        }
         protected override VehicleCam _CreateAnotherCam()
         {
-            Log.Msg($"pedestrian(ID:{_id}) entered a vehicle");
+            Log.Msg($" -- pedestrian(ID:{_id}) entered a vehicle");
             return new VehicleCam(_target.RiddenVehicleID, _inputOffsetHandler);
         }
     }

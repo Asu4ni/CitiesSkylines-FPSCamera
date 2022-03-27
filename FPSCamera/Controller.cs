@@ -1,34 +1,33 @@
 namespace FPSCamera
 {
-    using Transform;
-    using Wrapper;
-    using static Utils;
-    using CamController = Game.CamController;
-    using Control = Game.Control;
+    using CSkyL.Transform;
+    using CamController = CSkyL.Game.CamController;
+    using Control = CSkyL.Game.Control;
+    using CUtils = CSkyL.Game.Utils;
+    using Log = CSkyL.Log;
+    using Range = CSkyL.Math.Range;
 
-    public class Controller : Game.Behavior
+    public class Controller : CSkyL.Game.Behavior
     {
         public bool IsActivated => _state == State.Activated;
         public bool IsIdle => _state == State.Idle;
 
         public void StartFreeCam()
         {
-            _SetCam(new Cam.FreeCam(_camGame.Positioning));
-            Log.Msg("starting FreeCam mode");
+            Log.Msg("Starting FreeCam mode");
+            _SetCam(new Cam.FreeCam(_camUnity.Positioning));
         }
-        public void StartFollow(ID idToFollow)
+        public void StartFollow(CSkyL.Game.ID.ObjectID idToFollow)
         {
+            Log.Msg("Starting Follow mode");
             var newCam = Cam.FollowCam.Follow(idToFollow, _FollowCamInputOffsetHandler);
-            if (newCam is Cam.FollowCam cam) {
-                _SetCam(newCam);
-                Log.Msg("starting Follow mode");
-            }
-            else Log.Msg($"fail to start Follow mode (ID: {idToFollow})");
+            if (newCam is Cam.FollowCam cam) _SetCam(newCam);
+            else Log.Msg($"Fail to start Follow mode (ID: {idToFollow})");
         }
         public void StartWalkThruMode()
         {
+            Log.Msg("Starting WalkThru mode");
             _SetCam(new Cam.WalkThruCam(_FollowCamInputOffsetHandler));
-            Log.Msg("starting WalkThru mode");
         }
 
         public void StopFPSCam()
@@ -37,26 +36,15 @@ namespace FPSCamera
             _camMod = null;
 
             _exitingTimer = Config.G.MaxExitingDuration;
-            _camGame.Setting = _originalSetting;
-            if (!Config.G.SetToOriginalPos)
-                _camGame.Positioning = CamController.LocateAt(_camGame.Positioning);
+            _camUnity.AllSetting = _originalSetting;
+            if (!Config.G.SetBackCamera)
+                _camUnity.Positioning = CamController.I.LocateAt(_camUnity.Positioning);
 
-            _camGame.SetFullScreen(false);
+            _camUnity.SetFullScreen(false);
+            _uiHidden = false;
             _uiCamInfoPanel.enabled = false;
 
             _state = State.Exiting;
-        }
-
-        public void ResetUI()
-        {
-            _DestroyUI();
-            _uiMainPanel = gameObject.AddComponent<UI.MainPanel>();
-            _uiMainPanel.SetWalkThruCallBack(StartWalkThruMode);
-            _uiCamInfoPanel = gameObject.AddComponent<UI.CamInfoPanel>();
-            if (Mod.IsInGameMode) {
-                _uiFollowButtons = gameObject.AddComponent<UI.FollowButtons>();
-                _uiFollowButtons.registerFollowCallBack(StartFollow);
-            }
         }
 
         private void _SetCam(Cam.Base newCam)
@@ -64,15 +52,16 @@ namespace FPSCamera
             _camMod = newCam;
             _uiCamInfoPanel.SetAssociatedCam(newCam);
             if (IsIdle) _EnableFPSCam();
+            else _uiMainPanel.OnCamActivate();
         }
 
         private void _EnableFPSCam()
         {
-            _originalSetting = _camGame.Setting;
+            _originalSetting = _camUnity.AllSetting;
             _ResetCamGame();
 
-            CamController.SetDepthOfField(Config.G.EnableDof);
-            CamController.Disable();
+            CamController.I.SetDepthOfField(Config.G.EnableDof);
+            CamController.I.Disable();
 
             _uiMainPanel.OnCamActivate();
 
@@ -86,27 +75,27 @@ namespace FPSCamera
             Control.ShowUI();
 
             Control.ShowCursor();
-            CamController.Restore();
+            CamController.I.Restore();
             _state = State.Idle;
         }
         private void _ResetCamGame()
         {
-            _camGame.ResetTarget();
-            _camGame.FieldOfView = Config.G.CamFieldOfView;
-            _camGame.NearClipPlane = Config.G.CamNearClipPlane;
+            _camUnity.ResetTarget();
+            _camUnity.FieldOfView = Config.G.CamFieldOfView;
+            _camUnity.NearClipPlane = Config.G.CamNearClipPlane;
         }
 
         // TODO: handle Esc
         private Offset _GetInputOffsetAfterHandleInput()
         {
-            if (Control.KeyTriggered(Control.Key.CamToggle)) {
+            if (Control.KeyTriggered(Config.G.KeyCamToggle)) {
                 if (IsActivated) StopFPSCam();
                 else StartFreeCam();
             }
             if (!IsActivated || !_camMod.Validate()) return null;
 
             if (Control.MouseTriggered(Control.MouseButton.Middle) ||
-                Control.KeyTriggered(Control.Key.CamReset)) {
+                Control.KeyTriggered(Config.G.KeyCamReset)) {
                 _camMod.InputReset();
                 _ResetCamGame();
             }
@@ -116,31 +105,31 @@ namespace FPSCamera
 
             var movement = LocalMovement.None;
             { // key movement
-                if (Control.KeyPressed(Control.Key.Forward)) movement.forward += 1f;
-                if (Control.KeyPressed(Control.Key.Backward)) movement.forward -= 1f;
-                if (Control.KeyPressed(Control.Key.Right)) movement.right += 1f;
-                if (Control.KeyPressed(Control.Key.Left)) movement.right -= 1f;
-                if (Control.KeyPressed(Control.Key.Up)) movement.up += 1f;
-                if (Control.KeyPressed(Control.Key.Down)) movement.up -= 1f;
-                movement *= (Control.KeyPressed(Control.Key.Faster) ? Config.G.SpeedUpFactor : 1f)
-                            * Config.G.MovementSpeed * Control.DurationFromLastFrame
-                            / Game.Map.ToKilometer(1f);
+                if (Control.KeyPressed(Config.G.KeyMoveForward)) movement.forward += 1f;
+                if (Control.KeyPressed(Config.G.KeyMoveBackward)) movement.forward -= 1f;
+                if (Control.KeyPressed(Config.G.KeyMoveRight)) movement.right += 1f;
+                if (Control.KeyPressed(Config.G.KeyMoveLeft)) movement.right -= 1f;
+                if (Control.KeyPressed(Config.G.KeyMoveUp)) movement.up += 1f;
+                if (Control.KeyPressed(Config.G.KeyMoveDown)) movement.up -= 1f;
+                movement *= (Control.KeyPressed(Config.G.KeySpeedUp) ? Config.G.SpeedUpFactor : 1f)
+                            * Config.G.MovementSpeed * CUtils.TimeSinceLastFrame
+                            / CSkyL.Game.Map.ToKilometer(1f);
             }
 
-            var cursorVisible = Control.KeyPressed(Control.Key.CursorToggle) ^ (
-                                _camMod is Cam.FreeCam ? Config.G.ShowCursorWhileFreeCam
-                                                    : Config.G.ShowCursorWhileFollow);
+            var cursorVisible = Control.KeyPressed(Config.G.KeyCursorToggle) ^ (
+                                _camMod is Cam.FreeCam ? Config.G.ShowCursor4Free
+                                                    : Config.G.ShowCursor4Follow);
             Control.ShowCursor(cursorVisible);
 
             float yawDegree = 0f, pitchDegree = 0f;
             { // key rotation
-                if (Control.KeyPressed(Control.Key.RotateR)) yawDegree += 1f;
-                if (Control.KeyPressed(Control.Key.RotateL)) yawDegree -= 1f;
-                if (Control.KeyPressed(Control.Key.RotateU)) pitchDegree += 1f;
-                if (Control.KeyPressed(Control.Key.RotateD)) pitchDegree -= 1f;
+                if (Control.KeyPressed(Config.G.KeyRotateRight)) yawDegree += 1f;
+                if (Control.KeyPressed(Config.G.KeyRotateLeft)) yawDegree -= 1f;
+                if (Control.KeyPressed(Config.G.KeyRotateUp)) pitchDegree += 1f;
+                if (Control.KeyPressed(Config.G.KeyRotateDown)) pitchDegree -= 1f;
 
                 if (yawDegree != 0f || pitchDegree != 0f) {
-                    var factor = Config.G.KeyRotateFactor * Control.DurationFromLastFrame;
+                    var factor = Config.G.RotateKeyFactor * CUtils.TimeSinceLastFrame;
                     yawDegree *= factor; pitchDegree *= factor;
                 }
                 else if (!cursorVisible) {
@@ -154,30 +143,35 @@ namespace FPSCamera
             }
             { // scroll zooming
                 var scroll = Control.MouseScroll;
-                var targetFoV = _camGame.TargetFoV;
+                var targetFoV = _camUnity.TargetFoV;
                 if (scroll > 0f && targetFoV > Config.G.CamFieldOfView.Min)
-                    _camGame.FieldOfView = targetFoV / Config.G.FoViewScrollfactor;
+                    _camUnity.FieldOfView = targetFoV / Config.G.FoViewScrollfactor;
                 else if (scroll < 0f && targetFoV < Config.G.CamFieldOfView.Max)
-                    _camGame.FieldOfView = targetFoV * Config.G.FoViewScrollfactor;
+                    _camUnity.FieldOfView = targetFoV * Config.G.FoViewScrollfactor;
             }
             return new Offset(movement, new DeltaAttitude(yawDegree, pitchDegree));
         }
 
-        private void _DestroyUI()
+        private void _SetUpUI()
         {
-            if (_uiMainPanel != null) Destroy(_uiMainPanel);
-            if (_uiCamInfoPanel != null) Destroy(_uiCamInfoPanel);
-            if (_uiFollowButtons != null) Destroy(_uiFollowButtons);
+            _uiMainPanel = gameObject.AddComponent<UI.MainPanel>();
+            _uiMainPanel.SetWalkThruCallBack(StartWalkThruMode);
+            _uiCamInfoPanel = gameObject.AddComponent<UI.CamInfoPanel>();
+            if (CUtils.InGameMode) {
+                _uiFollowButtons = gameObject.AddComponent<UI.FollowButtons>();
+                _uiFollowButtons.registerFollowCallBack(StartFollow);
+            }
         }
 
         protected override void _Init()
         {
             _state = State.Idle;
-            ResetUI();
+            _uiHidden = false;
         }
         protected override void _SetUp()
         {
-            _camGame = new Game.Cam(CamController.GetCamera());
+            _camUnity = new UnityCam();
+            _SetUpUI();
         }
         protected override void _UpdateLate()
         {
@@ -187,9 +181,9 @@ namespace FPSCamera
                 if (IsIdle) return;
 
                 if (_state == State.Exiting) {
-                    _exitingTimer -= Control.DurationFromLastFrame;
-                    if (_camGame.AlmostAtTarget() is bool done && done || _exitingTimer <= 0f) {
-                        if (!done) _camGame.AdvanceToTarget();
+                    _exitingTimer -= CUtils.TimeSinceLastFrame;
+                    if (_camUnity.AlmostAtTarget() is bool done && done || _exitingTimer <= 0f) {
+                        if (!done) _camUnity.AdvanceToTarget();
                         _DisableFPSCam();
                         return;
                     }
@@ -197,28 +191,32 @@ namespace FPSCamera
                 else if (!_camMod.Validate()) { StopFPSCam(); return; }
                 else {
                     _camMod.InputOffset(controlOffset);
-                    (_camMod as Cam.ICamUsingTimer)?.ElapseTime(Control.DurationFromLastFrame);
-                    _camGame.Positioning = _camMod.GetPositioning();
+                    (_camMod as Cam.ICamUsingTimer)?.ElapseTime(CUtils.TimeSinceLastFrame);
+                    _camUnity.Positioning = _camMod.GetPositioning();
                 }
 
                 // TODO: fade out fade in for any instant move
-                var distance = _camGame.Positioning.position
-                                   .DistanceTo(_camGame.TargetPositioning.position);
-                var factor = Config.G.GetAdvanceFactor(Control.DurationFromLastFrame);
+                var distance = _camUnity.Positioning.position
+                                   .DistanceTo(_camUnity.TargetPositioning.position);
+                var factor = Config.G.GetAdvanceRatio(CUtils.TimeSinceLastFrame);
                 if (Config.G.SmoothTransition) {
-                    if (distance > Config.G.GiveUpTransitionDistance ||
-                        _camMod is Cam.FollowCam && distance <= Config.G.InstantMoveMax)
-                        _camGame.AdvanceToTargetSmooth(factor, instantMove: true);
-                    else _camGame.AdvanceToTargetSmooth(factor);
+                    if (distance > Config.G.GiveUpTransDistance)
+                        _camUnity.AdvanceToTargetSmooth(factor,
+                                                        instantMove: true, instantAngle: true);
+                    else if (_camMod is Cam.FollowCam && distance <= Config.G.InstantMoveMax)
+                        _camUnity.AdvanceToTargetSmooth(factor, instantMove: true);
+                    else _camUnity.AdvanceToTargetSmooth(factor);
                 }
                 else {
-                    _camGame.AdvanceToTarget(factor, smoothRRect: true);
+                    _camUnity.AdvanceToTarget(factor, smoothArea: true);
                 }
+
                 if (IsActivated) {
-                    _uiCamInfoPanel.enabled = Config.G.DisplayInfoPanel;
-                    if (Config.G.HideUIwhenActivate ^ _camGame.IsFullScreen) {
-                        Control.ShowUI(!Config.G.HideUIwhenActivate);
-                        _camGame.SetFullScreen(Config.G.HideUIwhenActivate);
+                    _uiCamInfoPanel.enabled = Config.G.ShowInfoPanel;
+                    if (Config.G.HideGameUI ^ _uiHidden) {
+                        _uiHidden = Config.G.HideGameUI;
+                        Control.ShowUI(!_uiHidden);
+                        _camUnity.SetFullScreen(_uiHidden);
                     }
                 }
             }
@@ -229,19 +227,20 @@ namespace FPSCamera
 
         private Offset _FollowCamInputOffsetHandler(Offset inputOffset)
             => new Offset(inputOffset.movement, inputOffset.deltaAttitude.Clamp(
-                    new Range(-Config.G.MaxHoriRotate4Follow, Config.G.MaxHoriRotate4Follow),
-                    new Range(-Config.G.MaxVertRotate4Follow, Config.G.MaxVertRotate4Follow))
+                    new Range(-Config.G.MaxYawDeg4Follow, Config.G.MaxYawDeg4Follow),
+                    new Range(-Config.G.MaxPitchDeg4Follow, Config.G.MaxPitchDeg4Follow))
                );
 
         // Cameras
         private Cam.Base _camMod;
-        private Game.Cam _camGame;
-        private Game.CamSetting _originalSetting;
+        private UnityCam _camUnity;
+        private UnityCam.Setting _originalSetting;
 
         // UI
         private UI.MainPanel _uiMainPanel;
         private UI.CamInfoPanel _uiCamInfoPanel;
         private UI.FollowButtons _uiFollowButtons;
+        private bool _uiHidden;
 
         // state
         private enum State { Idle, Exiting, Activated }

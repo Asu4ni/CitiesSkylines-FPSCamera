@@ -1,139 +1,142 @@
 namespace FPSCamera.UI
 {
-    using ColossalFramework.UI;
-    using UnityEngine;
+    using CSkyL.UI;
+    using System.Collections.Generic;
+    using CStyle = CSkyL.UI.Style;
+    using Vec2D = CSkyL.Math.Vec2D;
 
     // TODO: incorporate UnifiedUI
-    internal class MainPanel : Game.Behavior
+    internal class MainPanel : CSkyL.Game.Behavior
     {
-        public UIPanel GetPanel() => _mainPanel;
-        public UIButton GetWalkThruButton() => _walkThruBtn;
-
         protected override void _Init()
         {
-            _panelBtn = _SetUpPanelButton();
+            CStyle.Current = Style.basic;
+            {
+                CStyle.Current.scale = .8f;
+                float x = Config.G.MainPanelBtnPos.right, y = Config.G.MainPanelBtnPos.up;
+                if (x < 0f || y < 0f) {
+                    var escbutton = Helper.GetElement("Esc");
+                    x = escbutton.x;
+                    y = escbutton.y + escbutton.height * 1.5f;
+                }
+                _panelBtn = Element.Root.Add<SpriteButton>(new Properties
+                {
+                    name = "MainPanelBtn", tooltip = "FPS Camera",
+                    x = x, y = y, size = _mainBtnSize,
+                    sprite = "InfoPanelIconFreecamera"
+                });
+                CStyle.Current = Style.basic;
+            }
 
-            _hintLabel = Helper.RootParent.AddLabel("ToggleHintLabel",
-                                                    $"Press [{Config.G.KeyCamToggle}] to exit");
-            _hintLabel.Hide();
+            _hintLabel = _panelBtn.Add<Label>(new Properties
+            {
+                name = "ToggleHintLabel",
+                text = $"Press [{Config.G.KeyCamToggle}] for Free-Camera",
+            });
+            _hintLabel.position = _HintLabelPosition;
 
-            _mainPanel = Helper.RootParent.AddPanel("MainPanel", new Utils.Size2D(400f, 740f));
-            PanelExpanded = false;
-
+            _mainPanel = Element.Root.Add<SpritePanel>(new LayoutProperties
+            {
+                name = "MainPanel",
+                width = 400f, height = 1000f,
+                autoLayout = true, layoutGap = 10
+            });
+            _panelBtn.SetTriggerAction(() => {
+                _mainPanel.position = Vec2D.Position(
+                    _panelBtn.x + (_panelBtn.x < Helper.ScreenWidth / 2f ?
+                         _panelBtn.width - 10f : -_mainPanel.width + 10f),
+                    _panelBtn.y + (_panelBtn.y < Helper.ScreenHeight / 2f ?
+                        _panelBtn.height - 15f : -_mainPanel.height + 15f)
+                  );
+                _mainPanel.Visible = !_mainPanel.Visible;
+            });
             _panelBtn.MakeDraggable(
-                actionDragStart: () => PanelExpanded = false,
+                actionDragStart: () => _mainPanel.Visible = false,
                 actionDragEnd: () => {
-                    Config.G.MainPanelBtnPos.right.assign(_panelBtn.relativePosition.x);
-                    Config.G.MainPanelBtnPos.up.assign(_panelBtn.relativePosition.y);
+                    Config.G.MainPanelBtnPos.right.Assign(_panelBtn.x);
+                    Config.G.MainPanelBtnPos.up.Assign(_panelBtn.y);
                     Config.G.Save();
                 });
 
-            const float margin = 5f;
-            var y = margin * 3;
-            var panelParent = _mainPanel.AsParent();
+            var props = new SettingProperties
+            {
+                width = _mainPanel.width - Style.basic.padding * 2f,
+                configObj = Config.G
+            };
 
-            UIComponent comp;
-            comp = panelParent.AddCheckbox(Config.G.HideUIwhenActivate, yPos: y);
-            y += comp.height + margin;
-            comp = panelParent.AddCheckbox(Config.G.EnableDof, yPos: y);
-            y += comp.height + margin;
-            comp = panelParent.AddSlider(Config.G.CamFieldOfView, 1f, "F0",
-                                         yPos: y, width: _mainPanel.width);
-            y += comp.height + margin;
-            comp = panelParent.AddSlider(Config.G.MovementSpeed, 1f, "F0",
-                                         yPos: y, width: _mainPanel.width);
-            y += comp.height + margin;
-            comp = panelParent.AddSlider(Config.G.SpeedUpFactor, .25f,
-                                         yPos: y, width: _mainPanel.width);
-            y += comp.height + margin;
-            comp = panelParent.AddCheckbox(Config.G.SetToOriginalPos, yPos: y);
-            y += comp.height + margin;
-            comp = panelParent.AddCheckbox(Config.G.SmoothTransition, yPos: y);
-            y += comp.height + margin;
-            comp = panelParent.AddDropDown(Config.G.GroundClippingOption,
-                                           yPos: y, width: _mainPanel.width);
+            _settings.Add(_mainPanel.Add<ToggleSetting>(props.Swap(Config.G.HideGameUI)));
+            _settings.Add(_mainPanel.Add<ToggleSetting>(props.Swap(Config.G.ShowInfoPanel)));
+            _settings.Add(_mainPanel.Add<ToggleSetting>(props.Swap(Config.G.SetBackCamera)));
 
-            if (Mod.IsInGameMode) {
-                y += comp.height + margin;
+            props.stepSize = 1f; props.valueFormat = "F0";
+            _settings.Add(_mainPanel.Add<SliderSetting>(props.Swap(Config.G.MovementSpeed)));
 
-                comp = panelParent.AddCheckbox(Config.G.StickToFrontVehicle, yPos: y);
-                y += comp.height + margin;
-                comp = panelParent.AddCheckbox(Config.G.DisplayInfoPanel, yPos: y);
-                y += comp.height + margin;
+            _settings.Add(_mainPanel.Add<ToggleSetting>(props.Swap(Config.G.EnableDof)));
+            props.stepSize = 1f; props.valueFormat = "F0";
+            _settings.Add(_mainPanel.Add<SliderSetting>(props.Swap(Config.G.CamFieldOfView)));
 
-                comp = panelParent.AddCheckbox(Config.G.ClickToSwitch4WalkThru, yPos: y);
-                y += comp.height + margin;
-                comp = panelParent.AddSlider(Config.G.Period4WalkThru, 1f, "F0",
-                                             yPos: y, width: _mainPanel.width);
-                y += comp.height + margin;
+            _settings.Add(_mainPanel.Add<ToggleSetting>(props.Swap(Config.G.SmoothTransition)));
 
-                var btnSize = new Utils.Size2D(200f, 40f);
-                _mainPanel.height = y + btnSize.height + margin * (1 + 3);
-                _walkThruBtn = panelParent.AddTextButton("WalkThruButton", "Start Walk-Through",
-                                                btnSize, (a, b) => _walkThruCallBack?.Invoke(),
-                                                (_mainPanel.width - btnSize.width) / 2,
-                                                _mainPanel.height - btnSize.height - margin * 3);
+            var tmpLast = _mainPanel.Add<ChoiceSetting<Config.GroundClipping>>(
+                                props.Swap(Config.G.GroundClippingOption));
+            _settings.Add(tmpLast);
+
+            if (CSkyL.Game.Utils.InGameMode) {
+
+                _settings.Add(_mainPanel.Add<ToggleSetting>(props.Swap(Config.G.StickToFrontVehicle)));
+
+                props.stepSize = 1f; props.valueFormat = "F0";
+                _settings.Add(_mainPanel.Add<SliderSetting>(props.Swap(Config.G.Period4Walk)));
+
+                var last = _mainPanel.Add<ToggleSetting>(props.Swap(Config.G.ManualSwitch4Walk));
+                _settings.Add(last);
+
+                _mainPanel.AutoLayout = false;
+                _mainPanel.height = last.bottom + _walkThruBtnSize.height +
+                                    Style.basic.padding * 2;
+
+                var walkThruBtn = _mainPanel.Add<TextButton>(new Properties
+                {
+                    name = "WalkThruBtn", text = "Start Walk-Through",
+                    x = (_mainPanel.width - _walkThruBtnSize.width) / 2f,
+                    y = _mainPanel.height - Style.basic.padding - _walkThruBtnSize.height,
+                    size = _walkThruBtnSize
+                });
+                walkThruBtn.SetTriggerAction(() => _walkThruCallBack?.Invoke());
             }
-            else _mainPanel.height = y + 20f;
+            else {
+                _mainPanel.AutoLayout = false;
+                _mainPanel.height = tmpLast.bottom + Style.basic.padding;
+            }
+            _mainPanel.Visible = false;
         }
-
 
         public void OnCamDeactivate()
-        { _hintLabel.Hide(); }
+        { _hintLabel.color = CStyle.Color.None; }
         public void OnCamActivate()
         {
-            PanelExpanded = false;
-            _panelBtn.Focus();  // TODO: temp fix for Esc pressing
+            _mainPanel.Visible = false;
 
-            _hintLabel.color = new Color32(255, 255, 255, 255);
-            _hintLabel.AlignTo(_panelBtn, UIAlignAnchor.BottomRight);
-
-            _hintLabel.relativePosition += new Vector3(
-                    _panelBtn.absolutePosition.x > Helper.ScreenSize.width / 2f ?
-                        -_panelBtn.width : _hintLabel.width + 3f,
-                    (_hintLabel.height - _panelBtn.height) / 2f + 3f);
-            _hintLabel.Show();
+            _hintLabel.text = $"Press [{Config.G.KeyCamToggle}] to exit";
+            _hintLabel.color = CStyle.Color.White;
+            _hintLabel.position = _HintLabelPosition;
         }
 
-        public void OnEsc() => PanelExpanded = false;
-        public bool PanelExpanded {
-            get => _mainPanel.isVisible;
-            set { _mainPanel.isVisible = value; }
-        }
+        public void OnEsc() => _mainPanel.Visible = false;
 
         public void SetWalkThruCallBack(System.Action callBackAction)
             => _walkThruCallBack = callBackAction;
 
-        private UIButton _SetUpPanelButton()
-        {
-            float x = Config.G.MainPanelBtnPos.right, y = Config.G.MainPanelBtnPos.up;
-            if (x < 0f || y < 0f) {
-                UIComponent escbutton = Helper.Root.FindUIComponent("Esc");
-                x = escbutton.relativePosition.x;
-                y = escbutton.relativePosition.y + escbutton.height * 1.5f;
-            }
-
-            var btn = Helper.RootParent.AddSpriteButton("MainPanelBtn", new Utils.Size2D(50, 48),
-                          Helper.GetClickHandler((_) => {
-                              var screen = Helper.ScreenSize;
-                              _mainPanel.relativePosition = new Vector3(
-                                  _panelBtn.absolutePosition.x > screen.width / 2f ?
-                                      _panelBtn.relativePosition.x - _mainPanel.width + 10f :
-                                      _panelBtn.relativePosition.x + _panelBtn.width - 10f,
-                                  _panelBtn.absolutePosition.y < screen.height / 2f ?
-                                      _panelBtn.relativePosition.y + _panelBtn.height - 15f :
-                                      _panelBtn.relativePosition.y - _mainPanel.height + 15f
-                                );
-                              PanelExpanded = !PanelExpanded;
-                              return true;
-                          }), "FPS Camera", x, y, .7f);
-
-            btn.tooltipBox = Helper.Root.defaultTooltipBox;
-            return btn;
-        }
+        private Vec2D _HintLabelPosition => Vec2D.Position(
+                _panelBtn.x > Helper.ScreenWidth / 2f ?
+                    -_hintLabel.width - _hintLabelPadding : _panelBtn.width + _hintLabelPadding,
+                (_panelBtn.height - _hintLabel.height) / 2f
+        );
 
         protected override void _UpdateLate()
         {
+            foreach (var setting in _settings) setting.UpdateUI();
+
             // fade out label
             var color = _hintLabel.color;
             if (color.a > 0) {
@@ -142,11 +145,16 @@ namespace FPSCamera.UI
             }
         }
 
-        private UIButton _panelBtn;
-        private UILabel _hintLabel;
-        private UIPanel _mainPanel;
-        private UIButton _walkThruBtn;
+        private SpriteButton _panelBtn;
+        private Label _hintLabel;
+        private Panel _mainPanel;
+
+        private readonly List<ISetting> _settings = new List<ISetting>();
 
         private System.Action _walkThruCallBack;
+
+        private static readonly Vec2D _mainBtnSize = Vec2D.Size(48f, 46f);
+        private static readonly Vec2D _walkThruBtnSize = Vec2D.Size(200f, 40f);
+        private static readonly float _hintLabelPadding = 3f;
     }
 }

@@ -1,31 +1,33 @@
-namespace FPSCamera.Game
+namespace CSkyL.Game
 {
     using System;
     using Transform;
 
-    public static class CamController
+    public class CamController
     {
-        public static void Init()
-        {
-            _controller = UnityEngine.Object.FindObjectOfType<CameraController>();
-            _camDoF = GetComponent<UnityStandardAssets.ImageEffects.DepthOfField>();
-            _camTiltEffect = GetComponent<TiltShiftEffect>();
-
-            if (_camDoF != null) _oDoFEnabled = _camDoF.enabled;
-            if (_camTiltEffect != null) _oTiltEffectEnabled = _camTiltEffect.enabled;
+        public static CamController I {
+            get {
+                if (_instance is null || _instance._controller == null) {
+                    _instance = new CamController();
+                    if (_instance._controller is null) return _instance = null;
+                }
+                return _instance;
+            }
         }
+        private static CamController _instance = null;
 
-        public static CustomController AddCustomController<CustomController>()
-                                        where CustomController : Behavior
-            => _controller.gameObject.AddComponent<CustomController>();
+        public TComp AddComponent<TComp>() where TComp : Behavior
+            => _controller.gameObject.AddComponent<TComp>();
+        public TComp GetComponent<TComp>() where TComp : UnityEngine.MonoBehaviour
+            => _controller.gameObject.GetComponent<TComp>();
 
-        public static UnityEngine.Camera GetCamera()
-            => Utils.ReadFields(_controller).Get<UnityEngine.Camera>("m_camera");
+        public UnityEngine.Camera GetCamera()
+            => Lang.ReadFields(_controller).Get<UnityEngine.Camera>("m_camera");
 
-        public static void SetDepthOfField(bool enabled)
+        public void SetDepthOfField(bool enabled)
         { if (_camDoF != null) _camDoF.enabled = enabled; }
 
-        public static void Restore()
+        public void Restore()
         {
             _controller.enabled = true;
 
@@ -33,42 +35,53 @@ namespace FPSCamera.Game
             if (_camTiltEffect != null) _camTiltEffect.enabled = _oTiltEffectEnabled;
         }
 
-        public static void Disable()
+        public void Disable()
         {
             _controller.enabled = false;
             if (_camTiltEffect != null) _camTiltEffect.enabled = false;
         }
+
         // TODO: improvement: only works close to ground now.
-        public static Positioning LocateAt(Positioning positioning)
+        public Positioning LocateAt(Positioning positioning)
         {
             _controller.ClearTarget();
 
             var position = positioning.position;
             var angle = new Angle(positioning.angle.yawDegree,
-                                  positioning.angle.pitchDegree > -20f ?
-                                      -20f : positioning.angle.pitchDegree);
+                                  positioning.angle.pitchDegree.Clamp(-90f, -20f));
 
 
-            _controller.m_currentAngle = _controller.m_targetAngle = angle.AsGameAngle;
-            _controller.m_currentPosition = _controller.m_targetPosition = position.AsGamePosition;
-            _controller.m_currentSize = _controller.m_targetSize = position.up * 1.4f;
+            _controller.m_currentAngle = _controller.m_targetAngle = angle._AsVec2;
+            _controller.m_currentPosition = _controller.m_targetPosition = position._AsVec;
+            _controller.m_currentSize = _controller.m_targetSize = (float) (
+                (position.up - Map.GetMinHeightAt(position)).Clamp(10f, 1000f)
+                    / Math.Sin(-angle.pitchDegree / 180f * Math.PI));
             _controller.m_currentHeight = _controller.m_targetHeight = position.up;
 
             return _GetUpdatedPositioning();
         }
 
-        private static Comp GetComponent<Comp>() => _controller.GetComponent<Comp>();
+        private CamController()
+        {
+            _controller = ToolsModifierControl.cameraController;
+            if (_controller is null) return;
+            _camDoF = GetComponent<UnityStandardAssets.ImageEffects.DepthOfField>();
+            _camTiltEffect = GetComponent<TiltShiftEffect>();
 
-        private static CameraController _controller;
+            if (_camDoF != null) _oDoFEnabled = _camDoF.enabled;
+            if (_camTiltEffect != null) _oTiltEffectEnabled = _camTiltEffect.enabled;
+        }
 
-        private static UnityStandardAssets.ImageEffects.DepthOfField _camDoF;
-        private static TiltShiftEffect _camTiltEffect;
+        private CameraController _controller;
 
-        private static bool _oDoFEnabled;
-        private static bool _oTiltEffectEnabled;
+        private UnityStandardAssets.ImageEffects.DepthOfField _camDoF;
+        private TiltShiftEffect _camTiltEffect;
+
+        private bool _oDoFEnabled;
+        private bool _oTiltEffectEnabled;
 
         // simulate how CamController would work
-        private static Positioning _GetUpdatedPositioning()
+        private Positioning _GetUpdatedPositioning()
         {
             var targetSize = _controller.m_targetSize
                              .Clamp(_controller.m_minDistance, _controller.m_maxDistance);
@@ -108,7 +121,7 @@ namespace FPSCamera.Game
             pos.y += CameraController.CalculateCameraHeightOffset(pos, dist);
             pos = CameraController.ClampCameraPosition(pos);
 
-            return new Positioning(Position.FromGame(pos), Angle.FromGame(rotation));
+            return new Positioning(Position._FromVec(pos), Angle._FromQuat(rotation));
         }
 
     }

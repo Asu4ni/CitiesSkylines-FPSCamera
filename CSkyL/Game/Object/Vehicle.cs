@@ -1,8 +1,9 @@
-namespace FPSCamera.Wrapper
+namespace CSkyL.Game.Object
 {
+    using CSkyL.Game.ID;
+    using CSkyL.Transform;
     using System.Collections.Generic;
     using System.Linq;
-    using Transform;
 
     public abstract class Vehicle : Object<VehicleID>, IObjectToFollow
     {
@@ -11,7 +12,7 @@ namespace FPSCamera.Wrapper
         public Positioning GetPositioning()
         {
             _vehicle.GetSmoothPosition(_vid.implIndex, out var position, out var rotation);
-            return new Positioning(Position.FromGame(position), Angle.FromGame(rotation));
+            return new Positioning(Position._FromVec(position), Angle._FromQuat(rotation));
         }
         public float GetSpeed() => _vehicle.GetSmoothVelocity(_vid.implIndex).magnitude;
 
@@ -20,7 +21,7 @@ namespace FPSCamera.Wrapper
             var vehicle = _Of(GetHeadVehicleID());
             var status = vehicle._VAI.GetLocalizedStatus(
                                 vehicle._vid.implIndex, ref vehicle._vehicle, out var implID);
-            switch (ID.FromGame(implID)) {
+            switch (ObjectID._FromIID(implID)) {
             case BuildingID bid: status += " " + Building.GetName(bid); break;
             case HumanID hid: status += " " + Of(hid).Name; break;
             }
@@ -29,7 +30,7 @@ namespace FPSCamera.Wrapper
 
         public Utils.Infos GetInfos()
         {
-            Utils.Infos details = new Utils.Infos();
+            var details = new Utils.Infos();
 
             var vehicle = _Of(GetHeadVehicleID());
             switch (vehicle.GetOwnerID()) {
@@ -52,15 +53,16 @@ namespace FPSCamera.Wrapper
 
         public float GetAttachOffsetFront() => _VInfo.m_attachOffsetFront;
         public VehicleID GetFrontVehicleID()
-            => VehicleID.FromGame(IsReversed ? _vehicle.GetLastVehicle(_vid.implIndex) :
+            => VehicleID._FromIndex(IsReversed ? _vehicle.GetLastVehicle(_vid.implIndex) :
                                                _vehicle.GetFirstVehicle(_vid.implIndex));
 
         public static VehicleID GetHeadVehicleIDof(VehicleID id)
-            => VehicleID.FromGame(_GetVehicle(id).GetFirstVehicle(id.implIndex));
+            => VehicleID._FromIndex(_GetVehicle(id).GetFirstVehicle(id.implIndex));
         public VehicleID GetHeadVehicleID()
-            => VehicleID.FromGame(_vehicle.GetFirstVehicle(_vid.implIndex));
-        public ID GetOwnerID() => ID.FromGame(_VAI.GetOwnerID(_vid.implIndex, ref _vehicle));
-        public TransitID GetTransitLineID() => TransitID.FromGame(_vehicle.m_transportLine);
+            => VehicleID._FromIndex(_vehicle.GetFirstVehicle(_vid.implIndex));
+        public ObjectID GetOwnerID()
+            => ObjectID._FromIID(_VAI.GetOwnerID(_vid.implIndex, ref _vehicle));
+        public TransitID GetTransitLineID() => TransitID._FromIndex(_vehicle.m_transportLine);
         // capacity == 0: invalid
         public void GetLoadAndCapacity(out int load, out int capacity)
             => _VAI.GetBufferStatus(_vid.implIndex, ref _vehicle, out _, out load, out capacity);
@@ -68,7 +70,7 @@ namespace FPSCamera.Wrapper
         public static IEnumerable<Vehicle> GetIf(System.Func<Vehicle, bool> filter)
         {
             return Enumerable.Range(1, manager.m_vehicleCount)
-                    .Select(i => Of(VehicleID.FromGame((ushort) i)) as Vehicle)
+                    .Select(i => Of(VehicleID._FromIndex((ushort) i)) as Vehicle)
                     .Where(v => v is Vehicle && filter(v));
         }
 
@@ -118,7 +120,7 @@ namespace FPSCamera.Wrapper
             case FishingBoatAI fishingBoatAi_: return new MissionVehicle(id);
 
             default:
-                Log.Msg($"Vehicle(ID:{id} of type [{ai.GetType().Name}] is not recognized.");
+                CSkyL.Log.Warn($"Vehicle(ID:{id} of type [{ai.GetType().Name}] is not recognized.");
                 return null;
             }
         }

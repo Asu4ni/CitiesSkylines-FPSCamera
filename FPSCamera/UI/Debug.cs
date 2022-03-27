@@ -1,13 +1,14 @@
 #if DEBUG
 namespace FPSCamera.UI
 {
+    using CSkyL.UI;
     using System.Collections.Generic;
     using UnityEngine;
 
-    internal class Debug : Game.UnityGUI
+    internal class Debug : CSkyL.Game.UnityGUI
     {
         public static Debug Panel {
-            get => _panel ?? (_panel = Helper.Root.gameObject.AddComponent<Debug>());
+            get => _panel ?? (_panel = CSkyL.Game.CamController.I.AddComponent<Debug>());
         }
 
         protected override void _Init() => enabled = true;
@@ -24,9 +25,8 @@ namespace FPSCamera.UI
 
         protected override void _UnityGUI()
         {
-            var screen = Helper.ScreenSize;
-            var boxWidth = Mathf.Min(screen.width / 5f, 400f);
-            var boxHeight = Mathf.Min(screen.height / 2f, 1000f);
+            var boxWidth = Mathf.Min(Helper.ScreenWidth / 5f, 400f);
+            var boxHeight = Mathf.Min(Helper.ScreenHeight / 2f, 1000f);
 
             GUI.color = new Color(0f, 0f, 0f, .9f);
             GUI.Box(new Rect(0f, boxHeight / 2f, boxWidth, boxHeight), "");

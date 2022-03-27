@@ -1,68 +1,82 @@
 namespace FPSCamera
 {
     using ICities;
+    using CamController = CSkyL.Game.CamController;
+    using Log = CSkyL.Log;
 
     public class Mod : LoadingExtensionBase, IUserMod
     {
-        public static string name = "First Person Camera v2.0";
-        public string Name => name;
-        public string Description => "View your city from a different perspective";
+        public const string name = "First Person Camera";
+        public const string nameShort = "FPSCamera";
+        public const string version = "v2.0";
 
-        public void OnSettingsUI(UIHelperBase helper)
-        {
-            UI.OptionsMenu.Generate(helper);
-            var comp = (helper as UIHelper)?.self as ColossalFramework.UI.UIComponent;
-            _optionsMenu = comp.gameObject.AddComponent<UI.OptionsMenu>();
-            _optionsMenu.name = "FPS_Options";
-        }
+        public string Name => $"{name} {version}";
+        public string Description => "View your city from a different perspective";
 
         public void OnEnabled()
         {
+            Log.Logger = new CSkyL.FileLog(nameShort);
+            Log.Msg("Mod: enabled - v" +
+                    System.Reflection.Assembly.GetExecutingAssembly().GetName().Version);
+
             LoadConfig();
-            Log.Msg("Mod enabled.");
+
+            if (CamController.I is CamController c) {
+                // enable during game mode usually means an updated dll
+                _controller = c.AddComponent<Controller>();
+                Log.Msg("Controller: updated");
+            }
         }
         public void OnDisabled()
         {
+            if (_controller != null) {
+                _controller.Destroy();
+                Log.Msg("Controller: remove old version");
+            }
             Log.Msg("Mod disabled.");
-            if (_optionsMenu != null) UnityEngine.Object.Destroy(_optionsMenu);
-            UI.OptionsMenu.Destroy();
         }
 
         public override void OnLevelLoaded(LoadMode mode)
         {
-            Log.Msg("Level loaded in: " + mode.ToString());
-            IsInGameMode = mode == LoadMode.LoadGame || mode == LoadMode.NewGame;
+            Log.Msg("Mod: level loaded in: " + mode.ToString());
 
-            Game.CamController.Init();
-            _controller = Game.CamController.AddCustomController<Controller>();
+            if (CamController.I is CamController c) {
+                _controller = c.AddComponent<Controller>();
+                Log.Msg("Controller: installed");
+            }
+            else Log.Err("Mod: fail to get <CameraController>.");
         }
         public override void OnLevelUnloading()
         {
-            Log.Msg("Level unloaded");
-            UnityEngine.Object.Destroy(_controller);
+            if (_controller != null) {
+                _controller.Destroy();
+                Log.Msg("Controller: uninstalled");
+            }
+            Log.Msg("Mod: level unloaded");
         }
 
-        internal static void LoadConfig()
+        public void OnSettingsUI(UIHelperBase helper)
         {
-            Config.G = Config.Load() ?? Config.G;
-            Config.G.Save();
-        }
-        internal static void ResetConfig()
-        {
-            Config.G = new Config();
-            Config.G.Save();
-            ResetUI();
-        }
-        internal static void ResetUI()
-        {
-            UI.OptionsMenu.Rebuild();
-            var fps = UnityEngine.Object.FindObjectOfType<Controller>();
-            if (fps != null) fps.ResetUI();
+            var comp = (helper as UIHelper)?.self as ColossalFramework.UI.UIComponent;
+            var menu = comp.gameObject.AddComponent<UI.OptionsMenu>();
+            menu.name = "FPS_Options";
+            menu.Generate(CSkyL.UI.Helper.GetElement(helper));
+            Log.Msg("Settings UI - OptionsMenu generated");
         }
 
-        internal static bool IsInGameMode { get; private set; }
+        public static void LoadConfig()
+        {
+            if (Config.Load() is Config config) Config.G.Assign(config);
+            Config.G.Save();
+            Log.Msg("Config: loaded");
+        }
+        public static void ResetConfig()
+        {
+            Config.G.Reset();
+            Config.G.Save();
+            Log.Msg("Config: reset");
+        }
 
         private Controller _controller;
-        private UI.OptionsMenu _optionsMenu;
     }
 }

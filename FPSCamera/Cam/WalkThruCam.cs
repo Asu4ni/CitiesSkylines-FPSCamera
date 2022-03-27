@@ -1,12 +1,15 @@
 ﻿namespace FPSCamera.Cam
 {
+    using CSkyL;
+    using CSkyL.Game;
+    using CSkyL.Game.ID;
+    using CSkyL.Game.Object;
+    using CSkyL.Transform;
     using System.Linq;
-    using Transform;
-    using Wrapper;
 
     public class WalkThruCam : FollowCam, ICamUsingTimer
     {
-        public override ID TargetID => _currentCam.TargetID;
+        public override ObjectID TargetID => _currentCam.TargetID;
 
         public void SwitchTarget() => _SetRandomCam();
         public void ElapseTime(float seconds) => _elapsedTime += seconds;
@@ -17,13 +20,13 @@
             if (!IsOperating) return false;
 
             var ok = _currentCam?.Validate() ?? false;
-            if (!Config.G.ClickToSwitch4WalkThru &&
-                _elapsedTime > Config.G.Period4WalkThru) ok = false;
+            if (!Config.G.ManualSwitch4Walk &&
+                _elapsedTime > Config.G.Period4Walk) ok = false;
             if (!ok) {
                 _SetRandomCam();
                 ok = _currentCam?.Validate() ?? false;
             }
-            if (!ok) Log.Warn("no target for Walk-Thru mode");
+            if (!ok) CSkyL.Log.Warn("no target for Walk-Thru mode");
             return ok;
         }
 
@@ -51,7 +54,7 @@
             if (!list.Any()) return;
 
             int attempt = 3;
-            do _currentCam = Follow(list.GetRandomOne().ObjectID, _inputOffsetHandler);
+            do _currentCam = Follow(list.GetRandomOne().ID, _inputOffsetHandler);
             while (!(_currentCam?.Validate() ?? false) && --attempt >= 0);
             _elapsedTime = 0f;
         }

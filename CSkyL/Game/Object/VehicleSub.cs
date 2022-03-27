@@ -1,5 +1,7 @@
-﻿namespace FPSCamera.Wrapper
+﻿namespace CSkyL.Game.Object
 {
+    using CSkyL.Game.ID;
+
     public class CargoVehicle : Vehicle
     {
         public CargoVehicle(VehicleID id) : base(id) { }

@@ -1,8 +1,12 @@
 namespace FPSCamera.UI
 {
+    using CSkyL;
+    using CSkyL.Game;
     using UnityEngine;
+    using Cam = Cam;
+    using Obj = CSkyL.Game.Object.Object;
 
-    public class CamInfoPanel : Game.UnityGUI
+    public class CamInfoPanel : UnityGUI
     {
         public void SetAssociatedCam(Cam.Base cam)
         {
@@ -21,13 +25,18 @@ namespace FPSCamera.UI
             _elapsedTime = 0f;
             _lastBufferStrUpdateTime = -1f;
             _left = ""; _mid = ""; _right = ""; _footer = "";
+
+            _texture = new Texture2D(1, 1, TextureFormat.RGBA32, false);
+            _texture.SetPixel(0, 0, new Color32(50, 40, 100, 180));
+            _texture.Apply();
+
             enabled = false;
         }
 
         protected override void _UpdateLate()
         {
             if (_camWRef?.Target is Cam.Base cam && cam.Validate()) {
-                _elapsedTime += Game.Control.DurationFromLastFrame;
+                _elapsedTime += CSkyL.Game.Utils.TimeSinceLastFrame;
                 if (_elapsedTime - _lastBufferStrUpdateTime > bufferUpdateInterval) {
                     _left = _GetStatus(cam);
                     _mid = _GetSpeed(cam.GetSpeed());
@@ -58,7 +67,7 @@ namespace FPSCamera.UI
         {
             string str = "";
             if (cam is Cam.FollowCam followCam) {
-                str += $"[Name] {Wrapper.Object.Of(followCam.TargetID).Name}\n";
+                str += $"[Name] {Obj.Of(followCam.TargetID).Name}\n";
                 str += $"[Status] {followCam.GetTargetStatus()}\n";
             }
             cam.GetGeoInfos()?.ForEach(pair => str += $"[{pair.field}] {pair.text}\n");
@@ -67,20 +76,20 @@ namespace FPSCamera.UI
 
         private static string _GetSpeed(float speed)
             => string.Format("{0,5:F1} {1}ph",
-                Config.G.UseMetricUnit ? Game.Map.ToKilometer(speed) : Game.Map.ToMile(speed),
+                Config.G.UseMetricUnit ? Map.ToKilometer(speed) : Map.ToMile(speed),
                 Config.G.UseMetricUnit ? "k" : "m");
 
         protected override void _UnityGUI()
         {
             var width = (float) Screen.width;
             var height = (Screen.height * .15f).Clamp(100f, 800f)
-                                * Config.G.FollowPanelHeightScale;
-
-            GUI.color = new Color(.11f, .1f, .3f, .9f);
-            GUI.Box(new Rect(0f, -10f, width, height + 10f), "");
-            GUI.color = new Color(.92f, .91f, 1f, 1f);
-
+                                * Config.G.InfoPanelHeightScale;
             var style = new GUIStyle();
+
+            style.normal.background = _texture;
+            GUI.Box(new Rect(0f, -10f, width, height + 10f), "", style);
+            style.normal.background = null;
+
             style.fontSize = (int) (height * fontHeightRatio);
             style.normal.textColor = new Color(.9f, .9f, 1f);
             style.wordWrap = true;
@@ -115,5 +124,6 @@ namespace FPSCamera.UI
         private float _elapsedTime, _lastBufferStrUpdateTime;
 
         private string _left, _mid, _right, _footer;
+        private Texture2D _texture;
     }
 }

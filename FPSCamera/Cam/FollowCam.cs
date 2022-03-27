@@ -1,11 +1,13 @@
 namespace FPSCamera.Cam
 {
-    using FPSCamera.Transform;
-    using Wrapper;
+    using CSkyL.Game;
+    using CSkyL.Game.ID;
+    using CSkyL.Game.Object;
+    using CSkyL.Transform;
 
     public abstract class FollowCam : Base
     {
-        public static FollowCam Follow(ID targetID, System.Func<Offset, Offset> handler)
+        public static FollowCam Follow(ObjectID targetID, System.Func<Offset, Offset> handler)
         {
             switch (Object.Of(targetID)) {
             case Pedestrian ped: return new PedestrianCam(ped.pedestrianID, handler);
@@ -16,7 +18,7 @@ namespace FPSCamera.Cam
             default: return null;
             }
         }
-        public abstract ID TargetID { get; }
+        public abstract ObjectID TargetID { get; }
 
         public abstract string GetTargetStatus();
         public abstract Utils.Infos GetTargetInfos();
@@ -31,7 +33,7 @@ namespace FPSCamera.Cam
     }
 
     public abstract class FollowCam<IDType, TargetType> : FollowCam
-           where IDType : ID where TargetType : class, IObjectToFollow
+           where IDType : ObjectID where TargetType : class, IObjectToFollow
     {
         protected FollowCam(IDType id, System.Func<Offset, Offset> handler) : base(handler)
         {
@@ -53,7 +55,7 @@ namespace FPSCamera.Cam
             return true;
         }
 
-        public override ID TargetID => _id;
+        public override ObjectID TargetID => _id;
         public TargetType Target => _target;
 
         public override float GetSpeed() => _target.GetSpeed();
@@ -88,7 +90,7 @@ namespace FPSCamera.Cam
     }
 
     public abstract class FollowCamWithCam<IDType, TargetType, AnotherCam>
-            : FollowCam<IDType, TargetType> where IDType : ID
+            : FollowCam<IDType, TargetType> where IDType : ObjectID
                                           where TargetType : class, IObjectToFollow
             where AnotherCam : Base
     {

@@ -1,9 +1,11 @@
-namespace FPSCamera.Wrapper
+namespace CSkyL.Game.Object
 {
+    using CSkyL.Game.ID;
+
     public interface IObject
     {
         string Name { get; }
-        ID ObjectID { get; }
+        ObjectID ID { get; }
     }
     public interface IObjectToFollow : IObject
     {
@@ -16,8 +18,9 @@ namespace FPSCamera.Wrapper
     public abstract class Object : IObject
     {
         public abstract string Name { get; }
+        public abstract ObjectID ID { get; }
 
-        public static Object Of(ID id)
+        public static Object Of(ObjectID id)
         {
             if (!(id?.IsValid ?? false)) return null;
             switch (id) {
@@ -28,12 +31,11 @@ namespace FPSCamera.Wrapper
             default: return null;
             }
         }
-        public abstract ID ObjectID { get; }
     }
 
-    public abstract class Object<IDType> : Object where IDType : ID
+    public abstract class Object<IDType> : Object where IDType : ObjectID
     {
-        public override ID ObjectID => id;
+        public override ObjectID ID => id;
         public override string Name {
             get {
                 var name = InstanceManager.instance.GetName(id.implID);
@@ -51,8 +53,7 @@ namespace FPSCamera.Wrapper
         public static string GetName(BuildingID id)
             => BuildingManager.instance.GetBuildingName(id.implIndex, id.implID);
 
-        internal static Building _Of(BuildingID id)
-            => new Building(id);
+        internal static Building _Of(BuildingID id) => new Building(id);
         private Building(BuildingID id) : base(id) { }
     }
     public class TransitLine : Object<TransitID>
@@ -61,15 +62,17 @@ namespace FPSCamera.Wrapper
         public static string GetName(TransitID id)
             => TransportManager.instance.GetLineName(id.implIndex);
 
+        internal static TransitLine _Of(TransitID id) => new TransitLine(id);
         private TransitLine(TransitID id) : base(id) { }
     }
     public class Node : Object<NodeID>
     {
         public TransitID TransitLineID => GetTransitLineID(id);
         public static TransitID GetTransitLineID(NodeID id)
-            => TransitID.FromGame(NetManager.instance.m_nodes
+            => TransitID._FromIndex(NetManager.instance.m_nodes
                             .m_buffer[id.implIndex].m_transportLine);
 
+        internal static Node _Of(NodeID id) => new Node(id);
         private Node(NodeID id) : base(id) { }
     }
 }

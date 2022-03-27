@@ -1,7 +1,9 @@
 namespace FPSCamera.Cam
 {
-    using Transform;
-    using Wrapper;
+    using CSkyL.Game.ID;
+    using CSkyL.Game.Object;
+    using CSkyL.Transform;
+    using Log = CSkyL.Log;
 
     public class VehicleCam : FollowCam<VehicleID, Vehicle>
     {
@@ -17,7 +19,7 @@ namespace FPSCamera.Cam
                 Log.Warn($"vehicle(ID:{_id}) to follow does not exist");
                 return;
             }
-            Log.Msg($"following vehicle(ID:{_id})");
+            Log.Msg($" -- following vehicle(ID:{_id})");
             _wasReversed = _target.IsReversed;
         }
 
@@ -26,7 +28,7 @@ namespace FPSCamera.Cam
             if (!base.Validate()) return false;
 
             if (_target.IsReversed != _wasReversed) {
-                Log.Msg($"vehicle(ID:{_id}) changes direction");
+                Log.Msg($" -- vehicle(ID:{_id}) changes direction");
                 _wasReversed = !_wasReversed;
                 if (Config.G.StickToFrontVehicle &&
                     !_SwitchTarget(_target.GetFrontVehicleID())) return false;
