@@ -3,4 +3,4 @@
 	url = https://github.com/Asu4ni/CitiesSkylines-FPSCamera.wiki.git
 [submodule "CSkyL"]
 	path = CSkyL
-	url = ./CSkyL/
+	url = https://github.com/Asu4ni/CSkyL.git
