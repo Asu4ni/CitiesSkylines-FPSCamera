@@ -26,10 +26,9 @@ namespace FPSCamera.Cam
             return status;
         }
 
-        protected override Offset _LocalOffset
-            => new Offset(Config.G.PedestrianCamOffset.AsLocalMovement +
-                              new LocalMovement { up = Config.G.PedestrianFOffsetUp },
-                          DeltaAttitude.None);
+        protected override Offset _LocalOffset => new Offset(
+            Config.G.PedestrianCamOffset.AsMovement + Config.G.PedestrianFixedOffset.AsMovement,
+            DeltaAttitude.None);
 
         public override Utils.Infos GetTargetInfos()
         {

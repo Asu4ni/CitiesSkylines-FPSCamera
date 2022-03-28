@@ -69,6 +69,7 @@ namespace FPSCamera.Cam
 
         public override void InputOffset(Offset inputOffset)
         {
+            inputOffset.movement *= movementFactor;
             inputOffset.movement.up *= heightMovementFactor;
             _inputOffset = _inputOffset.FollowedBy(inputOffset);
             if (_inputOffsetHandler is object)
@@ -82,7 +83,8 @@ namespace FPSCamera.Cam
             return Validate();
         }
 
-        protected const float heightMovementFactor = .4f;
+        protected const float movementFactor = .3f;
+        protected const float heightMovementFactor = .2f;
 
         protected IDType _id;
         protected TargetType _target;

@@ -1,7 +1,7 @@
 namespace FPSCamera.UI
 {
-    using CSkyL.UI;
     using Configuration;
+    using CSkyL.UI;
     using System.Collections.Generic;
     using CStyle = CSkyL.UI.Style;
 
@@ -131,6 +131,7 @@ namespace FPSCamera.UI
                 _settings.Add(panel.Add<KeyMapSetting>(props.Swap(Config.G.KeySpeedUp)));
                 _settings.Add(panel.Add<KeyMapSetting>(props.Swap(Config.G.KeyCamReset)));
                 _settings.Add(panel.Add<KeyMapSetting>(props.Swap(Config.G.KeyCursorToggle)));
+                _settings.Add(panel.Add<KeyMapSetting>(props.Swap(Config.G.KeyAutoMove)));
 
                 _settings.Add(panel.Add<KeyMapSetting>(props.Swap(Config.G.KeyMoveForward)));
                 _settings.Add(panel.Add<KeyMapSetting>(props.Swap(Config.G.KeyMoveBackward)));

@@ -37,15 +37,10 @@ namespace FPSCamera.Cam
             return true;
         }
 
-        protected override Offset _LocalOffset
-            => new Offset(new LocalMovement
-            {
-                forward = Config.G.VehicleCamOffset.forward +
-                          Config.G.VehicleFOffsetForward + _target.GetAttachOffsetFront(),
-                up = Config.G.VehicleCamOffset.up + Config.G.VehicleFOffsetUp +
-                            (_target.IsMiddle ? Config.G.MiddleVehicleFOffsetUp : 0f),
-                right = Config.G.VehicleCamOffset.right
-            }, DeltaAttitude.None);
+        protected override Offset _LocalOffset => new Offset(
+            Config.G.VehicleCamOffset.AsMovement + Config.G.VehicleFixedOffset.AsMovement
+                + (_target.IsMiddle ? Config.G.MidVehFixedOffset.AsMovement : LocalMovement.None),
+            DeltaAttitude.None);
 
         private bool _wasReversed;
     }

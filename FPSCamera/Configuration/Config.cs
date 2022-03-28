@@ -108,6 +108,9 @@ namespace FPSCamera.Configuration
         public readonly CfKey KeyCamReset = new CfKey(KeyCode.Backspace);
         [Config("KeyCursorToggle", "Cursor visibility toggle")]
         public readonly CfKey KeyCursorToggle = new CfKey(KeyCode.LeftControl);
+        [Config("KeyAutoMove", "Auto moving toggle in Free-Camera mode",
+                "Camera moves forward automatically when it's toggled on.")]
+        public readonly CfKey KeyAutoMove = new CfKey(KeyCode.E);
 
         [Config("KeyMoveForward", "Move/Offset forward")]
         public readonly CfKey KeyMoveForward = new CfKey(KeyCode.W);
@@ -172,21 +175,22 @@ namespace FPSCamera.Configuration
         public readonly CfOffset MainPanelBtnPos
                 = new CfOffset(new CfFloat(0f, 0f, 0f), new CfFloat(-1f), new CfFloat(-1f));
         //                        always 0 (forward)  |    y-axis (up)  |    x-axis (right)
-        // value == -1 : unset
+        // value == -1 : unset 
 
         [Config("CamNearClipPlane", "Camera Near clip plane")]
         public readonly CfFloat CamNearClipPlane = new CfFloat(1f, min: .125f, max: 64f);
         [Config("FoViewScrollfactor", "Field of View scaling factor by scrolling")]
         public readonly CfFloat FoViewScrollfactor = new CfFloat(1.05f, 1.01f, 2f);
 
-        [Config("VehicleFOffsetUp", "Cam fixed offset.up for vehicle")]
-        public readonly CfFloat VehicleFOffsetUp = new CfFloat(2f);
-        [Config("VehicleFOffsetForward", "Cam fixed offset.forward for vehicle")]
-        public readonly CfFloat VehicleFOffsetForward = new CfFloat(3f);
-        [Config("MiddleVehicleFOffsetUp", "Cam fixed offset.up for vehicle in the middle")]
-        public readonly CfFloat MiddleVehicleFOffsetUp = new CfFloat(3f);
-        [Config("PedestrianFOffsetUp", "Cam fixed offset.up for pedestrians")]
-        public readonly CfFloat PedestrianFOffsetUp = new CfFloat(2f);
+        [Config("VehicleFixedOffset", "Cam fixed offset for vehicle")]
+        public readonly CfOffset VehicleFixedOffset = new CfOffset(
+            new CfFloat(3f), new CfFloat(2f), new CfFloat(0f));
+        [Config("MidVehFixedOffset", "Cam fixed offset for vehicle in the middle")]
+        public readonly CfOffset MidVehFixedOffset = new CfOffset(
+            new CfFloat(-2f), new CfFloat(3f), new CfFloat(0f));
+        [Config("PedestrianFixedOffset", "Cam fixed offset for pedestrian")]
+        public readonly CfOffset PedestrianFixedOffset = new CfOffset(
+            new CfFloat(0f), new CfFloat(2f), new CfFloat(0f));
 
         [Config("MaxExitingDuration", "Max duration for exiting fps cam")]
         public readonly CfFloat MaxExitingDuration = new CfFloat(5f, 0f);
