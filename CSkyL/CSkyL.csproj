@@ -59,14 +59,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Game\Object\Human.cs" />
-    <Compile Include="Game\Object\Object.cs" />
-    <Compile Include="Game\Object\Vehicle.cs" />
-    <Compile Include="Game\Object\VehicleSub.cs" />
-    <Compile Include="Patcher.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="Log.cs" />
     <Compile Include="Transform.cs" />
+    <Compile Include="Patcher.cs" />
     <Compile Include="Game\Utils.cs" />
     <Compile Include="Game\Behavior.cs" />
     <Compile Include="Game\Cam.cs" />
@@ -74,10 +70,16 @@
     <Compile Include="Game\Control.cs" />
     <Compile Include="Game\Map.cs" />
     <Compile Include="Game\ObjectID.cs" />
+    <Compile Include="Game\Object\Human.cs" />
+    <Compile Include="Game\Object\Object.cs" />
+    <Compile Include="Game\Object\Vehicle.cs" />
+    <Compile Include="Game\Object\VehicleSub.cs" />
     <Compile Include="UI\Helper.cs" />
     <Compile Include="UI\Element.cs" />
     <Compile Include="UI\InfoPanel.cs" />
     <Compile Include="UI\Style.cs" />
+    <Compile Include="Config\Base.cs" />
+    <Compile Include="Config\Utils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

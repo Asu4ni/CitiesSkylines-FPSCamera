@@ -1,26 +1,20 @@
-namespace FPSCamera
+namespace FPSCamera.Configuration
 {
+    using CSkyL.Config;
     using System;
-    using System.ComponentModel;
-    using System.IO;
-    using System.Reflection;
-    using System.Xml;
-    using System.Xml.Serialization;
     using UnityEngine;
-    using CfFlag = ConfigData<bool>;
-    using CfKey = ConfigData<UnityEngine.KeyCode>;
+    using CfFlag = CSkyL.Config.ConfigData<bool>;
+    using CfKey = CSkyL.Config.ConfigData<UnityEngine.KeyCode>;
     using Lang = CSkyL.Lang;
-    using Log = CSkyL.Log;
 
-    public class Config : IXmlSerializable
+    public class Config : Base
     {
-        private const string defaultConfigPath = "FPSCameraConfig.xml";
+        private const string defaultPath = "FPSCameraConfig.xml";
         public static readonly Config G = new Config();  // G: Global config
 
-        public Config() : this(defaultConfigPath) { }
-        public Config(string filePath)
+        public Config() : this(defaultPath) { }
+        public Config(string filePath) : base(filePath)
         {
-            _filePath = filePath;
             Lang.LoadFieldNameAttribute(this,
                 (Lang.IFieldWithName field, ConfigAttribute attr) => {
                     if (field is IConfigData config)
@@ -28,15 +22,7 @@ namespace FPSCamera
                 });
         }
 
-        public void Assign(Config other)
-        {
-            foreach (var field in GetType().GetFields(
-                                       BindingFlags.Public | BindingFlags.Instance)) {
-                if (field.GetValue(this) is IConfigData cur &&
-                    field.GetValue(other) is IConfigData oth) cur.Assign(oth);
-            }
-        }
-        public void Reset() => Assign(new Config());
+        public static Config Load(string path = defaultPath) => Load<Config>(path);
 
         /*----------- general config ----------------------------------------*/
 
@@ -212,158 +198,5 @@ namespace FPSCamera
         //  *retain ratio: RetainRatioPUnit ^ units          *advance ratio: 1f - RetainRatio
         public float GetAdvanceRatio(float elapsedTime)
             => 1f - (float) Math.Pow(1f - TransRate, elapsedTime / .1f);
-
-
-
-        /*--------- serialization -------------------------------------------*/
-
-        public void Save(object dummyAssignExpr = null) { Save(this, _filePath); }
-        public static void Save(Config config, string configPath = defaultConfigPath)
-        {
-            var serializer = new XmlSerializer(typeof(Config));
-            using (var writer = new StreamWriter(configPath)) {
-                serializer.Serialize(writer, config);
-            }
-        }
-
-        public static Config Load(string configPath = defaultConfigPath)
-        {
-            var serializer = new XmlSerializer(typeof(Config));
-            try {
-                using (var reader = new StreamReader(configPath)) {
-                    return (Config) serializer.Deserialize(reader);
-                }
-            }
-            catch (FileNotFoundException e) {
-                Log.Msg($"Config file ({e.FileName}) not existed");
-            }
-            catch (Exception e) {
-                Log.Err($"exception while reading configuration: {e}");
-            }
-            return null;
-        }
-
-        public System.Xml.Schema.XmlSchema GetSchema() => null;
-        public void ReadXml(XmlReader reader)
-        {
-            reader.ReadStartElement();
-            while (reader.IsStartElement()) {
-                var fieldName = reader.Name;
-                reader.ReadStartElement();
-                if (GetType().GetField(fieldName) is FieldInfo field) {
-                    if (field.GetValue(this) is IConfigData config) {
-                        var str = reader.ReadContentAsString();
-                        if (!config.AssignByParsing(str))
-                            Log.Warn($"Config: invalid value({str}) for field[{fieldName}]");
-                    }
-                    else Log.Err($"Config: invalid type of config field[{fieldName}]");
-                }
-                else {
-                    Log.Warn($"Config: unknown config field name [{fieldName}]");
-                    reader.Skip();
-                }
-                reader.ReadEndElement();
-            }
-            reader.ReadEndElement();
-        }
-        public void WriteXml(XmlWriter writer)
-        {
-            foreach (var field in GetType().GetFields(
-                                        BindingFlags.Public | BindingFlags.Instance)) {
-                writer.WriteStartElement(field.Name);
-                if (field.GetValue(this) is IConfigData config)
-                    writer.WriteString(config.ToString());
-                else Log.Err($"Config: invalid type of config field[{field.Name}]");
-                writer.WriteEndElement();
-            }
-        }
-
-        private readonly string _filePath;
-    }
-
-    [AttributeUsage(AttributeTargets.Field)]
-    public class ConfigAttribute : CSkyL.Lang.FieldNameAttribute
-    {
-        public readonly string description;
-        public readonly string detail;
-        public ConfigAttribute(string name, string description, string detail = "") : base(name)
-        { this.description = description; this.detail = detail; }
-    }
-    public interface IConfigData : CSkyL.Lang.IFieldWithName
-    {
-        bool AssignByParsing(string str);
-        void Assign(object objOfSameType);
-        void _set(string name, string description, string detail);
-        string Description { get; }
-        string Detail { get; }
-    }
-    public class ConfigData<T> : IConfigData
-    {
-        public static implicit operator T(ConfigData<T> data) => data._data;
-        public ConfigData(T a) { this._data = a; }
-
-        public virtual void Assign(object other) { if (other is ConfigData<T> o) Assign(o); }
-        public virtual T Assign(T value) { return this._data = value; }
-        public override string ToString() => _data.ToString();
-        public virtual bool AssignByParsing(string str)
-        {
-            try { Assign((T) TypeDescriptor.GetConverter(_data).ConvertFromString(str)); }
-            catch {
-                Log.Err($"Config loading: cannot convert {str} to type[{typeof(T).Name}]");
-                return false;
-            }
-            return true;
-        }
-
-        public string Name { get; private set; }
-        public string Description { get; private set; }
-        public string Detail { get; private set; }
-        public void _set(string name) => _set(name, "", "");
-        public void _set(string name, string description, string detail)
-        { Name = name; Description = description; Detail = detail; }
-
-        protected T _data;
-    }
-
-    public class CfFloat : ConfigData<float>
-    {
-        public sealed override float Assign(float num) =>
-            _data = num < Min ? Min : num > Max ? Max : num;
-
-        public float Max { get; }
-        public float Min { get; }
-
-        public CfFloat(float num, float min = float.MinValue, float max = float.MaxValue) : base(num)
-        { Min = min; Max = max; Assign(num); }
-    }
-
-    public class OffsetConfig
-    {
-        public OffsetConfig(CfFloat forward, CfFloat up, CfFloat right)
-        { this.forward = forward; this.up = up; this.right = right; }
-        public override string ToString() => $"{forward} {up} {right}";
-        public readonly CfFloat forward, up, right;
-    }
-    public class CfOffset : ConfigData<OffsetConfig>
-    {
-        public CfOffset(CfFloat forward, CfFloat up, CfFloat right)
-            : base(new OffsetConfig(forward, up, right)) { }
-
-        public CfFloat forward => _data.forward;
-        public CfFloat up => _data.up;
-        public CfFloat right => _data.right;
-
-        public override bool AssignByParsing(string str)
-        {
-            var strs = str.Split(' ');
-            if (strs.Length != 3) return false;
-            try {
-                _data.forward.Assign(float.Parse(strs[0]));
-                _data.up.Assign(float.Parse(strs[1]));
-                _data.right.Assign(float.Parse(strs[2]));
-            }
-            catch { return false; }
-            return true;
-        }
     }
 }

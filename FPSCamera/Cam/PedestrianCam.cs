@@ -1,5 +1,6 @@
 namespace FPSCamera.Cam
 {
+    using Configuration;
     using CSkyL.Game;
     using CSkyL.Game.ID;
     using CSkyL.Game.Object;
@@ -26,12 +27,9 @@ namespace FPSCamera.Cam
         }
 
         protected override Offset _LocalOffset
-            => new Offset(new LocalMovement
-            {
-                forward = Config.G.PedestrianCamOffset.forward,
-                up = Config.G.PedestrianCamOffset.up + Config.G.PedestrianFOffsetUp,
-                right = Config.G.PedestrianCamOffset.right
-            }, DeltaAttitude.None);
+            => new Offset(Config.G.PedestrianCamOffset.AsLocalMovement +
+                              new LocalMovement { up = Config.G.PedestrianFOffsetUp },
+                          DeltaAttitude.None);
 
         public override Utils.Infos GetTargetInfos()
         {

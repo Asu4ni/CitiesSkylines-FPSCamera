@@ -2,6 +2,7 @@
 {
     using CSkyL;
     using CSkyL.Transform;
+    using Configuration;
     using Range = CSkyL.Math.Range;
 
     public class UnityCam : CSkyL.Game.Cam

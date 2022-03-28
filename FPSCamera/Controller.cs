@@ -1,5 +1,6 @@
 namespace FPSCamera
 {
+    using Configuration;
     using CSkyL.Transform;
     using CamController = CSkyL.Game.CamController;
     using Control = CSkyL.Game.Control;

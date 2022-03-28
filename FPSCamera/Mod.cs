@@ -1,5 +1,6 @@
 namespace FPSCamera
 {
+    using Configuration;
     using ICities;
     using System.Reflection;
     using CamController = CSkyL.Game.CamController;
@@ -71,12 +72,21 @@ namespace FPSCamera
         {
             if (Config.Load() is Config config) Config.G.Assign(config);
             Config.G.Save();
+
+            if (CamOffset.Load() is CamOffset offset) CamOffset.G.Assign(offset);
+            CamOffset.G.Save();
+
             Log.Msg("Config: loaded");
         }
         public static void ResetConfig()
         {
             Config.G.Reset();
             Config.G.Save();
+
+            // TODO: separate
+            CamOffset.G.Reset();
+            CamOffset.G.Save();
+
             Log.Msg("Config: reset");
         }
 

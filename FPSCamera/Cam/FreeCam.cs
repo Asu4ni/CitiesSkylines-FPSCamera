@@ -1,6 +1,7 @@
 ﻿namespace FPSCamera.Cam
 {
     using CSkyL.Transform;
+    using Configuration;
 
     public class FreeCam : Base
     {

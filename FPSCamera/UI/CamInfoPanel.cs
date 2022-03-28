@@ -1,5 +1,6 @@
 namespace FPSCamera.UI
 {
+    using Configuration;
     using CSkyL;
     using CSkyL.Game;
     using UnityEngine;

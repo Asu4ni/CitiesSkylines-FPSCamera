@@ -1,5 +1,7 @@
 ﻿namespace FPSCamera.UI
 {
+    using Configuration;
+    using CSkyL.Config;
     using CSkyL.UI;
     using CStyle = CSkyL.UI.Style;
 

@@ -1,5 +1,6 @@
 namespace FPSCamera.Cam
 {
+    using Configuration;
     using CSkyL.Game.ID;
     using CSkyL.Game.Object;
     using CSkyL.Transform;

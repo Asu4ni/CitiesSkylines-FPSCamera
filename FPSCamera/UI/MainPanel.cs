@@ -1,6 +1,7 @@
 namespace FPSCamera.UI
 {
     using CSkyL.UI;
+    using Configuration;
     using System.Collections.Generic;
     using CStyle = CSkyL.UI.Style;
     using Vec2D = CSkyL.Math.Vec2D;
