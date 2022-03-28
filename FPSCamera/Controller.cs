@@ -114,9 +114,10 @@ namespace FPSCamera
 
             if (Control.MouseTriggered(Control.MouseButton.Secondary))
                 (_camMod as Cam.WalkThruCam)?.SwitchTarget();
-
             if (Control.KeyTriggered(Config.G.KeyAutoMove))
                 (_camMod as Cam.FreeCam)?.ToggleAutoMove();
+            if (Control.KeyTriggered(Config.G.KeySaveOffset))
+                (_camMod as Cam.FollowCam)?.SaveOffset();
 
             var movement = LocalMovement.None;
             { // key movement

@@ -32,16 +32,13 @@
         }
 
         public override Positioning GetPositioning() => _currentCam.GetPositioning();
-
         public override float GetSpeed() => _currentCam.GetSpeed();
-
         public override void InputOffset(Offset inputOffset)
             => _currentCam.InputOffset(inputOffset);
         public override void InputReset() => _currentCam.InputReset();
-
         public override string GetTargetStatus() => _currentCam.GetTargetStatus();
-
         public override Utils.Infos GetTargetInfos() => _currentCam.GetTargetInfos();
+        public override void SaveOffset() => _currentCam.SaveOffset();
 
         public WalkThruCam(System.Func<Offset, Offset> handler) : base(handler) { }
 

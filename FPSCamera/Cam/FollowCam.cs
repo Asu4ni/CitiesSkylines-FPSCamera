@@ -1,5 +1,6 @@
 namespace FPSCamera.Cam
 {
+    using Configuration;
     using CSkyL.Game;
     using CSkyL.Game.ID;
     using CSkyL.Game.Object;
@@ -23,6 +24,8 @@ namespace FPSCamera.Cam
         public abstract string GetTargetStatus();
         public abstract Utils.Infos GetTargetInfos();
 
+        public abstract void SaveOffset();
+
         public void SetInputOffsetHandler(System.Func<Offset, Offset> handler)
             => _inputOffsetHandler = handler;
 
@@ -39,7 +42,7 @@ namespace FPSCamera.Cam
         {
             _id = id;
             if (!Validate()) return;
-            _inputOffset = Offset.None;
+            InputReset();
         }
 
         public override bool Validate()
@@ -63,7 +66,15 @@ namespace FPSCamera.Cam
         public override Utils.Infos GetTargetInfos() => _target.GetInfos();
 
         public override Positioning GetPositioning()
-            => _target.GetPositioning().Apply(_LocalOffset).Apply(_inputOffset);
+            => _target.GetPositioning().Apply(_LocalOffset)
+                                       .Apply(Config.G.FollowCamOffset.AsOffSet)
+                                       .Apply(_inputOffset);
+
+        public override void SaveOffset()
+        {
+            CamOffset.G[_SavedOffsetKey] = _inputOffset;
+            CamOffset.G.Save();
+        }
 
         protected virtual Offset _LocalOffset => Offset.None;
 
@@ -75,7 +86,8 @@ namespace FPSCamera.Cam
             if (_inputOffsetHandler is object)
                 _inputOffset = _inputOffsetHandler(_inputOffset);
         }
-        public override void InputReset() => _inputOffset = Offset.None;
+        public override void InputReset()
+            => _inputOffset = CamOffset.G[_SavedOffsetKey];
 
         protected virtual bool _SwitchTarget(IDType newID)
         {
@@ -83,7 +95,9 @@ namespace FPSCamera.Cam
             return Validate();
         }
 
-        protected const float movementFactor = .3f;
+        protected virtual string _SavedOffsetKey => _target.GetPrefabName();
+
+        protected const float movementFactor = .1f;
         protected const float heightMovementFactor = .2f;
 
         protected IDType _id;
@@ -134,6 +148,11 @@ namespace FPSCamera.Cam
         {
             if (_state is UsingOtherCam) _camOther.InputReset();
             else base.InputReset();
+        }
+        public override void SaveOffset()
+        {
+            if (_state is UsingOtherCam) (_camOther as FollowCam)?.SaveOffset();
+            else base.SaveOffset();
         }
 
         protected abstract bool _ReadyToSwitchToOtherCam { get; }

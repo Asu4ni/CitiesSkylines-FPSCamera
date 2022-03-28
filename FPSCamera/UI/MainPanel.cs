@@ -14,13 +14,12 @@ namespace FPSCamera.UI
             CStyle.Current = Style.basic;
             {
                 CStyle.Current.scale = .8f;
-                float x = Config.G.MainPanelBtnPos.right, y = Config.G.MainPanelBtnPos.up;
+                float x = Config.G.MainPanelBtnPos.x, y = Config.G.MainPanelBtnPos.y;
                 if (x < 0f || y < 0f || x > Helper.ScreenWidth || y > Helper.ScreenHeight) {
                     var escbutton = Helper.GetElement("Esc");
                     x = escbutton.x;
                     y = escbutton.y + escbutton.height * 1.5f;
-                    Config.G.MainPanelBtnPos.right.Assign(x);
-                    Config.G.MainPanelBtnPos.up.Assign(y);
+                    Config.G.MainPanelBtnPos.Assign(Vec2D.Position(x, y));
                     Config.G.Save();
                 }
                 _panelBtn = Element.Root.Add<SpriteButton>(new Properties
@@ -57,8 +56,7 @@ namespace FPSCamera.UI
             _panelBtn.MakeDraggable(
                 actionDragStart: () => _mainPanel.Visible = false,
                 actionDragEnd: () => {
-                    Config.G.MainPanelBtnPos.right.Assign(_panelBtn.x);
-                    Config.G.MainPanelBtnPos.up.Assign(_panelBtn.y);
+                    Config.G.MainPanelBtnPos.Assign(Vec2D.Position(_panelBtn.x, _panelBtn.y));
                     Config.G.Save();
                 });
 

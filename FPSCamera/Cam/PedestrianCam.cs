@@ -26,9 +26,8 @@ namespace FPSCamera.Cam
             return status;
         }
 
-        protected override Offset _LocalOffset => new Offset(
-            Config.G.PedestrianCamOffset.AsMovement + Config.G.PedestrianFixedOffset.AsMovement,
-            DeltaAttitude.None);
+        protected override Offset _LocalOffset
+            => Config.G.PedestrianFixedOffset.AsOffSet;
 
         public override Utils.Infos GetTargetInfos()
         {
@@ -51,6 +50,7 @@ namespace FPSCamera.Cam
                 return true;
             }
         }
+
         protected override VehicleCam _CreateAnotherCam()
         {
             Log.Msg($" -- pedestrian(ID:{_id}) entered a vehicle");

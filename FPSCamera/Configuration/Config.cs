@@ -91,6 +91,13 @@ namespace FPSCamera.Configuration
                 "the target even when smooth transition is enabled.\n" +
                 "This sets the minimum distance to start applying smooth transition.")]
         public readonly CfFloat InstantMoveMax = new CfFloat(15f, min: 5f, max: 50f);
+        [Config("FollowCamOffset", "Follow mode universal camera offset")]
+        public readonly CfOffset FollowCamOffset = new CfOffset(
+            new CfFloat(0f, min: -20f, max: 20f),
+            new CfFloat(0f, min: -20f, max: 20f),
+            new CfFloat(0f, min: -20f, max: 20f)
+        );
+
 
         // walkThru config
         [Config("Period4Walk", "Period (seconds) for each random target")]
@@ -111,6 +118,10 @@ namespace FPSCamera.Configuration
         [Config("KeyAutoMove", "Auto moving toggle in Free-Camera mode",
                 "Camera moves forward automatically when it's toggled on.")]
         public readonly CfKey KeyAutoMove = new CfKey(KeyCode.E);
+        [Config("KeySaveOffset", "Save the current camera setting as default",
+                "In Follow/Walk-Through mode, save the \n" +
+                "current camera setting for the followed target")]
+        public readonly CfKey KeySaveOffset = new CfKey(KeyCode.Backslash);
 
         [Config("KeyMoveForward", "Move/Offset forward")]
         public readonly CfKey KeyMoveForward = new CfKey(KeyCode.W);
@@ -154,28 +165,13 @@ namespace FPSCamera.Configuration
         [Config("DeltaRotateMax", "Max rotation for smooth transition", "unit: degree")]
         public readonly CfFloat MaxTransRotate = new CfFloat(10f, min: 5f, max: 45f);
 
-        // position offset
-        [Config("VehicleCamOffset", "Camera offset while following vehicles")]
-        public readonly CfOffset VehicleCamOffset = new CfOffset(
-            new CfFloat(0f, min: -20f, max: 40f),
-            new CfFloat(0f, min: -20f, max: 40f),
-            new CfFloat(0f, min: -30f, max: 30f)
-        );
-        [Config("PedestrianCamOffset", "Camera offset while following pedestrians")]
-        public readonly CfOffset PedestrianCamOffset = new CfOffset(
-            new CfFloat(0f, min: -20f, max: 40f),
-            new CfFloat(0f, min: -20f, max: 40f),
-            new CfFloat(0f, min: -30f, max: 30f)
-        );
-
 
         /*--------- configurable constants ----------------------------------*/
 
         [Config("MainPanelBtnPos", "In-Game main panel button position")]
-        public readonly CfOffset MainPanelBtnPos
-                = new CfOffset(new CfFloat(0f, 0f, 0f), new CfFloat(-1f), new CfFloat(-1f));
-        //                        always 0 (forward)  |    y-axis (up)  |    x-axis (right)
-        // value == -1 : unset 
+        public readonly CfScreenPosition MainPanelBtnPos
+            = new CfScreenPosition(CSkyL.Math.Vec2D.Position(-1f, -1f));
+        // (-1, -1): for unset position
 
         [Config("CamNearClipPlane", "Camera Near clip plane")]
         public readonly CfFloat CamNearClipPlane = new CfFloat(1f, min: .125f, max: 64f);

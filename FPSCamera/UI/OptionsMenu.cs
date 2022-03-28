@@ -102,11 +102,13 @@ namespace FPSCamera.UI
                 _settings.Add(panel.Add<SliderSetting>(props.Swap(Config.G.MaxPitchDeg4Follow)));
                 _settings.Add(panel.Add<SliderSetting>(props.Swap(Config.G.MaxYawDeg4Follow)));
                 _settings.Add(panel.Add<SliderSetting>(props.Swap(Config.G.InstantMoveMax)));
+
+                _settings.Add(panel.Add<OffsetSetting>(props.Swap(Config.G.FollowCamOffset)));
             }
             {
                 var panel = settingPanel.Add<Group>(new LayoutProperties
                 {
-                    name = "FollowWalkThru", text = "Walk-Through Mode Options",
+                    name = "WalkThru", text = "Walk-Through Mode Options",
                     autoLayout = true, layoutGap = 10
                 });
                 var props = _DefaultProps(panel);
@@ -132,6 +134,7 @@ namespace FPSCamera.UI
                 _settings.Add(panel.Add<KeyMapSetting>(props.Swap(Config.G.KeyCamReset)));
                 _settings.Add(panel.Add<KeyMapSetting>(props.Swap(Config.G.KeyCursorToggle)));
                 _settings.Add(panel.Add<KeyMapSetting>(props.Swap(Config.G.KeyAutoMove)));
+                _settings.Add(panel.Add<KeyMapSetting>(props.Swap(Config.G.KeySaveOffset)));
 
                 _settings.Add(panel.Add<KeyMapSetting>(props.Swap(Config.G.KeyMoveForward)));
                 _settings.Add(panel.Add<KeyMapSetting>(props.Swap(Config.G.KeyMoveBackward)));
@@ -173,18 +176,6 @@ namespace FPSCamera.UI
 
                 props.stepSize = 1f; props.valueFormat = "F0";
                 _settings.Add(panel.Add<SliderSetting>(props.Swap(Config.G.MaxTransRotate)));
-            }
-            {
-                var panel = settingPanel.Add<Group>(new LayoutProperties
-                {
-                    name = "Offset", text = "Camera Offsets",
-                    autoLayout = true, layoutGap = 10
-                });
-                var props = _DefaultProps(panel);
-
-                _settings.Add(panel.Add<OffsetSetting>(props.Swap(Config.G.VehicleCamOffset)));
-
-                _settings.Add(panel.Add<OffsetSetting>(props.Swap(Config.G.PedestrianCamOffset)));
             }
         }
 
