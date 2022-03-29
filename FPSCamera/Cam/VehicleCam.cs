@@ -8,8 +8,7 @@ namespace FPSCamera.Cam
 
     public class VehicleCam : FollowCam<VehicleID, Vehicle>
     {
-        public VehicleCam(VehicleID vehicleID, System.Func<Offset, Offset> handler)
-                    : base(vehicleID, handler)
+        public VehicleCam(VehicleID vehicleID) : base(vehicleID)
         {
             if (!IsOperating) {
                 Log.Warn($"vehicle(ID:{_id}) to follow does not exist");

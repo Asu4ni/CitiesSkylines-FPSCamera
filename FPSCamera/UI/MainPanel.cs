@@ -15,12 +15,13 @@ namespace FPSCamera.UI
             {
                 CStyle.Current.scale = .8f;
                 float x = Config.G.MainPanelBtnPos.x, y = Config.G.MainPanelBtnPos.y;
-                if (x < 0f || y < 0f || x > Helper.ScreenWidth || y > Helper.ScreenHeight) {
+                if (x < 0f || y < 0f) {
                     var escbutton = Helper.GetElement("Esc");
                     x = escbutton.x;
                     y = escbutton.y + escbutton.height * 1.5f;
                     Config.G.MainPanelBtnPos.Assign(Vec2D.Position(x, y));
                     Config.G.Save();
+                    CSkyL.Log.Msg($"reset {x}, {y}");
                 }
                 _panelBtn = Element.Root.Add<SpriteButton>(new Properties
                 {

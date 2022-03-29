@@ -6,7 +6,6 @@ namespace FPSCamera
     using Control = CSkyL.Game.Control;
     using CUtils = CSkyL.Game.Utils;
     using Log = CSkyL.Log;
-    using Range = CSkyL.Math.Range;
 
     public class Controller : CSkyL.Game.Behavior
     {
@@ -22,14 +21,14 @@ namespace FPSCamera
         public void StartFollow(CSkyL.Game.ID.ObjectID idToFollow)
         {
             Log.Msg("Starting Follow mode");
-            var newCam = Cam.FollowCam.Follow(idToFollow, _FollowCamInputOffsetHandler);
+            var newCam = Cam.FollowCam.Follow(idToFollow);
             if (newCam is Cam.FollowCam cam) _SetCam(newCam);
             else Log.Msg($"Fail to start Follow mode (ID: {idToFollow})");
         }
         public void StartWalkThruMode()
         {
             Log.Msg("Starting WalkThru mode");
-            _SetCam(new Cam.WalkThruCam(_FollowCamInputOffsetHandler));
+            _SetCam(new Cam.WalkThruCam());
         }
 
         public void StopFPSCam()
@@ -240,12 +239,6 @@ namespace FPSCamera
                 Log.Err("Unrecognized Error: " + e.ToString());
             }
         }
-
-        private Offset _FollowCamInputOffsetHandler(Offset inputOffset)
-            => new Offset(inputOffset.movement, inputOffset.deltaAttitude.Clamp(
-                    new Range(-Config.G.MaxYawDeg4Follow, Config.G.MaxYawDeg4Follow),
-                    new Range(-Config.G.MaxPitchDeg4Follow, Config.G.MaxPitchDeg4Follow))
-               );
 
         // Cameras
         private Cam.Base _camMod;

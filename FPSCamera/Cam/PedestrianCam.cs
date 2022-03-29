@@ -9,8 +9,7 @@ namespace FPSCamera.Cam
 
     public class PedestrianCam : FollowCamWithCam<PedestrianID, Pedestrian, VehicleCam>
     {
-        public PedestrianCam(PedestrianID pedID, System.Func<Offset, Offset> handler)
-                    : base(pedID, handler)
+        public PedestrianCam(PedestrianID pedID) : base(pedID)
         {
             if (IsOperating)
                 Log.Msg($" -- following pedestrian(ID:{_id})");
@@ -54,7 +53,7 @@ namespace FPSCamera.Cam
         protected override VehicleCam _CreateAnotherCam()
         {
             Log.Msg($" -- pedestrian(ID:{_id}) entered a vehicle");
-            return new VehicleCam(_target.RiddenVehicleID, _inputOffsetHandler);
+            return new VehicleCam(_target.RiddenVehicleID);
         }
     }
 }

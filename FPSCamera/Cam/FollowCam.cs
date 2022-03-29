@@ -8,14 +8,14 @@ namespace FPSCamera.Cam
 
     public abstract class FollowCam : Base
     {
-        public static FollowCam Follow(ObjectID targetID, System.Func<Offset, Offset> handler)
+        public static FollowCam Follow(ObjectID targetID)
         {
             switch (Object.Of(targetID)) {
-            case Pedestrian ped: return new PedestrianCam(ped.pedestrianID, handler);
+            case Pedestrian ped: return new PedestrianCam(ped.pedestrianID);
             case Vehicle vehicle:
                 if (vehicle is PersonalVehicle car &&
-                        Follow(car.GetDriverID(), handler) is FollowCam cam) return cam;
-                return new VehicleCam(vehicle.id, handler);
+                        Follow(car.GetDriverID()) is FollowCam cam) return cam;
+                return new VehicleCam(vehicle.id);
             default: return null;
             }
         }
@@ -25,20 +25,12 @@ namespace FPSCamera.Cam
         public abstract Utils.Infos GetTargetInfos();
 
         public abstract void SaveOffset();
-
-        public void SetInputOffsetHandler(System.Func<Offset, Offset> handler)
-            => _inputOffsetHandler = handler;
-
-        protected FollowCam(System.Func<Offset, Offset> handler)
-        { _inputOffsetHandler = handler; }
-
-        protected System.Func<Offset, Offset> _inputOffsetHandler = null;
     }
 
     public abstract class FollowCam<IDType, TargetType> : FollowCam
            where IDType : ObjectID where TargetType : class, IObjectToFollow
     {
-        protected FollowCam(IDType id, System.Func<Offset, Offset> handler) : base(handler)
+        protected FollowCam(IDType id)
         {
             _id = id;
             if (!Validate()) return;
@@ -83,8 +75,8 @@ namespace FPSCamera.Cam
             inputOffset.movement *= movementFactor;
             inputOffset.movement.up *= heightMovementFactor;
             _inputOffset = _inputOffset.FollowedBy(inputOffset);
-            if (_inputOffsetHandler is object)
-                _inputOffset = _inputOffsetHandler(_inputOffset);
+            _inputOffset.deltaAttitude = _inputOffset.deltaAttitude.Clamp(pitchRange:
+                    new CSkyL.Math.Range(-Config.G.MaxPitchDeg, Config.G.MaxPitchDeg));
         }
         public override void InputReset()
             => _inputOffset = CamOffset.G[_SavedOffsetKey];
@@ -110,8 +102,7 @@ namespace FPSCamera.Cam
                                           where TargetType : class, IObjectToFollow
             where AnotherCam : Base
     {
-        protected FollowCamWithCam(IDType id, System.Func<Offset, Offset> handler)
-            : base(id, handler) { }
+        protected FollowCamWithCam(IDType id) : base(id) { }
 
         public override bool Validate()
         {

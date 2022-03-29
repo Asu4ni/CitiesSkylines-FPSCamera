@@ -102,7 +102,7 @@
                 width = panel.width - padding, wideCondition = true,
                 text = "Forward direction",
                 config = config.forward, configObj = Config.G,
-                stepSize = .25f, valueFormat = "F2"
+                stepSize = .05f, valueFormat = "F2"
             };
             sliderProp.SetUpFromConfig();
             var forward = panel.Add<SliderSetting>(sliderProp);

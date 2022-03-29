@@ -28,16 +28,19 @@ namespace FPSCamera.Configuration
 
         [Config("HideGameUI", "Hide Game's UI")]
         public readonly CfFlag HideGameUI = new CfFlag(false);
-        [Config("ShowInfoPanel", "Show Info panel")]
-        public readonly CfFlag ShowInfoPanel = new CfFlag(true);
-        [Config("InfoPanelHeightScale", "Scaling factor of Info panel's height")]
-        public readonly CfFloat InfoPanelHeightScale = new CfFloat(1f, min: .5f, max: 2f);
         [Config("SetBackCamera", "Set camera back after exiting",
                 "When exiting FPS Cam, set the camera position \n" +
                 "back to where it's left beforehand")]
         public readonly CfFlag SetBackCamera = new CfFlag(true);
         [Config("UseMetricUnit", "Use metric units")]
         public readonly CfFlag UseMetricUnit = new CfFlag(true);
+        [Config("ShowInfoPanel", "Show Info panel")]
+        public readonly CfFlag ShowInfoPanel = new CfFlag(true);
+        [Config("InfoPanelHeightScale", "Scaling factor of Info panel's height")]
+        public readonly CfFloat InfoPanelHeightScale = new CfFloat(1f, min: .5f, max: 2f);
+        [Config("MaxPitchDeg", "Max vertical viewing angle",
+                "The maximum degree to rotate camera up & down.")]
+        public readonly CfFloat MaxPitchDeg = new CfFloat(70f, min: 0f, max: 90f);
 
         // camera control
         [Config("MovementSpeed", "Movement/Offset speed")]
@@ -62,9 +65,6 @@ namespace FPSCamera.Configuration
         // free cam config
         [Config("ShowCursor4Free", "Show cursor in Free-Camera mode")]
         public readonly CfFlag ShowCursor4Free = new CfFlag(false);
-        [Config("MaxPitchDeg4Free", "Max vertical viewing angle",
-                "The maximum degree to rotate camera up & down.")]
-        public readonly CfFloat MaxPitchDeg4Free = new CfFloat(70f, min: 0f, max: 90f);
 
         public enum GroundClipping { None, PreventClip, SnapToGround }
         [Config("GroundClipping", "Ground clipping option",
@@ -82,10 +82,6 @@ namespace FPSCamera.Configuration
         public readonly CfFlag ShowCursor4Follow = new CfFlag(false);
         [Config("StickToFrontVehicle", "Always follow the front vehicle")]
         public readonly CfFlag StickToFrontVehicle = new CfFlag(true);
-        [Config("MaxYawDeg4Follow", "Max horizontal viewing angle")]
-        public readonly CfFloat MaxYawDeg4Follow = new CfFloat(60f, min: 0f, max: 180f);
-        [Config("MaxPitchDeg4Follow", "Max vertical viewing angle")]
-        public readonly CfFloat MaxPitchDeg4Follow = new CfFloat(30f, min: 0f, max: 90f);
         [Config("InstantMoveMax", "Min distance for smooth transition",
                 "In Follow Mode, camera needs to move instantly with\n" +
                 "the target even when smooth transition is enabled.\n" +

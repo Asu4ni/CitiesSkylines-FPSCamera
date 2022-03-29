@@ -40,7 +40,7 @@
         public override Utils.Infos GetTargetInfos() => _currentCam.GetTargetInfos();
         public override void SaveOffset() => _currentCam.SaveOffset();
 
-        public WalkThruCam(System.Func<Offset, Offset> handler) : base(handler) { }
+        public WalkThruCam() : base() { }
 
         private void _SetRandomCam()
         {
@@ -52,7 +52,7 @@
             if (!list.Any()) return;
 
             int attempt = 3;
-            do _currentCam = Follow(list.GetRandomOne().ID, _inputOffsetHandler);
+            do _currentCam = Follow(list.GetRandomOne().ID);
             while (!(_currentCam?.Validate() ?? false) && --attempt >= 0);
             _elapsedTime = 0f;
         }

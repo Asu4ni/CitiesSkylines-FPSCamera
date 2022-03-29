@@ -20,7 +20,7 @@
             _lastPosition = _positioning.position;
             _positioning = _positioning.Apply(inputOffset);
             _positioning.angle = _positioning.angle.Clamp(pitchRange:
-                    new CSkyL.Math.Range(-Config.G.MaxPitchDeg4Free, Config.G.MaxPitchDeg4Free));
+                    new CSkyL.Math.Range(-Config.G.MaxPitchDeg, Config.G.MaxPitchDeg));
 
             if (Config.G.GroundClippingOption != Config.GroundClipping.None) {
                 var minHeight = Map.GetMinHeightAt(_positioning.position)

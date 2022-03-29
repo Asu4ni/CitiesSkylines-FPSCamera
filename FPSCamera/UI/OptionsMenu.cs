@@ -26,6 +26,8 @@ namespace FPSCamera.UI
                 _settings.Add(panel.Add<ToggleSetting>(props.Swap(Config.G.ShowInfoPanel)));
                 props.stepSize = .05f; props.valueFormat = "F2";
                 _settings.Add(panel.Add<SliderSetting>(props.Swap(Config.G.InfoPanelHeightScale)));
+                props.stepSize = 1f; props.valueFormat = "F0";
+                _settings.Add(panel.Add<SliderSetting>(props.Swap(Config.G.MaxPitchDeg)));
 
 
                 panel.AutoLayout = false;
@@ -79,9 +81,6 @@ namespace FPSCamera.UI
 
                 _settings.Add(panel.Add<ToggleSetting>(props.Swap(Config.G.ShowCursor4Free)));
 
-                props.stepSize = 1f; props.valueFormat = "F0";
-                _settings.Add(panel.Add<SliderSetting>(props.Swap(Config.G.MaxPitchDeg4Free)));
-
                 _settings.Add(panel.Add<ChoiceSetting<Config.GroundClipping>>(
                                     props.Swap(Config.G.GroundClippingOption)));
                 props.stepSize = .1f; props.valueFormat = "F1";
@@ -99,8 +98,6 @@ namespace FPSCamera.UI
                 _settings.Add(panel.Add<ToggleSetting>(props.Swap(Config.G.StickToFrontVehicle)));
 
                 props.stepSize = 1f; props.valueFormat = "F0";
-                _settings.Add(panel.Add<SliderSetting>(props.Swap(Config.G.MaxPitchDeg4Follow)));
-                _settings.Add(panel.Add<SliderSetting>(props.Swap(Config.G.MaxYawDeg4Follow)));
                 _settings.Add(panel.Add<SliderSetting>(props.Swap(Config.G.InstantMoveMax)));
 
                 _settings.Add(panel.Add<OffsetSetting>(props.Swap(Config.G.FollowCamOffset)));

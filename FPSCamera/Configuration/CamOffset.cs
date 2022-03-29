@@ -51,9 +51,10 @@ namespace FPSCamera.Configuration
         {
             ["Bus"] = _CreateOffset(2.55f, .42f),
             ["Biofuel Bus 01"] = _CreateOffset(2.1f, .2f),
+            ["School Bus 01"] = _CreateOffset(.75f, .3f),
 
             ["Tram"] = _CreateOffset(1.04f, .23f),
-            ["Tram Middle"] = _CreateOffset(-6.24f, -1.32f, 1.82f, .6f, -16f),
+            ["Tram Middle"] = _CreateOffset(-6.24f, -1.32f, 1.82f, .6f, -3.6f),
             ["Tram End"] = _CreateOffset(-5f, -2.76f, 0f, 180f),
 
             ["Metro"] = _CreateOffset(4.35f, .76f),
