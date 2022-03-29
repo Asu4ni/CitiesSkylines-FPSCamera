@@ -6,7 +6,6 @@ namespace FPSCamera.UI
     using CStyle = CSkyL.UI.Style;
     using Vec2D = CSkyL.Math.Vec2D;
 
-    // TODO: incorporate UnifiedUI
     internal class MainPanel : CSkyL.Game.Behavior
     {
         protected override void _Init()

@@ -37,8 +37,8 @@ namespace FPSCamera.UI
         protected override void _UpdateLate()
         {
             if (_camWRef?.Target is Cam.Base cam && cam.Validate()) {
-                _elapsedTime += CSkyL.Game.Utils.TimeSinceLastFrame;
-                if (_elapsedTime - _lastBufferStrUpdateTime > bufferUpdateInterval) {
+                _elapsedTime += Utils.TimeSinceLastFrame;
+                if (_elapsedTime - _lastBufferStrUpdateTime > _bufferUpdateInterval) {
                     _left = _GetStatus(cam);
                     _mid = _GetSpeed(cam.GetSpeed());
                     _right = cam is Cam.FollowCam fc ? _GetTargetInfos(fc.GetTargetInfos()) : "";
@@ -60,7 +60,7 @@ namespace FPSCamera.UI
         private static string _GetTargetInfos(Utils.Infos infos)
         {
             string str = "";
-            infos?.ForEach(pair => str += $"[{pair.field}] {pair.text}\n");
+            infos?.ForEach(pair => str += $"{pair.text} [{pair.field}]\n");
             return str.Length == 0 ? "" : str.Substring(0, str.Length - 1);
         }
 
@@ -91,35 +91,34 @@ namespace FPSCamera.UI
             GUI.Box(new Rect(0f, -10f, width, height + 10f), "", style);
             style.normal.background = null;
 
-            style.fontSize = (int) (height * fontHeightRatio);
+            style.fontSize = (int) (height * _fontHeightRatio);
             style.normal.textColor = new Color(.9f, .9f, 1f);
             style.wordWrap = true;
-            var blockWidth = width / 3f;
+            var blockWidth = width / 5f;
             var margin = Mathf.Clamp(width * .01f, style.fontSize, style.fontSize * 4f);
 
-            var rect = new Rect(margin, 0, blockWidth - 2f * margin, height);
-            style.alignment = TextAnchor.MiddleLeft;
+            var rect = new Rect(margin, margin, (blockWidth - margin) * 2f, height - margin);
+            style.alignment = TextAnchor.UpperLeft;
             GUI.Label(rect, _left, style);
 
-            rect.x += blockWidth * 2f;
-            style.alignment = TextAnchor.MiddleRight;
+            rect.x += blockWidth * 3f;
+            style.alignment = TextAnchor.UpperRight;
             GUI.Label(rect, _right, style);
 
-
-            var timerHeight = height / 8f;
-            rect.x -= blockWidth; rect.height -= timerHeight;
+            var timerHeight = height / 6f;
+            rect.x -= blockWidth; rect.y = 0f;
+            rect.height = height - timerHeight; rect.width = blockWidth;
             style.alignment = TextAnchor.MiddleCenter;
-            style.fontSize = (int) (style.fontSize * 1.6f);
+            style.fontSize = (int) (style.fontSize * 1.8f);
             GUI.Label(rect, _mid, style);
 
-            rect.y = rect.height - timerHeight; rect.height = timerHeight;
-            style.alignment = TextAnchor.LowerCenter;
-            style.fontSize = (int) Mathf.Max(8f, style.fontSize / 2f);
+            rect.y += rect.height; rect.height = timerHeight;
+            style.fontSize = (int) Mathf.Max(8f, style.fontSize / 2.5f);
             GUI.Label(rect, _footer, style);
         }
 
-        private const float bufferUpdateInterval = .25f;
-        private const float fontHeightRatio = .12f;
+        private const float _bufferUpdateInterval = .25f;
+        private const float _fontHeightRatio = .14f;
 
         private System.WeakReference _camWRef;
         private float _elapsedTime, _lastBufferStrUpdateTime;

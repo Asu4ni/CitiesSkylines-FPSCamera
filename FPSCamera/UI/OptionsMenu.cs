@@ -77,7 +77,6 @@ namespace FPSCamera.UI
                     autoLayout = true, layoutGap = 10
                 });
                 var props = _DefaultProps(panel);
-                // TODO: display Info
 
                 _settings.Add(panel.Add<ToggleSetting>(props.Swap(Config.G.ShowCursor4Free)));
 

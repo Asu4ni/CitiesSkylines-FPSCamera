@@ -96,7 +96,6 @@ namespace FPSCamera
             _camUnity.NearClipPlane = Config.G.CamNearClipPlane;
         }
 
-        // TODO: handle Esc
         private Offset _GetInputOffsetAfterHandleInput()
         {
             if (Control.KeyTriggered(Config.G.KeyCamToggle)) {
@@ -210,7 +209,6 @@ namespace FPSCamera
                     _camUnity.Positioning = _camMod.GetPositioning();
                 }
 
-                // TODO: fade out fade in for any instant move
                 var distance = _camUnity.Positioning.position
                                    .DistanceTo(_camUnity.TargetPositioning.position);
                 var factor = Config.G.GetAdvanceRatio(CUtils.TimeSinceLastFrame);

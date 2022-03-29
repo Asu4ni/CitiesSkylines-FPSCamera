@@ -1,6 +1,7 @@
 namespace FPSCamera.Cam
 {
     using CSkyL.Game;
+    using CSkyL.Game.Object;
     using CSkyL.Transform;
 
     public interface ICamUsingTimer
@@ -21,9 +22,15 @@ namespace FPSCamera.Cam
         {
             Utils.Infos infos = new Utils.Infos();
             if (!(GetPositioning() is Positioning positioning)) return infos;
-            var pos = positioning.position;
 
-            // TODO: add Infos such as RayCast road
+            Map.RayCast(positioning.position, out var segmentID, out var districtID);
+
+            if (segmentID is object) {
+                var name = Segment.GetName(segmentID);
+                if (!string.IsNullOrEmpty(name))
+                    infos["Road"] = name;
+            }
+            if (districtID is object) infos["District"] = District.GetName(districtID);
 
             return infos;
         }

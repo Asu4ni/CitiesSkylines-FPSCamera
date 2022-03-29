@@ -83,7 +83,6 @@ namespace FPSCamera
             Config.G.Reset();
             Config.G.Save();
 
-            // TODO: separate
             CamOffset.G.Reset();
             CamOffset.G.Save();
 
