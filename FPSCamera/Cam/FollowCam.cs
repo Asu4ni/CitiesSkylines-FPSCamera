@@ -20,11 +20,13 @@ namespace FPSCamera.Cam
             }
         }
         public abstract ObjectID TargetID { get; }
+        public abstract IObjectToFollow Target { get; }
 
         public abstract string GetTargetStatus();
         public abstract Utils.Infos GetTargetInfos();
 
-        public abstract void SaveOffset();
+        // return saved entry key, usually PrefabInfo.name
+        public abstract string SaveOffset();
     }
 
     public abstract class FollowCam<IDType, TargetType> : FollowCam
@@ -33,8 +35,9 @@ namespace FPSCamera.Cam
         protected FollowCam(IDType id)
         {
             _id = id;
-            if (!Validate()) return;
-            InputReset();
+            _target = Object.Of(_id) as TargetType;
+            if (_target is null) _state = new Finish();
+            else _inputOffset = CamOffset.G[_target.GetPrefabName()];
         }
 
         public override bool Validate()
@@ -51,7 +54,7 @@ namespace FPSCamera.Cam
         }
 
         public override ObjectID TargetID => _id;
-        public TargetType Target => _target;
+        public override IObjectToFollow Target => _target;
 
         public override float GetSpeed() => _target.GetSpeed();
         public override string GetTargetStatus() => _target.GetStatus();
@@ -62,10 +65,11 @@ namespace FPSCamera.Cam
                                        .Apply(Config.G.FollowCamOffset.AsOffSet)
                                        .Apply(_inputOffset);
 
-        public override void SaveOffset()
+        public override string SaveOffset()
         {
             CamOffset.G[_SavedOffsetKey] = _inputOffset;
             CamOffset.G.Save();
+            return _SavedOffsetKey;
         }
 
         protected virtual Offset _LocalOffset => Offset.None;
@@ -84,7 +88,9 @@ namespace FPSCamera.Cam
         protected virtual bool _SwitchTarget(IDType newID)
         {
             _id = newID;
-            return Validate();
+            if (!Validate()) return false;
+            InputReset();
+            return true;
         }
 
         protected virtual string _SavedOffsetKey => _target.GetPrefabName();
@@ -108,24 +114,23 @@ namespace FPSCamera.Cam
         {
             if (!base.Validate()) return false;
 
-            if (_state is UsingOtherCam && !_camOther.Validate()) {
-                _state = new Normal();
+            if (_state is UsingOtherCam) {
+                if (!_camOther.Validate() || _ReadyToSwitchBack) {
+                    _camOther = null;
+                    _state = new Normal();
+                }
+                return true;
+            }
+            else if (_state is Normal && _ReadyToSwitchToOtherCam) {
+                _camOther = _CreateAnotherCam();
+                if (_camOther.Validate()) _state = new UsingOtherCam();
+                else _camOther = null;
             }
             return true;
         }
 
         public override Positioning GetPositioning()
-        {
-            if (_state is Normal && _ReadyToSwitchToOtherCam) {
-                _camOther = _CreateAnotherCam();
-                _state = new UsingOtherCam();
-            }
-            if (_state is UsingOtherCam) {
-                if (!_ReadyToSwitchBack) return _camOther.GetPositioning();
-                _state = new Normal();
-            }
-            return base.GetPositioning();
-        }
+            => _state is UsingOtherCam ? _camOther.GetPositioning() : base.GetPositioning();
 
         public override float GetSpeed()
             => _state is UsingOtherCam ? _camOther.GetSpeed() : base.GetSpeed();
@@ -140,11 +145,10 @@ namespace FPSCamera.Cam
             if (_state is UsingOtherCam) _camOther.InputReset();
             else base.InputReset();
         }
-        public override void SaveOffset()
-        {
-            if (_state is UsingOtherCam) (_camOther as FollowCam)?.SaveOffset();
-            else base.SaveOffset();
-        }
+        public override string SaveOffset()
+            => _state is UsingOtherCam ? (_camOther as FollowCam)?.SaveOffset() :
+                                         base.SaveOffset();
+
 
         protected abstract bool _ReadyToSwitchToOtherCam { get; }
         protected abstract bool _ReadyToSwitchBack { get; }

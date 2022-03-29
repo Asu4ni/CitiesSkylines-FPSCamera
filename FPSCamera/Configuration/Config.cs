@@ -185,7 +185,7 @@ namespace FPSCamera.Configuration
             new CfFloat(0f), new CfFloat(2f), new CfFloat(0f));
 
         [Config("MaxExitingDuration", "Max duration for exiting fps cam")]
-        public readonly CfFloat MaxExitingDuration = new CfFloat(5f, 0f);
+        public readonly CfFloat MaxExitingDuration = new CfFloat(2f, 0f);
         /*-------------------------------------------------------------------*/
 
         // Return a ratio[0f, 1f] representing the proportion to advance to the target

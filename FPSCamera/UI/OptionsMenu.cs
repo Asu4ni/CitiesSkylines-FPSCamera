@@ -11,174 +11,187 @@ namespace FPSCamera.UI
         {
             CStyle.Current = Style.basic;
             {
-                var panel = settingPanel.Add<Group>(new LayoutProperties
+                var group = settingPanel.Add<Group>(new LayoutProperties
                 {
-                    name = "General", text = "General Options",
-                    autoLayout = true, layoutGap = 10
+                    name = "General", text = "General Options"
                 });
-                var props = _DefaultProps(panel);
+                var props = _DefaultProps(group);
+                props.x = CStyle.Current.padding;
+                const float gap = 10f;
 
-                _settings.Add(panel.Add<ToggleSetting>(props.Swap(Config.G.HideGameUI)));
+                var tog = group.Add<ToggleSetting>(props.Swap(Config.G.HideGameUI));
+                props.y += tog.height + gap; _settings.Add(tog);
 
-                _settings.Add(panel.Add<ToggleSetting>(props.Swap(Config.G.SetBackCamera)));
-                _settings.Add(panel.Add<ToggleSetting>(props.Swap(Config.G.UseMetricUnit)));
+                tog = group.Add<ToggleSetting>(props.Swap(Config.G.SetBackCamera));
+                props.y += tog.height + gap; _settings.Add(tog);
 
-                _settings.Add(panel.Add<ToggleSetting>(props.Swap(Config.G.ShowInfoPanel)));
+                tog = group.Add<ToggleSetting>(props.Swap(Config.G.UseMetricUnit));
+                props.y += tog.height + gap; _settings.Add(tog);
+
+                tog = group.Add<ToggleSetting>(props.Swap(Config.G.ShowInfoPanel));
+                props.y += tog.height + gap; _settings.Add(tog);
+
                 props.stepSize = .05f; props.valueFormat = "F2";
-                _settings.Add(panel.Add<SliderSetting>(props.Swap(Config.G.InfoPanelHeightScale)));
+                var slider = group.Add<SliderSetting>(props.Swap(Config.G.InfoPanelHeightScale));
+                props.y += tog.height + gap; _settings.Add(slider);
+
                 props.stepSize = 1f; props.valueFormat = "F0";
-                _settings.Add(panel.Add<SliderSetting>(props.Swap(Config.G.MaxPitchDeg)));
+                slider = group.Add<SliderSetting>(props.Swap(Config.G.MaxPitchDeg));
+                props.y += tog.height; _settings.Add(slider);
 
+                group.contentHeight = props.y + CStyle.Current.padding;
 
-                panel.AutoLayout = false;
                 var btnProps = new Properties
                 {
                     name = "ReloadConfig", text = "Reload Configurations",
-                    x = panel.width - _btnSize.width - Style.basic.padding * 2f,
+                    x = group.width - _btnSize.width - Style.basic.padding * 2f,
                     y = 10f, size = _btnSize
                 };
-                var btn = panel.Add<TextButton>(btnProps);
+                var btn = group.Add<TextButton>(btnProps);
                 btn.SetTriggerAction(() => Mod.LoadConfig());
 
                 btnProps.name = "ResetConfig"; btnProps.text = "Reset Configurations";
                 btnProps.y += _btnSize.height;
-                btn = panel.Add<TextButton>(btnProps);
+                btn = group.Add<TextButton>(btnProps);
                 btn.SetTriggerAction(() => Mod.ResetConfig());
             }
             {
-                var panel = settingPanel.Add<Group>(new LayoutProperties
+                var group = settingPanel.Add<Group>(new LayoutProperties
                 {
                     name = "CamControl", text = "Camera Controls",
                     autoLayout = true, layoutGap = 10
                 });
-                var props = _DefaultProps(panel);
+                var props = _DefaultProps(group);
 
                 props.stepSize = 1f; props.valueFormat = "F0";
-                _settings.Add(panel.Add<SliderSetting>(props.Swap(Config.G.MovementSpeed)));
+                _settings.Add(group.Add<SliderSetting>(props.Swap(Config.G.MovementSpeed)));
                 props.stepSize = .25f; props.valueFormat = "F2";
-                _settings.Add(panel.Add<SliderSetting>(props.Swap(Config.G.SpeedUpFactor)));
+                _settings.Add(group.Add<SliderSetting>(props.Swap(Config.G.SpeedUpFactor)));
 
-                _settings.Add(panel.Add<ToggleSetting>(props.Swap(Config.G.InvertRotateVertical)));
-                _settings.Add(panel.Add<ToggleSetting>(props.Swap(Config.G.InvertRotateHorizontal)));
+                _settings.Add(group.Add<ToggleSetting>(props.Swap(Config.G.InvertRotateVertical)));
+                _settings.Add(group.Add<ToggleSetting>(props.Swap(Config.G.InvertRotateHorizontal)));
                 props.stepSize = .25f; props.valueFormat = "F2";
-                _settings.Add(panel.Add<SliderSetting>(props.Swap(Config.G.RotateSensitivity)));
+                _settings.Add(group.Add<SliderSetting>(props.Swap(Config.G.RotateSensitivity)));
                 props.stepSize = .5f; props.valueFormat = "F1";
-                _settings.Add(panel.Add<SliderSetting>(props.Swap(Config.G.RotateKeyFactor)));
+                _settings.Add(group.Add<SliderSetting>(props.Swap(Config.G.RotateKeyFactor)));
 
 
-                _settings.Add(panel.Add<ToggleSetting>(props.Swap(Config.G.EnableDof)));
+                _settings.Add(group.Add<ToggleSetting>(props.Swap(Config.G.EnableDof)));
                 props.stepSize = 1f; props.valueFormat = "F0";
-                _settings.Add(panel.Add<SliderSetting>(props.Swap(Config.G.CamFieldOfView)));
+                _settings.Add(group.Add<SliderSetting>(props.Swap(Config.G.CamFieldOfView)));
             }
             {
-                var panel = settingPanel.Add<Group>(new LayoutProperties
+                var group = settingPanel.Add<Group>(new LayoutProperties
                 {
                     name = "FreeCam", text = "Free-Camera Mode Options",
                     autoLayout = true, layoutGap = 10
                 });
-                var props = _DefaultProps(panel);
+                var props = _DefaultProps(group);
 
-                _settings.Add(panel.Add<ToggleSetting>(props.Swap(Config.G.ShowCursor4Free)));
+                _settings.Add(group.Add<ToggleSetting>(props.Swap(Config.G.ShowCursor4Free)));
 
-                _settings.Add(panel.Add<ChoiceSetting<Config.GroundClipping>>(
+                _settings.Add(group.Add<ChoiceSetting<Config.GroundClipping>>(
                                     props.Swap(Config.G.GroundClippingOption)));
                 props.stepSize = .1f; props.valueFormat = "F1";
-                _settings.Add(panel.Add<SliderSetting>(props.Swap(Config.G.GroundLevelOffset)));
+                _settings.Add(group.Add<SliderSetting>(props.Swap(Config.G.GroundLevelOffset)));
             }
             {
-                var panel = settingPanel.Add<Group>(new LayoutProperties
+                var group = settingPanel.Add<Group>(new LayoutProperties
                 {
                     name = "FollowWalkThru", text = "Follow Mode Options",
                     autoLayout = true, layoutGap = 10
                 });
-                var props = _DefaultProps(panel);
+                var props = _DefaultProps(group);
 
-                _settings.Add(panel.Add<ToggleSetting>(props.Swap(Config.G.ShowCursor4Follow)));
-                _settings.Add(panel.Add<ToggleSetting>(props.Swap(Config.G.StickToFrontVehicle)));
+                _settings.Add(group.Add<ToggleSetting>(props.Swap(Config.G.ShowCursor4Follow)));
+                _settings.Add(group.Add<ToggleSetting>(props.Swap(Config.G.StickToFrontVehicle)));
 
                 props.stepSize = 1f; props.valueFormat = "F0";
-                _settings.Add(panel.Add<SliderSetting>(props.Swap(Config.G.InstantMoveMax)));
+                _settings.Add(group.Add<SliderSetting>(props.Swap(Config.G.InstantMoveMax)));
 
-                _settings.Add(panel.Add<OffsetSetting>(props.Swap(Config.G.FollowCamOffset)));
+                _settings.Add(group.Add<OffsetSetting>(props.Swap(Config.G.FollowCamOffset)));
             }
             {
-                var panel = settingPanel.Add<Group>(new LayoutProperties
+                var group = settingPanel.Add<Group>(new LayoutProperties
                 {
                     name = "WalkThru", text = "Walk-Through Mode Options",
                     autoLayout = true, layoutGap = 10
                 });
-                var props = _DefaultProps(panel);
+                var props = _DefaultProps(group);
 
                 props.stepSize = 1f; props.valueFormat = "F0";
-                _settings.Add(panel.Add<SliderSetting>(props.Swap(Config.G.Period4Walk)));
-                _settings.Add(panel.Add<ToggleSetting>(props.Swap(Config.G.ManualSwitch4Walk)));
+                _settings.Add(group.Add<SliderSetting>(props.Swap(Config.G.Period4Walk)));
+                _settings.Add(group.Add<ToggleSetting>(props.Swap(Config.G.ManualSwitch4Walk)));
             }
             {
-                var panel = settingPanel.Add<Group>
-                            (new Properties { name = "KeyMap", text = "Key Mappings" });
-                panel.Add<Label>(new Properties
+                var group = settingPanel.Add<Group>(new LayoutProperties
+                {
+                    name = "KeyMap", text = "Key Mappings",
+                    autoLayout = true, layoutGap = 0
+                });
+                group.Add<Label>(new Properties
                 {
                     name = "KeyMappingComment",
                     text = "*Mouse Primary Click: change the key / cancel\n" +
                            "*Mouse Secondary Click: remove"
                 });
-                var props = _DefaultProps(panel);
+                var props = _DefaultProps(group);
 
                 CStyle.Current.scale = .8f;
-                _settings.Add(panel.Add<KeyMapSetting>(props.Swap(Config.G.KeyCamToggle)));
-                _settings.Add(panel.Add<KeyMapSetting>(props.Swap(Config.G.KeySpeedUp)));
-                _settings.Add(panel.Add<KeyMapSetting>(props.Swap(Config.G.KeyCamReset)));
-                _settings.Add(panel.Add<KeyMapSetting>(props.Swap(Config.G.KeyCursorToggle)));
-                _settings.Add(panel.Add<KeyMapSetting>(props.Swap(Config.G.KeyAutoMove)));
-                _settings.Add(panel.Add<KeyMapSetting>(props.Swap(Config.G.KeySaveOffset)));
+                _settings.Add(group.Add<KeyMapSetting>(props.Swap(Config.G.KeyCamToggle)));
+                _settings.Add(group.Add<KeyMapSetting>(props.Swap(Config.G.KeySpeedUp)));
+                _settings.Add(group.Add<KeyMapSetting>(props.Swap(Config.G.KeyCamReset)));
+                _settings.Add(group.Add<KeyMapSetting>(props.Swap(Config.G.KeyCursorToggle)));
+                _settings.Add(group.Add<KeyMapSetting>(props.Swap(Config.G.KeyAutoMove)));
+                _settings.Add(group.Add<KeyMapSetting>(props.Swap(Config.G.KeySaveOffset)));
 
-                _settings.Add(panel.Add<KeyMapSetting>(props.Swap(Config.G.KeyMoveForward)));
-                _settings.Add(panel.Add<KeyMapSetting>(props.Swap(Config.G.KeyMoveBackward)));
-                _settings.Add(panel.Add<KeyMapSetting>(props.Swap(Config.G.KeyMoveLeft)));
-                _settings.Add(panel.Add<KeyMapSetting>(props.Swap(Config.G.KeyMoveRight)));
-                _settings.Add(panel.Add<KeyMapSetting>(props.Swap(Config.G.KeyMoveUp)));
-                _settings.Add(panel.Add<KeyMapSetting>(props.Swap(Config.G.KeyMoveDown)));
+                _settings.Add(group.Add<KeyMapSetting>(props.Swap(Config.G.KeyMoveForward)));
+                _settings.Add(group.Add<KeyMapSetting>(props.Swap(Config.G.KeyMoveBackward)));
+                _settings.Add(group.Add<KeyMapSetting>(props.Swap(Config.G.KeyMoveLeft)));
+                _settings.Add(group.Add<KeyMapSetting>(props.Swap(Config.G.KeyMoveRight)));
+                _settings.Add(group.Add<KeyMapSetting>(props.Swap(Config.G.KeyMoveUp)));
+                _settings.Add(group.Add<KeyMapSetting>(props.Swap(Config.G.KeyMoveDown)));
 
-                _settings.Add(panel.Add<KeyMapSetting>(props.Swap(Config.G.KeyRotateLeft)));
-                _settings.Add(panel.Add<KeyMapSetting>(props.Swap(Config.G.KeyRotateRight)));
-                _settings.Add(panel.Add<KeyMapSetting>(props.Swap(Config.G.KeyRotateUp)));
-                _settings.Add(panel.Add<KeyMapSetting>(props.Swap(Config.G.KeyRotateDown)));
+                _settings.Add(group.Add<KeyMapSetting>(props.Swap(Config.G.KeyRotateLeft)));
+                _settings.Add(group.Add<KeyMapSetting>(props.Swap(Config.G.KeyRotateRight)));
+                _settings.Add(group.Add<KeyMapSetting>(props.Swap(Config.G.KeyRotateUp)));
+                _settings.Add(group.Add<KeyMapSetting>(props.Swap(Config.G.KeyRotateDown)));
                 CStyle.Current = Style.basic;
             }
             {
-                var panel = settingPanel.Add<Group>(new LayoutProperties
+                var group = settingPanel.Add<Group>(new LayoutProperties
                 {
                     name = "SmoothTrans", text = "Smooth Transition Options",
                     autoLayout = true, layoutGap = 10
                 });
-                var props = _DefaultProps(panel);
+                var props = _DefaultProps(group);
 
-                _settings.Add(panel.Add<ToggleSetting>(props.Swap(Config.G.SmoothTransition)));
+                _settings.Add(group.Add<ToggleSetting>(props.Swap(Config.G.SmoothTransition)));
 
                 props.stepSize = .1f; props.valueFormat = "F1";
-                _settings.Add(panel.Add<SliderSetting>(props.Swap(Config.G.TransRate)));
+                _settings.Add(group.Add<SliderSetting>(props.Swap(Config.G.TransRate)));
 
                 props.stepSize = 50f; props.valueFormat = "F0";
-                _settings.Add(panel.Add<SliderSetting>(props.Swap(Config.G.GiveUpTransDistance)));
+                _settings.Add(group.Add<SliderSetting>(props.Swap(Config.G.GiveUpTransDistance)));
 
                 props.stepSize = .05f; props.valueFormat = "F2";
-                _settings.Add(panel.Add<SliderSetting>(props.Swap(Config.G.MinTransMove)));
+                _settings.Add(group.Add<SliderSetting>(props.Swap(Config.G.MinTransMove)));
 
                 props.stepSize = 1f; props.valueFormat = "F0";
-                _settings.Add(panel.Add<SliderSetting>(props.Swap(Config.G.MaxTransMove)));
+                _settings.Add(group.Add<SliderSetting>(props.Swap(Config.G.MaxTransMove)));
 
                 props.stepSize = .05f; props.valueFormat = "F2";
-                _settings.Add(panel.Add<SliderSetting>(props.Swap(Config.G.MinTransRotate)));
+                _settings.Add(group.Add<SliderSetting>(props.Swap(Config.G.MinTransRotate)));
 
                 props.stepSize = 1f; props.valueFormat = "F0";
-                _settings.Add(panel.Add<SliderSetting>(props.Swap(Config.G.MaxTransRotate)));
+                _settings.Add(group.Add<SliderSetting>(props.Swap(Config.G.MaxTransRotate)));
             }
         }
 
         private const float rightMargin = 30f;
-        private SettingProperties _DefaultProps(Panel panel) => new SettingProperties
+        private SettingProperties _DefaultProps(Group group) => new SettingProperties
         {
-            width = panel.width - rightMargin - CStyle.Current.padding * 2f,
+            width = group.contentWidth - rightMargin - CStyle.Current.padding * 2f,
             wideCondition = true,
             configObj = Config.G
         };

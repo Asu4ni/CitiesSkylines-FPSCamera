@@ -11,6 +11,7 @@
     public class WalkThruCam : FollowCam, ICamUsingTimer
     {
         public override ObjectID TargetID => _currentCam.TargetID;
+        public override IObjectToFollow Target => _currentCam.Target;
 
         public void SwitchTarget() => _SetRandomCam();
         public void ElapseTime(float seconds) => _elapsedTime += seconds;
@@ -27,7 +28,7 @@
                 _SetRandomCam();
                 ok = _currentCam?.Validate() ?? false;
             }
-            if (!ok) CSkyL.Log.Warn("no target for Walk-Thru mode");
+            if (!ok) Log.Warn("no target for Walk-Thru mode");
             return ok;
         }
 
@@ -38,13 +39,12 @@
         public override void InputReset() => _currentCam.InputReset();
         public override string GetTargetStatus() => _currentCam.GetTargetStatus();
         public override Utils.Infos GetTargetInfos() => _currentCam.GetTargetInfos();
-        public override void SaveOffset() => _currentCam.SaveOffset();
-
-        public WalkThruCam() : base() { }
+        public override string SaveOffset() => _currentCam.SaveOffset();
 
         private void _SetRandomCam()
         {
             _currentCam = null;
+            Log.Msg(" -- switching target");
 
             var list = Pedestrian.GetIf((p) => !p.IsHangingAround)
                                  .OfType<Object>().Concat(

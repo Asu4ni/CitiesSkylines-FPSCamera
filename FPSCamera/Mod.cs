@@ -26,8 +26,12 @@ namespace FPSCamera
 
             if (CamController.I is CamController c) {
                 // enable during game mode usually means an updated dll
-                _controller = c.AddComponent<Controller>();
-                Log.Msg("Controller: updated");
+                if ((_controller = c.GetComponent<Controller>()) is Controller)
+                    Log.Warn("Controller: somehow already installed");
+                else {
+                    _controller = c.AddComponent<Controller>();
+                    Log.Msg("Controller: updated");
+                }
             }
         }
         public void OnDisabled()
@@ -45,8 +49,12 @@ namespace FPSCamera
             Log.Msg("Mod: level loaded in: " + mode.ToString());
 
             if (CamController.I is CamController c) {
-                _controller = c.AddComponent<Controller>();
-                Log.Msg("Controller: installed");
+                if ((_controller = c.GetComponent<Controller>()) is Controller)
+                    Log.Warn("Controller: somehow already installed");
+                else {
+                    _controller = c.AddComponent<Controller>();
+                    Log.Msg("Controller: installed");
+                }
             }
             else Log.Err("Mod: fail to get <CameraController>.");
         }

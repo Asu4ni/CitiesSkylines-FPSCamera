@@ -59,6 +59,7 @@ namespace FPSCamera.Configuration
 
             ["Metro"] = _CreateOffset(4.35f, .76f),
             ["Metro Passenger"] = _CreateOffset(.11f, -1.05f, 2.43f, -6.3f, -8f),
+            ["Monorail Passenger"] = _CreateOffset(-.32f,-1.7f,1.2f),
             ["Train Engine"] = _CreateOffset(3.84f, .9f),
             ["Train Passenger"] = _CreateOffset(-2.44f, -.45f, 1.78f, -4.5f, -7.35f),
             ["Train Cargo Engine"] = _CreateOffset(3.19f, .9f),
@@ -71,6 +72,7 @@ namespace FPSCamera.Configuration
 
             ["Tractor"] = _CreateOffset(-.46f, .7f),
             ["Forest Forwarder 01"] = _CreateOffset(1.16f, .96f),
+            ["Farm Truck 01"] = _CreateOffset(-1f, .5f),
         };
     }
 }

@@ -8,6 +8,39 @@ namespace FPSCamera.UI
 
     internal class MainPanel : CSkyL.Game.Behavior
     {
+        public void OnCamDeactivate()
+        { _msgTimer = 0f; }
+        public void OnCamActivate()
+        {
+            _mainPanel.Visible = false;
+            ShowMessage($"Press [{Config.G.KeyCamToggle}] to exit");
+        }
+
+        public void ShowMessage(string msg)
+        {
+            _msgLabel.text = msg;
+            _msgLabel.position = _MsgLabelPosition;
+            _msgTimer = _msgDuration;
+        }
+
+        public bool OnEsc()
+        {
+            if (_mainPanel.Visible) {
+                _mainPanel.Visible = false;
+                return true;
+            }
+            return false;
+        }
+
+        public void SetWalkThruCallBack(System.Action callBackAction)
+            => _walkThruCallBack = callBackAction;
+
+        private Vec2D _MsgLabelPosition => Vec2D.Position(
+                _panelBtn.x > Helper.ScreenWidth / 2f ?
+                    -_msgLabel.width - _msgLabelPadding : _panelBtn.width + _msgLabelPadding,
+                (_panelBtn.height - _msgLabel.height) / 2f
+        );
+
         protected override void _Init()
         {
             CStyle.Current = Style.basic;
@@ -20,7 +53,6 @@ namespace FPSCamera.UI
                     y = escbutton.y + escbutton.height * 1.5f;
                     Config.G.MainPanelBtnPos.Assign(Vec2D.Position(x, y));
                     Config.G.Save();
-                    CSkyL.Log.Msg($"reset {x}, {y}");
                 }
                 _panelBtn = Element.Root.Add<SpriteButton>(new Properties
                 {
@@ -31,12 +63,9 @@ namespace FPSCamera.UI
                 CStyle.Current = Style.basic;
             }
 
-            _hintLabel = _panelBtn.Add<Label>(new Properties
-            {
-                name = "ToggleHintLabel",
-                text = $"Press [{Config.G.KeyCamToggle}] for Free-Camera",
-            });
-            _hintLabel.position = _HintLabelPosition;
+            _msgLabel = _panelBtn.Add<Label>(new Properties { name = "ToggleMsgLabel", });
+            _msgLabel.position = _MsgLabelPosition;
+            ShowMessage($"Press [{Config.G.KeyCamToggle}] for Free-Camera");
 
             _mainPanel = Element.Root.Add<SpritePanel>(new LayoutProperties
             {
@@ -113,57 +142,26 @@ namespace FPSCamera.UI
             _mainPanel.Visible = false;
         }
 
-        public void OnCamDeactivate()
-        { _hintLabel.color = CStyle.Color.None; }
-        public void OnCamActivate()
-        {
-            _mainPanel.Visible = false;
-
-            _hintLabel.text = $"Press [{Config.G.KeyCamToggle}] to exit";
-            _hintLabel.color = CStyle.Color.White;
-            _hintLabel.position = _HintLabelPosition;
-        }
-
-        public bool OnEsc()
-        {
-            if (_mainPanel.Visible) {
-                _mainPanel.Visible = false;
-                return true;
-            }
-            return false;
-        }
-
-        public void SetWalkThruCallBack(System.Action callBackAction)
-            => _walkThruCallBack = callBackAction;
-
-        private Vec2D _HintLabelPosition => Vec2D.Position(
-                _panelBtn.x > Helper.ScreenWidth / 2f ?
-                    -_hintLabel.width - _hintLabelPadding : _panelBtn.width + _hintLabelPadding,
-                (_panelBtn.height - _hintLabel.height) / 2f
-        );
-
         protected override void _UpdateLate()
         {
             foreach (var setting in _settings) setting.UpdateUI();
 
-            // fade out label
-            var color = _hintLabel.color;
-            if (color.a > 0) {
-                --color.a;
-                _hintLabel.color = color;
-            }
+            _msgTimer -= CSkyL.Game.Utils.TimeSinceLastFrame;
+            _msgLabel.opacity = _msgTimer / _msgDuration;
         }
 
         private SpriteButton _panelBtn;
-        private Label _hintLabel;
+        private Label _msgLabel;
         private Panel _mainPanel;
 
         private readonly List<ISetting> _settings = new List<ISetting>();
 
+        private float _msgTimer = 0f;
         private System.Action _walkThruCallBack;
 
         private static readonly Vec2D _mainBtnSize = Vec2D.Size(48f, 46f);
         private static readonly Vec2D _walkThruBtnSize = Vec2D.Size(200f, 40f);
-        private static readonly float _hintLabelPadding = 3f;
+        private const float _msgLabelPadding = 3f;
+        private const float _msgDuration = 10f;
     }
 }

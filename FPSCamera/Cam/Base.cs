@@ -1,6 +1,7 @@
 namespace FPSCamera.Cam
 {
     using CSkyL.Game;
+    using CSkyL.Game.ID;
     using CSkyL.Game.Object;
     using CSkyL.Transform;
 
@@ -23,15 +24,16 @@ namespace FPSCamera.Cam
             Utils.Infos infos = new Utils.Infos();
             if (!(GetPositioning() is Positioning positioning)) return infos;
 
-            Map.RayCast(positioning.position, out var segmentID, out var districtID);
-
-            if (segmentID is object) {
-                var name = Segment.GetName(segmentID);
+            if (Map.RayCastDistrict(positioning.position) is DistrictID disID) {
+                var name = District.GetName(disID);
+                if (!string.IsNullOrEmpty(name))
+                    infos["District"] = name;
+            }
+            if (Map.RayCastRoad(positioning.position) is SegmentID segID) {
+                var name = Segment.GetName(segID);
                 if (!string.IsNullOrEmpty(name))
                     infos["Road"] = name;
             }
-            if (districtID is object) infos["District"] = District.GetName(districtID);
-
             return infos;
         }
 
