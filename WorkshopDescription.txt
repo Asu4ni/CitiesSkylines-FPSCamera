@@ -2,6 +2,7 @@
 
 * Please refer to the [url=https://github.com/Asu4ni/CitiesSkylines-FPSCamera]GitHub[/url] page for change notes, source, discussions, etc.
 * Please refer to the [url=https://github.com/Asu4ni/CitiesSkylines-FPSCamera/wiki]Wiki[/url] page for more comprehensive Guide.
+* Consider submitting your issues or suggestions on the [url=https://github.com/Asu4ni/CitiesSkylines-FPSCamera/issues]Issues[/url] page.
 
 [quote] This is an updated version for [url=https://steamcommunity.com/sharedfiles/filedetails/?id=650805785]First Person Camera: Updated[/url] by tony56a [/quote] 
 
@@ -12,7 +13,8 @@
 [*] Enable the mod in Content Manager
 [*] After the game/editor starts, press ` "BackQuote" (to the left of "1") to toggle Free-Camera Mode.
 [*] Use mouse to rotate camera, "W/A/S/D" keys to move horizontally, and "PgUp/PgDn" to move vertically.
-[*] Use "Esc" or "BackQuote" to exit the mode.
+[*] Press "E" to toggle Auto moving, which moves the camera forward automatically.
+[*] Press "Esc" or "BackQuote" to exit the mode.
 [/list]
 
 [h3] Follow Mode [/h3]
@@ -20,7 +22,8 @@
 [*] After clicking on any citizen, tourist, or driving vehicles, click on the button with a camera icon at the bottom right of the Info panel to enter Follow Mode.
 [*] The camera follows the view of the selected person/vehicle.
 [*] As in Free-Camera Mode, use keys and mouse to move/look around.
-[*] Use "Esc" or "BackQuote" to exit the mode.
+[*] To save the current camera setting (position offset & angle) as the default, press \ "Backslash".
+[*] Press "Esc" or "BackQuote" to exit the mode.
 [/list]
 
 [h3] Walk-Through Mode [/h3]
@@ -28,7 +31,7 @@
 [*] Click on the button with camera icon below the in-game setting wheel button to bring up the Mod configuration panel.
 [*] Click "Start Walk-Through" to enter Walk-Through mode.
 [*] The camera randomly follows any person/vehicle.
-[*] Use "Esc" or "BackQuote" to exit the mode.
+[*] Press "Esc" or "BackQuote" to exit the mode.
 [/list]
 
 [h3] See [url=https://github.com/Asu4ni/CitiesSkylines-FPSCamera/wiki] Complete Guide [/url]

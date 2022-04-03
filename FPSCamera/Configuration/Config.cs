@@ -5,7 +5,6 @@ namespace FPSCamera.Configuration
     using UnityEngine;
     using CfFlag = CSkyL.Config.ConfigData<bool>;
     using CfKey = CSkyL.Config.ConfigData<UnityEngine.KeyCode>;
-    using Lang = CSkyL.Lang;
 
     public class Config : Base
     {
@@ -13,14 +12,7 @@ namespace FPSCamera.Configuration
         public static readonly Config G = new Config();  // G: Global config
 
         public Config() : this(defaultPath) { }
-        public Config(string filePath) : base(filePath)
-        {
-            Lang.LoadFieldNameAttribute(this,
-                (Lang.IFieldWithName field, ConfigAttribute attr) => {
-                    if (field is IConfigData config)
-                        config._set(attr.name, attr.description, attr.detail);
-                });
-        }
+        public Config(string filePath) : base(filePath) { }
 
         public static Config Load(string path = defaultPath) => Load<Config>(path);
 

@@ -24,23 +24,34 @@ namespace FPSCamera
             CSkyL.Harmony.Patcher.PatchOnReady(Assembly.GetExecutingAssembly());
             LoadConfig();
 
-            if (CamController.I is CamController c) {
-                // enable during game mode usually means an updated dll
-                if ((_controller = c.GetComponent<Controller>()) is Controller)
-                    Log.Warn("Controller: somehow already installed");
-                else {
-                    _controller = c.AddComponent<Controller>();
-                    Log.Msg("Controller: updated");
+            if (CamController.I is null) return;
+            // Otherwise, this implies it's in game/editor.
+            // This usually means dll was just updated.
+
+            Log.Msg("Controller: updating");
+            int attempt = 5;
+            var timer = new System.Timers.Timer(200) { AutoReset = false };
+            timer.Elapsed += (_, e) => {
+                if (_TryInstallController()) return;
+
+                if (attempt > 0) {
+                    attempt--;
+                    timer.Start();
                 }
-            }
+                else {
+                    Log.Msg("Controller: fails to install");
+                    timer.Dispose();
+                }
+            };
+            timer.Start();
         }
         public void OnDisabled()
         {
-            if (_controller != null) {
-                _controller.Destroy();
-                Log.Msg("Controller: remove old version");
-            }
+            if (_controller != null) _controller.Destroy();
             CSkyL.Harmony.Patcher.TryUnpatch(Assembly.GetExecutingAssembly());
+#if DEBUG
+            UnityEngine.Object.Destroy(CSkyL.UI.Debug.Panel);
+#endif
             Log.Msg("Mod disabled.");
         }
 
@@ -48,14 +59,9 @@ namespace FPSCamera
         {
             Log.Msg("Mod: level loaded in: " + mode.ToString());
 
-            if (CamController.I is CamController c) {
-                if ((_controller = c.GetComponent<Controller>()) is Controller)
-                    Log.Warn("Controller: somehow already installed");
-                else {
-                    _controller = c.AddComponent<Controller>();
-                    Log.Msg("Controller: installed");
-                }
-            }
+            if (CamController.I is CamController c)
+                _TryInstallController();
+
             else Log.Err("Mod: fail to get <CameraController>.");
         }
         public override void OnLevelUnloading()
@@ -73,7 +79,7 @@ namespace FPSCamera
             var menu = comp.gameObject.AddComponent<UI.OptionsMenu>();
             menu.name = "FPS_Options";
             menu.Generate(CSkyL.UI.Helper.GetElement(helper));
-            Log.Msg("Settings UI - OptionsMenu generated");
+            Log.Msg("Settings UI - generated");
         }
 
         public static void LoadConfig()
@@ -95,6 +101,19 @@ namespace FPSCamera
             CamOffset.G.Save();
 
             Log.Msg("Config: reset");
+        }
+
+        private bool _TryInstallController()
+        {
+            if (CamController.I.GetComponent<Controller>() is Controller c) {
+                Log.Warn("Controller: old one not yet removed");
+                UnityEngine.Object.Destroy(c);
+                return false;
+            }
+
+            _controller = CamController.I.AddComponent<Controller>();
+            Log.Msg("Controller: installed");
+            return true;
         }
 
         private Controller _controller;

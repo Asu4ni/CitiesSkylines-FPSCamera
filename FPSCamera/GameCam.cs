@@ -1,11 +1,11 @@
 ﻿namespace FPSCamera
 {
+    using Configuration;
     using CSkyL;
     using CSkyL.Transform;
-    using Configuration;
     using Range = CSkyL.Math.Range;
 
-    public class UnityCam : CSkyL.Game.Cam
+    public class GameCam : CSkyL.Game.Cam
     {
         // Getter => current setting / Setter: set target setting
         public override Positioning Positioning {
@@ -69,7 +69,12 @@
         public void SetFullScreen(bool isFullScreen)
             => Area = isFullScreen ? RenderArea.Full : originalArea;
 
-        public UnityCam() : base(CSkyL.Game.CamController.I.GetCamera())
+        public GameCam() : base(CSkyL.Game.CamController.I.Camera)
+        {
+            originalArea = Area;
+            _targetSetting = AllSetting;
+        }
+        public GameCam(CSkyL.Game.Cam cam) : base(cam)
         {
             originalArea = Area;
             _targetSetting = AllSetting;

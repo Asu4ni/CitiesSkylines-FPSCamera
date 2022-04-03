@@ -30,13 +30,6 @@ namespace FPSCamera.UI
                 p.followButton.Visible = p.panel.GetObjectID() is ObjectID id && p.filter(id);
         }
 
-        protected override void _Destruct()
-        {
-            foreach (var p in _panelSets)
-                if (p.panel != null) p.followButton.Destroy();
-            base._Destruct();
-        }
-
         private void CreateFollowBtn(InfoPanel.Base infoPanel, Func<ObjectID, bool> filter)
         {
             CSkyL.UI.Style.Current.scale = .8f;
@@ -62,17 +55,17 @@ namespace FPSCamera.UI
         public void Enable() { foreach (var p in _panelSets) p.followButton.Enable(); }
         public void Disable() { foreach (var p in _panelSets) p.followButton.Disable(); }
 
-        struct PanelSet
+        struct PanelSet : CSkyL.Game.IDestruction
         {
             public readonly InfoPanel.Base panel;
-            public readonly SpriteButton followButton;
+            [CSkyL.Game.RequireDestruction] public readonly SpriteButton followButton;
             public readonly Func<ObjectID, bool> filter;
             public PanelSet(InfoPanel.Base panel, SpriteButton followButton,
                             Func<ObjectID, bool> filter)
             { this.panel = panel; this.followButton = followButton; this.filter = filter; }
         }
 
-        private List<PanelSet> _panelSets;
+        [CSkyL.Game.RequireDestruction] private List<PanelSet> _panelSets;
         private Action<ObjectID> _followCallBack;
         private Action<ObjectID> followCallBack {
             get {

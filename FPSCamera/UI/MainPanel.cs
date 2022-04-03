@@ -45,7 +45,7 @@ namespace FPSCamera.UI
         {
             CStyle.Current = Style.basic;
             {
-                CStyle.Current.scale = .8f;
+                CStyle.Current.scale = .75f;
                 float x = Config.G.MainPanelBtnPos.x, y = Config.G.MainPanelBtnPos.y;
                 if (x < 0f || y < 0f) {
                     var escbutton = Helper.GetElement("Esc");
@@ -150,16 +150,16 @@ namespace FPSCamera.UI
             _msgLabel.opacity = _msgTimer / _msgDuration;
         }
 
-        private SpriteButton _panelBtn;
         private Label _msgLabel;
-        private Panel _mainPanel;
+        [CSkyL.Game.RequireDestruction] private SpriteButton _panelBtn;
+        [CSkyL.Game.RequireDestruction] private Panel _mainPanel;
 
         private readonly List<ISetting> _settings = new List<ISetting>();
 
         private float _msgTimer = 0f;
         private System.Action _walkThruCallBack;
 
-        private static readonly Vec2D _mainBtnSize = Vec2D.Size(48f, 46f);
+        private static readonly Vec2D _mainBtnSize = Vec2D.Size(40f, 39f);
         private static readonly Vec2D _walkThruBtnSize = Vec2D.Size(200f, 40f);
         private const float _msgLabelPadding = 3f;
         private const float _msgDuration = 10f;

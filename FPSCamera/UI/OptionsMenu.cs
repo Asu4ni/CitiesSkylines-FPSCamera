@@ -196,7 +196,6 @@ namespace FPSCamera.UI
             configObj = Config.G
         };
 
-
         protected override void _Init() { }
         protected override void _UpdateLate()
         {
