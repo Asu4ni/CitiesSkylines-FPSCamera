@@ -1,4 +1,4 @@
-# Cities: Skylines - First Person Camera Mod v2.0
+# Cities: Skylines - First Person Camera Mod v2.1
 
 <img src="images/banner.svg" width="750px"/>
 

@@ -1,4 +1,4 @@
-[h1] Cities: Skylines - First Person Camera mod v2.0 [/h1]
+[h1] Cities: Skylines - First Person Camera mod v2.1 [/h1]
 
 * Please refer to the [url=https://github.com/Asu4ni/CitiesSkylines-FPSCamera]GitHub[/url] page for change notes, source, discussions, etc.
 * Please refer to the [url=https://github.com/Asu4ni/CitiesSkylines-FPSCamera/wiki]Wiki[/url] page for more comprehensive Guide.
