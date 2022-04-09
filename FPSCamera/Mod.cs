@@ -10,7 +10,7 @@ namespace FPSCamera
     {
         public const string name = "First Person Camera";
         public const string nameShort = "FPSCamera";
-        public const string version = "v2.0";
+        public const string version = "v2.1";
 
         public string Name => $"{name} {version}";
         public string Description => "View your city from a different perspective";
@@ -21,8 +21,8 @@ namespace FPSCamera
             Log.Msg("Mod: enabled - v" +
                     Assembly.GetExecutingAssembly().GetName().Version);
 
-            CSkyL.Harmony.Patcher.PatchOnReady(Assembly.GetExecutingAssembly());
             LoadConfig();
+            CSkyL.Harmony.Patcher.PatchOnReady(Assembly.GetExecutingAssembly());
 
             if (CamController.I is null) return;
             // Otherwise, this implies it's in game/editor.
@@ -58,6 +58,10 @@ namespace FPSCamera
         public override void OnLevelLoaded(LoadMode mode)
         {
             Log.Msg("Mod: level loaded in: " + mode.ToString());
+
+            var assembly = Assembly.GetExecutingAssembly();
+            if (!CSkyL.Harmony.Patcher.HasPatched(assembly))
+                CSkyL.Harmony.Patcher.PatchOnReady(assembly);
 
             if (CamController.I is CamController c)
                 _TryInstallController();
