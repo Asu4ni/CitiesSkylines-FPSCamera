@@ -2,12 +2,11 @@ namespace FPSCamera.UI
 {
     using Configuration;
     using CSkyL.UI;
-    using System.Collections.Generic;
     using CStyle = CSkyL.UI.Style;
 
-    public class OptionsMenu : CSkyL.Game.Behavior
+    public class OptionsMenu : OptionsBase
     {
-        public void Generate(GameElement settingPanel)
+        public override void Generate(GameElement settingPanel)
         {
             CStyle.Current = Style.basic;
             {
@@ -48,12 +47,12 @@ namespace FPSCamera.UI
                     y = 10f, size = _btnSize
                 };
                 var btn = group.Add<TextButton>(btnProps);
-                btn.SetTriggerAction(() => Mod.LoadConfig());
+                btn.SetTriggerAction(() => Mod.I?.LoadConfig());
 
                 btnProps.name = "ResetConfig"; btnProps.text = "Reset Configurations";
                 btnProps.y += _btnSize.height;
                 btn = group.Add<TextButton>(btnProps);
-                btn.SetTriggerAction(() => Mod.ResetConfig());
+                btn.SetTriggerAction(() => Mod.I?.ResetConfig());
             }
             {
                 var group = settingPanel.Add<Group>(new LayoutProperties
@@ -195,14 +194,6 @@ namespace FPSCamera.UI
             wideCondition = true,
             configObj = Config.G
         };
-
-        protected override void _Init() { }
-        protected override void _UpdateLate()
-        {
-            foreach (var setting in _settings) setting.UpdateUI();
-        }
-
-        private readonly List<ISetting> _settings = new List<ISetting>();
 
         private static readonly CSkyL.Math.Vec2D _btnSize = CSkyL.Math.Vec2D.Size(200f, 40f);
     }

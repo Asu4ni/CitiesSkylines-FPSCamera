@@ -9,7 +9,7 @@ namespace FPSCamera.UI
     using Cam = Cam;
     using Obj = CSkyL.Game.Object.Object;
 
-    public class CamInfoPanel : UnityGUI
+    public class CamInfoPanel : Behavior
     {
         public void SetAssociatedCam(Cam.Base cam)
         {
@@ -77,17 +77,15 @@ namespace FPSCamera.UI
                 Config.G.UseMetricUnit ? cam.GetSpeed().ToKilometer() : cam.GetSpeed().ToMile(),
                 Config.G.UseMetricUnit ? "k" : "m");
 
-        protected override void _UnityGUI()
+        private void OnGUI()
         {
             var width = (float) Screen.width;
             var height = (Screen.height * _heightRatio).Clamp(100f, 800f)
                                                        * Config.G.InfoPanelHeightScale;
+
+            GUI.Box(new Rect(0f, -10f, width, height + 10f), _panelTexture);
+
             var style = new GUIStyle();
-
-            style.normal.background = _panelTexture;
-            GUI.Box(new Rect(0f, -10f, width, height + 10f), "", style);
-            style.normal.background = null;
-
             style.fontSize = (int) (height * _fontHeightRatio);
             style.normal.textColor = new Color(1f, 1f, 1f, .8f);
 
@@ -166,6 +164,6 @@ namespace FPSCamera.UI
 
         private string _mid, _footer;
         private Utils.Infos _leftInfos, _rightInfos;
-        private Texture2D _panelTexture, _infoFieldTexture;
+        [RequireDestruction] private Texture2D _panelTexture, _infoFieldTexture;
     }
 }
