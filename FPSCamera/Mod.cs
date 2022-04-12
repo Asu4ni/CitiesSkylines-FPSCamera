@@ -78,7 +78,7 @@ namespace FPSCamera
             Log.Msg("Config: reset");
         }
 
-        protected override Assembly _AssemblyToPatch => Assembly.GetExecutingAssembly();
+        protected override Assembly _Assembly => Assembly.GetExecutingAssembly();
 
         private bool _TryInstallController()
         {
