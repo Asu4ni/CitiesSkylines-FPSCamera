@@ -185,12 +185,17 @@ namespace FPSCamera
         {
             _state = State.Idle;
             _uiHidden = false;
+            ThreadingExtension.Controller = this;
         }
         protected override void _SetUp()
         {
             _camGame = new GameCam();
             _SetUpUI();
         }
+        
+        public void SimulationFrame() => _camMod?.SimulationFrame();
+        public void RenderOverlay(RenderManager.CameraInfo cameraInfo) => _camMod?.RenderOverlay(cameraInfo);
+
         protected override void _UpdateLate()
         {
             try {

@@ -5,6 +5,8 @@ namespace FPSCamera.Cam
     using CSkyL.Game.ID;
     using CSkyL.Game.Object;
     using CSkyL.Transform;
+    using System.Diagnostics;
+    using CSkyL.UI;
 
     public abstract class FollowCam : Base
     {
@@ -32,12 +34,18 @@ namespace FPSCamera.Cam
     public abstract class FollowCam<IDType, TargetType> : FollowCam
            where IDType : ObjectID where TargetType : class, IObjectToFollow
     {
+        const int timeFactor = 3;
+        const float angleFactor = .9f;
         protected FollowCam(IDType id)
         {
             _id = id;
             _target = Object.Of(_id) as TargetType;
             if (_target is null) _state = new Finish();
             else _inputOffset = CamOffset.G[_target.GetPrefabName()];
+            _frames = new Position[4];
+            for (int i = 0; i < 4; ++i) {
+                _frames[i] = _target.GetTargetPos(timeFactor);
+            }
         }
 
         public override bool Validate()
@@ -61,9 +69,18 @@ namespace FPSCamera.Cam
         public override Utils.Infos GetTargetInfos() => _target.GetInfos();
 
         public override Positioning GetPositioning()
-            => _target.GetPositioning().Apply(_LocalOffset)
-                                       .Apply(Config.G.FollowCamOffset.AsOffSet)
-                                       .Apply(_inputOffset);
+        { 
+            var pos =  _target.GetPositioning();
+            pos.position.up += 20; //debug
+            var look = GetSmoothLookPos();
+            var angle = Angle.Look(pos.position.DisplacementTo(look));
+            pos.angle = Angle.Lerp(pos.angle, angle, angleFactor);
+
+            return pos
+                .Apply(_LocalOffset)
+                .Apply(Config.G.FollowCamOffset.AsOffSet)
+                .Apply(_inputOffset);
+        }
 
         public override string SaveOffset()
         {
@@ -93,6 +110,44 @@ namespace FPSCamera.Cam
             return true;
         }
 
+        public Position GetSmoothLookPos()
+        {
+            uint targetFrame = _target.GetTargetFrame();
+            Position pos1 = _GetFrame(targetFrame - 2 * 16U);
+            Position pos2 = _GetFrame(targetFrame - 0 * 16U);
+            float t = ((targetFrame & 15U) + SimulationManager.instance.m_referenceTimer) * 0.0625f;
+            return Position.Lerp(pos1, pos2, t);
+        }
+
+        private Position _GetFrame(uint simulationFrame)
+        {
+            uint index = simulationFrame >> 4 & 3U;
+            return _frames[index];
+        }
+
+
+        public override void SimulationFrame()
+        {
+            _frames[_target.GetLastFrame()] = _target.GetTargetPos(timeFactor);
+        }
+
+        public override void RenderOverlay(RenderManager.CameraInfo cameraInfo)
+        {
+            uint targetFrame = _target.GetTargetFrame();
+            float hw = 4f;
+
+            for (int i = 0; i < 4; i++) {
+                // target position
+                uint targetF = (uint) (targetFrame - (16 * i));
+                var colorT = new UnityEngine.Color32(255, (byte)(100 + 50 * i), (byte)(64 * i), 255);
+                OverlayUtil.RenderCircle(cameraInfo, _GetFrame(targetF), colorT, hw * (1 - .25f * i));
+            }
+
+            var pos0 = _target.GetPositioning().position;
+            var lookPos = GetSmoothLookPos();
+            OverlayUtil.RenderArrow(cameraInfo, pos0, lookPos, UnityEngine.Color.red);
+        }
+
         protected virtual string _SavedOffsetKey => _target.GetPrefabName();
 
         protected const float movementFactor = .1f;
@@ -101,6 +156,7 @@ namespace FPSCamera.Cam
         protected IDType _id;
         protected TargetType _target;
         protected Offset _inputOffset;
+        private Position[] _frames;
     }
 
     public abstract class FollowCamWithCam<IDType, TargetType, AnotherCam>
@@ -148,13 +204,12 @@ namespace FPSCamera.Cam
         public override string SaveOffset()
             => _state is UsingOtherCam ? (_camOther as FollowCam)?.SaveOffset() :
                                          base.SaveOffset();
-
-
         protected abstract bool _ReadyToSwitchToOtherCam { get; }
         protected abstract bool _ReadyToSwitchBack { get; }
         protected abstract AnotherCam _CreateAnotherCam();
 
         protected class UsingOtherCam : State { }
         protected AnotherCam _camOther = null;
+
     }
 }
