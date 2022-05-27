@@ -42,17 +42,15 @@ namespace FPSCamera.Cam
             _target = Object.Of(_id) as TargetType;
             if (_target is null) _state = new Finish();
             else _inputOffset = CamOffset.G[_target.GetPrefabName()];
-            _frames = new Position[4];
-            for (int i = 0; i < 4; ++i) {
-                _frames[i] = _target.GetTargetPos(timeFactor);
-            }
         }
 
         public override bool Validate()
         {
             if (!IsOperating) return false;
 
-            _target = Object.Of(_id) as TargetType;
+            if (_target == null || !_target.ID.Equals(_id)) {
+                _target = Object.Of(_id) as TargetType;
+            }
 
             if (_target is null) {
                 _state = new Finish();
@@ -72,9 +70,6 @@ namespace FPSCamera.Cam
         { 
             var pos =  _target.GetPositioning();
             pos.position.up += 20; //debug
-            var look = GetSmoothLookPos();
-            var angle = Angle.Look(pos.position.DisplacementTo(look));
-            pos.angle = Angle.Lerp(pos.angle, angle, angleFactor);
 
             return pos
                 .Apply(_LocalOffset)
@@ -110,43 +105,8 @@ namespace FPSCamera.Cam
             return true;
         }
 
-        public Position GetSmoothLookPos()
-        {
-            uint targetFrame = _target.GetTargetFrame();
-            Position pos1 = _GetFrame(targetFrame - 2 * 16U);
-            Position pos2 = _GetFrame(targetFrame - 0 * 16U);
-            float t = ((targetFrame & 15U) + SimulationManager.instance.m_referenceTimer) * 0.0625f;
-            return Position.Lerp(pos1, pos2, t);
-        }
-
-        private Position _GetFrame(uint simulationFrame)
-        {
-            uint index = simulationFrame >> 4 & 3U;
-            return _frames[index];
-        }
-
-
-        public override void SimulationFrame()
-        {
-            _frames[_target.GetLastFrame()] = _target.GetTargetPos(timeFactor);
-        }
-
-        public override void RenderOverlay(RenderManager.CameraInfo cameraInfo)
-        {
-            uint targetFrame = _target.GetTargetFrame();
-            float hw = 4f;
-
-            for (int i = 0; i < 4; i++) {
-                // target position
-                uint targetF = (uint) (targetFrame - (16 * i));
-                var colorT = new UnityEngine.Color32(255, (byte)(100 + 50 * i), (byte)(64 * i), 255);
-                OverlayUtil.RenderCircle(cameraInfo, _GetFrame(targetF), colorT, hw * (1 - .25f * i));
-            }
-
-            var pos0 = _target.GetPositioning().position;
-            var lookPos = GetSmoothLookPos();
-            OverlayUtil.RenderArrow(cameraInfo, pos0, lookPos, UnityEngine.Color.red);
-        }
+        public override void SimulationFrame()=> _target?.SimulationFrame();
+        public override void RenderOverlay(RenderManager.CameraInfo cameraInfo) => _target?.RenderOverlay(cameraInfo);
 
         protected virtual string _SavedOffsetKey => _target.GetPrefabName();
 
@@ -156,7 +116,6 @@ namespace FPSCamera.Cam
         protected IDType _id;
         protected TargetType _target;
         protected Offset _inputOffset;
-        private Position[] _frames;
     }
 
     public abstract class FollowCamWithCam<IDType, TargetType, AnotherCam>

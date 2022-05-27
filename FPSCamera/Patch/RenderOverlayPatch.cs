@@ -1,4 +1,5 @@
-﻿namespace FPSCamera.Patch
+﻿#if DEBUG
+namespace FPSCamera.Patch
 {
     using HarmonyLib;
 
@@ -12,3 +13,4 @@
         }
     }
 }
+#endif
