@@ -5,8 +5,6 @@ namespace FPSCamera.Cam
     using CSkyL.Game.ID;
     using CSkyL.Game.Object;
     using CSkyL.Transform;
-    using System.Diagnostics;
-    using CSkyL.UI;
 
     public abstract class FollowCam : Base
     {
@@ -142,6 +140,18 @@ namespace FPSCamera.Cam
                 else _camOther = null;
             }
             return true;
+        }
+
+        public override void SimulationFrame()
+        {
+            if (_state is UsingOtherCam) _camOther.SimulationFrame();
+            else base.SimulationFrame();
+        }
+
+        public override void RenderOverlay(RenderManager.CameraInfo cameraInfo)
+        {
+            if (_state is UsingOtherCam) _camOther.RenderOverlay(cameraInfo);
+            else base.RenderOverlay(cameraInfo);
         }
 
         public override Positioning GetPositioning()
