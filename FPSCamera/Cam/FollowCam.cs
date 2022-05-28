@@ -32,8 +32,6 @@ namespace FPSCamera.Cam
     public abstract class FollowCam<IDType, TargetType> : FollowCam
            where IDType : ObjectID where TargetType : class, IObjectToFollow
     {
-        const int timeFactor = 3;
-        const float angleFactor = .9f;
         protected FollowCam(IDType id)
         {
             _id = id;

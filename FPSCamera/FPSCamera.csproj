@@ -12,6 +12,11 @@
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
+    <AssemblySearchPaths>
+      $(AssemblySearchPaths);
+      C:\Program Files (x86)\Steam\steamapps\common\Cities_Skylines\Cities_Data\Managed\;
+      ..\..\..\..\..\SteamLibrary\steamapps\common\Cities_Skylines\Cities_Data\Managed\
+    </AssemblySearchPaths>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -31,24 +36,18 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\..\..\..\SteamLibrary\steamapps\common\Cities_Skylines\Cities_Data\Managed\Assembly-CSharp.dll</HintPath>
-    </Reference>
+    <Reference Include="Assembly-CSharp" />
+    <Reference Include="ColossalManaged" />
     <Reference Include="CitiesHarmony.API, Version=2.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\CitiesHarmony.API.2.1.0\lib\net35\CitiesHarmony.API.dll</HintPath>
     </Reference>
     <Reference Include="CitiesHarmony.Harmony, Version=2.0.4.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\CitiesHarmony.Harmony.2.2.0\lib\net35\CitiesHarmony.Harmony.dll</HintPath>
     </Reference>
-    <Reference Include="ICities">
-      <HintPath>..\..\..\..\..\SteamLibrary\steamapps\common\Cities_Skylines\Cities_Data\Managed\ICities.dll</HintPath>
-    </Reference>
+    <Reference Include="ICities" />
     <Reference Include="System" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="UnityEngine">
-      <HintPath>..\..\..\..\..\SteamLibrary\steamapps\common\Cities_Skylines\Cities_Data\Managed\UnityEngine.dll</HintPath>
-    </Reference>
+    <Reference Include="UnityEngine" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Mod.cs" />
@@ -60,6 +59,8 @@
     <Compile Include="Cam\PedestrianCam.cs" />
     <Compile Include="Cam\VehicleCam.cs" />
     <Compile Include="Cam\WalkThruCam.cs" />
+    <Compile Include="Patch\RenderOverlayPatch.cs" />
+    <Compile Include="ThreadingExtension.cs" />
     <Compile Include="UI\Style.cs" />
     <Compile Include="UI\MainPanel.cs" />
     <Compile Include="UI\CamInfoPanel.cs" />
