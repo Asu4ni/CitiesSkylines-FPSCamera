@@ -65,7 +65,7 @@ namespace FPSCamera.Cam
         public override Positioning GetPositioning()
         { 
             var pos =  _target.GetPositioning();
-            pos.position.up += 20; //debug
+            //pos.position.up += 20; //debug
 
             return pos
                 .Apply(_LocalOffset)
