@@ -14,8 +14,9 @@
     <TargetFrameworkProfile />
     <AssemblySearchPaths>
       $(AssemblySearchPaths);
+      {HintPathFromItem};
       C:\Program Files (x86)\Steam\steamapps\common\Cities_Skylines\Cities_Data\Managed\;
-      ..\..\..\..\..\SteamLibrary\steamapps\common\Cities_Skylines\Cities_Data\Managed\
+      ..\..\..\..\..\SteamLibrary\steamapps\common\Cities_Skylines\Cities_Data\Managed\;
     </AssemblySearchPaths>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
