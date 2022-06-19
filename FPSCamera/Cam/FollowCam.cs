@@ -44,7 +44,9 @@ namespace FPSCamera.Cam
         {
             if (!IsOperating) return false;
 
-            _target = Object.Of(_id) as TargetType;
+            if (_target == null || !_target.ID.Equals(_id)) {
+                _target = Object.Of(_id) as TargetType;
+            }
 
             if (_target is null) {
                 _state = new Finish();
@@ -93,6 +95,13 @@ namespace FPSCamera.Cam
             return true;
         }
 
+        public override void SimulationFrame() {
+            // TODO complete
+        }
+        public override void RenderOverlay(RenderManager.CameraInfo cameraInfo) { 
+            // TODO complete
+        }
+
         protected virtual string _SavedOffsetKey => _target.GetPrefabName();
 
         protected const float movementFactor = .1f;
@@ -127,6 +136,18 @@ namespace FPSCamera.Cam
                 else _camOther = null;
             }
             return true;
+        }
+
+        public override void SimulationFrame()
+        {
+            if (_state is UsingOtherCam) _camOther.SimulationFrame();
+            else base.SimulationFrame();
+        }
+
+        public override void RenderOverlay(RenderManager.CameraInfo cameraInfo)
+        {
+            if (_state is UsingOtherCam) _camOther.RenderOverlay(cameraInfo);
+            else base.RenderOverlay(cameraInfo);
         }
 
         public override Positioning GetPositioning()
