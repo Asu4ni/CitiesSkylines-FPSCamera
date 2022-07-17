@@ -16,7 +16,8 @@ namespace FPSCamera.Cam
         public bool IsOperating => !(_state is Finish);
 
         public abstract bool Validate(); // call first before using the other methods.
-
+        public virtual void SimulationFrame() { }
+        public virtual void RenderOverlay(RenderManager.CameraInfo cameraInfo) { }
         public abstract Positioning GetPositioning();
         public abstract float GetSpeed();
         public virtual Utils.Infos GetGeoInfos()
