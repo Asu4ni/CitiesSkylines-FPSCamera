@@ -5,6 +5,7 @@ namespace FPSCamera.Cam
     using CSkyL.Game.ID;
     using CSkyL.Game.Object;
     using CSkyL.Transform;
+    using CSkyL.UI;
 
     public abstract class FollowCam : Base
     {
@@ -38,6 +39,10 @@ namespace FPSCamera.Cam
             _target = Object.Of(_id) as TargetType;
             if (_target is null) _state = new Finish();
             else _inputOffset = CamOffset.G[_target.GetPrefabName()];
+            _frames = new Position[4];
+            for (int i = 0; i < 4; ++i) {
+                _frames[i] = _target.GetTargetPos(targetPosIndex);
+            }
         }
 
         public override bool Validate()
@@ -63,9 +68,19 @@ namespace FPSCamera.Cam
         public override Utils.Infos GetTargetInfos() => _target.GetInfos();
 
         public override Positioning GetPositioning()
-            => _target.GetPositioning().Apply(_LocalOffset)
-                                       .Apply(Config.G.FollowCamOffset.AsOffSet)
-                                       .Apply(_inputOffset);
+        {
+            var pos = _target.GetPositioning();
+            var look = GetSmoothLookPos();
+            var dir = pos.position.DisplacementTo(look);
+            if (dir.SqrDistance >= minLookDistance * minLookDistance) {
+                pos.angle = Angle.Lerp(pos.angle, dir.AsLookingAngle(), angleFactor);
+            }
+
+            return pos
+                .Apply(_LocalOffset)
+                .Apply(Config.G.FollowCamOffset.AsOffSet)
+                .Apply(_inputOffset);
+        }
 
         public override string SaveOffset()
         {
@@ -95,21 +110,63 @@ namespace FPSCamera.Cam
             return true;
         }
 
-        public override void SimulationFrame() {
-            // TODO complete
+
+        public Position GetSmoothLookPos()
+        {
+            // code from decompiler : GetSmoothPos()
+            uint targetFrame = _target.GetTargetFrame();
+            Position pos1 = _GetFrame(targetFrame - 1 * 16U);
+            Position pos2 = _GetFrame(targetFrame - 0 * 16U);
+            float t = ((targetFrame & 15U) + SimulationManager.instance.m_referenceTimer) * 0.0625f;
+            return Position.Lerp(pos1, pos2, t);
         }
-        public override void RenderOverlay(RenderManager.CameraInfo cameraInfo) { 
-            // TODO complete
+
+        private Position _GetFrame(uint simulationFrame)
+        {
+            // code from decompiler : GetFrameData()
+            return _frames[simulationFrame >> 4 & 3U];
+        }
+
+
+        public override void SimulationFrame()
+        {
+            _frames[_target.GetLastFrame()] = _target.GetTargetPos(targetPosIndex);
+        }
+
+        public override void RenderOverlay(RenderManager.CameraInfo cameraInfo)
+        {
+#if DEBUG
+            uint targetFrame = _target.GetTargetFrame();
+            float hw = 4f;
+
+            for (int i = 0; i < 4; i++) {
+                // target position
+                uint targetF = (uint) (targetFrame - (16 * i));
+                var color = new UnityEngine.Color32(255, (byte) (100 + 50 * i), (byte) (64 * i), 255);
+                float r = hw * (1 - .25f * i);
+                OverlayUtil.RenderCircle(cameraInfo, _GetFrame(targetF), color, r);
+            }
+
+            var pos0 = _target.GetPositioning().position;
+            var lookPos = GetSmoothLookPos();
+            if (pos0.DistanceTo(lookPos) > minLookDistance) {
+                OverlayUtil.RenderArrow(cameraInfo, pos0, lookPos, UnityEngine.Color.red);
+            }
+#endif
         }
 
         protected virtual string _SavedOffsetKey => _target.GetPrefabName();
 
         protected const float movementFactor = .1f;
         protected const float heightMovementFactor = .2f;
+        const int targetPosIndex = 3;
+        const float angleFactor = .9f;
+        const float minLookDistance = 0.1f;
 
         protected IDType _id;
         protected TargetType _target;
         protected Offset _inputOffset;
+        private Position[] _frames;
     }
 
     public abstract class FollowCamWithCam<IDType, TargetType, AnotherCam>
