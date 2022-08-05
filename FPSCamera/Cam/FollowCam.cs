@@ -70,10 +70,12 @@ namespace FPSCamera.Cam
         public override Positioning GetPositioning()
         {
             var pos = _target.GetPositioning();
-            var look = GetSmoothLookPos();
-            var dir = pos.position.DisplacementTo(look);
-            if (dir.SqrDistance >= minLookDistance * minLookDistance) {
-                pos.angle = Angle.Lerp(pos.angle, dir.AsLookingAngle(), angleFactor);
+            if (Config.G.LookAhead) {
+                var look = GetSmoothLookPos();
+                var dir = pos.position.DisplacementTo(look);
+                if (dir.SqrDistance >= minLookDistance * minLookDistance) {
+                    pos.angle = Angle.Lerp(pos.angle, dir.AsLookingAngle(), angleFactor);
+                }
             }
 
             return pos
