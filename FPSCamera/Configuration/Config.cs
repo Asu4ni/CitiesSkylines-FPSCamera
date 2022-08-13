@@ -79,8 +79,9 @@ namespace FPSCamera.Configuration
         public readonly CfFlag ShowCursor4Follow = new CfFlag(false);
         [Config("StickToFrontVehicle", "Always follow the front vehicle")]
         public readonly CfFlag StickToFrontVehicle = new CfFlag(true);
-        [Config("LookAhead", "Look ahead", "Camera Looks toward the position the vehicle is going to be.")]
-        public readonly CfFlag LookAhead = new CfFlag(true);
+        [Config("LookAhead", "Look ahead",
+                "Camera Looks toward the position the vehicle is going to be.")]
+        public readonly CfFlag LookAhead = new CfFlag(false);
         [Config("InstantMoveMax", "Min distance for smooth transition",
                 "In Follow Mode, camera needs to move instantly with\n" +
                 "the target even when smooth transition is enabled.\n" +
