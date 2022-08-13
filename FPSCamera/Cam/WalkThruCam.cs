@@ -27,8 +27,8 @@
             if (!ok) {
                 _SetRandomCam();
                 ok = _currentCam?.Validate() ?? false;
+                if (!ok) Log.Warn("no target for Walk-Thru mode");
             }
-            if (!ok) Log.Warn("no target for Walk-Thru mode");
             return ok;
         }
 
