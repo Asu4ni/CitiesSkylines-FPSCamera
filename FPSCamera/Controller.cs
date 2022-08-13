@@ -192,7 +192,7 @@ namespace FPSCamera
             _camGame = new GameCam();
             _SetUpUI();
         }
-        
+
         public void SimulationFrame() => _camMod?.SimulationFrame();
         public void RenderOverlay(RenderManager.CameraInfo cameraInfo) => _camMod?.RenderOverlay(cameraInfo);
 

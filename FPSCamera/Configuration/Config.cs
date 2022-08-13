@@ -58,16 +58,21 @@ namespace FPSCamera.Configuration
         [Config("ShowCursor4Free", "Show cursor in Free-Camera mode")]
         public readonly CfFlag ShowCursor4Free = new CfFlag(false);
 
-        public enum GroundClipping { None, PreventClip, SnapToGround }
+        public enum GroundClipping { None, AboveGround, SnapToGround, AboveRoad, SnapToRoad }
         [Config("GroundClipping", "Ground clipping option",
                 "For Free-Camera Mode:\n-[None] free movement\n" +
-                "-[PreventClip] camera always above ground\n" +
-                "-[SnapToGround] camera sticks to ground")]
+                "-[AboveGround] camera always above ground\n" +
+                "-[SnapToGround] camera sticks to ground\n" +
+                "-[AboveRoad] camera always above the closest road\n" +
+                "-[SnapToRoad] camera sticks to the closest road or ground")]
         public readonly ConfigData<GroundClipping> GroundClippingOption
-                            = new ConfigData<GroundClipping>(GroundClipping.PreventClip);
+                            = new ConfigData<GroundClipping>(GroundClipping.AboveGround);
         [Config("GroundLevelOffset", "Ground level offset",
                 "Vertical offset for ground level for ground clipping option")]
         public readonly CfFloat GroundLevelOffset = new CfFloat(0f, min: -2f, max: 10f);
+        [Config("RoadLevelOffset", "Road level offset",
+                "Vertical offset for road level for ground clipping option")]
+        public readonly CfFloat RoadLevelOffset = new CfFloat(0f, min: -2f, max: 10f);
 
         // follow config
         [Config("ShowCursor4Follow", "Show cursor in Follow/Walk-Through mode")]

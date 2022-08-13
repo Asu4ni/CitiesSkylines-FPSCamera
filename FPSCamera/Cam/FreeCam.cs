@@ -23,11 +23,17 @@
                     new CSkyL.Math.Range(-Config.G.MaxPitchDeg, Config.G.MaxPitchDeg));
 
             if (Config.G.GroundClippingOption != Config.GroundClipping.None) {
-                var minHeight = Map.GetMinHeightAt(_positioning.position)
-                                    + Config.G.GroundLevelOffset;
-                if (Config.G.GroundClippingOption == Config.GroundClipping.SnapToGround
-                            || _positioning.position.up < minHeight)
-                    _positioning.position.up = minHeight;
+                var minH = Map.GetMinHeightAt(_positioning.position) + Config.G.GroundLevelOffset;
+                if ((Config.G.GroundClippingOption == Config.GroundClipping.AboveRoad ||
+                             Config.G.GroundClippingOption == Config.GroundClipping.SnapToRoad ?
+                             Map.GetClosestSegmentLevel(_positioning.position) : null)
+                        is float roadH
+                    ) minH = roadH + Config.G.RoadLevelOffset;
+
+                if (Config.G.GroundClippingOption == Config.GroundClipping.SnapToGround ||
+                    Config.G.GroundClippingOption == Config.GroundClipping.SnapToRoad ||
+                        _positioning.position.up < minH)
+                    _positioning.position.up = minH;
             }
         }
         public override void InputReset() { _autoMove = false; }

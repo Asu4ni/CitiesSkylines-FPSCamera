@@ -93,6 +93,7 @@ namespace FPSCamera.UI
                                     props.Swap(Config.G.GroundClippingOption)));
                 props.stepSize = .1f; props.valueFormat = "F1";
                 _settings.Add(group.Add<SliderSetting>(props.Swap(Config.G.GroundLevelOffset)));
+                _settings.Add(group.Add<SliderSetting>(props.Swap(Config.G.RoadLevelOffset)));
             }
             {
                 var group = settingPanel.Add<Group>(new LayoutProperties
