@@ -102,6 +102,21 @@ namespace FPSCamera.Configuration
                 "Use secondary mouse click to\nswitch following targets instead.")]
         public readonly CfFlag ManualSwitch4Walk = new CfFlag(false);
 
+        [Config("SelectPedestrian", "Walking pedestrians")]
+        public readonly CfFlag SelectPedestrian = new CfFlag(true);
+        [Config("SelectPassenger", "Pedestrians on public transits")]
+        public readonly CfFlag SelectPassenger = new CfFlag(true);
+        [Config("SelectWaiting", "Pedestrians waiting for public transits")]
+        public readonly CfFlag SelectWaiting = new CfFlag(true);
+        [Config("SelectDriving", "Driving/Riding citizens")]
+        public readonly CfFlag SelectDriving = new CfFlag(true);
+        [Config("SelectPublicTransit", "Public transit vehicles")]
+        public readonly CfFlag SelectPublicTransit = new CfFlag(true);
+        [Config("SelectService", "Service vehicles")]
+        public readonly CfFlag SelectService = new CfFlag(true);
+        [Config("SelectCargo", "Cargo vehicles")]
+        public readonly CfFlag SelectCargo = new CfFlag(true);
+
         // keys
         [Config("KeyCamToggle", "FPS Camera toggle")]
         public readonly CfKey KeyCamToggle = new CfKey(KeyCode.BackQuote);

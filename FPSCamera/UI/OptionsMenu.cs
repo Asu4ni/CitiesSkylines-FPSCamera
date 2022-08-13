@@ -123,6 +123,16 @@ namespace FPSCamera.UI
                 props.stepSize = 1f; props.valueFormat = "F0";
                 _settings.Add(group.Add<SliderSetting>(props.Swap(Config.G.Period4Walk)));
                 _settings.Add(group.Add<ToggleSetting>(props.Swap(Config.G.ManualSwitch4Walk)));
+
+                props.text = "Targets to follow:";
+                group.Add<Label>(props);
+                _settings.Add(group.Add<ToggleSetting>(props.Swap(Config.G.SelectPedestrian)));
+                _settings.Add(group.Add<ToggleSetting>(props.Swap(Config.G.SelectPassenger)));
+                _settings.Add(group.Add<ToggleSetting>(props.Swap(Config.G.SelectWaiting)));
+                _settings.Add(group.Add<ToggleSetting>(props.Swap(Config.G.SelectDriving)));
+                _settings.Add(group.Add<ToggleSetting>(props.Swap(Config.G.SelectPublicTransit)));
+                _settings.Add(group.Add<ToggleSetting>(props.Swap(Config.G.SelectService)));
+                _settings.Add(group.Add<ToggleSetting>(props.Swap(Config.G.SelectCargo)));
             }
             {
                 var group = settingPanel.Add<Group>(new LayoutProperties

@@ -46,9 +46,33 @@
             _currentCam = null;
             Log.Msg(" -- switching target");
 
-            var list = Pedestrian.GetIf((p) => !p.IsHangingAround)
-                                 .OfType<Object>().Concat(
-                       Vehicle.GetIf((v) => true).OfType<Object>()).ToList();
+            var list = Vehicle.GetIf((v) => {
+                switch (v) {
+                case PersonalVehicle _: return Config.G.SelectDriving;
+                case TransitVehicle _: return Config.G.SelectPublicTransit;
+                case ServiceVehicle _: return Config.G.SelectService;
+                case MissionVehicle _: return Config.G.SelectService;
+                case CargoVehicle _: return Config.G.SelectCargo;
+                default:
+                    Log.Warn("WalkThru selection: unknow vehicle type:"
+                             + v.GetPrefabName());
+                    return false;
+                }
+            }).OfType<Object>().Concat(
+                       Pedestrian.GetIf((p) => {
+                           if (p.IsHangingAround) return false;
+                           switch (Vehicle.Of(p.RiddenVehicleID)) {
+                           case TransitVehicle _: return Config.G.SelectPassenger;
+                           case PersonalVehicle _: return false;    // already selected by Vehicle
+                           case Vehicle v:
+                               Log.Warn("WalkThru selection: unknow pedestrian type: on a "
+                                        + v.GetPrefabName());
+                               return false;
+                           default:
+                               return p.IsWaitingTransit ? Config.G.SelectWaiting
+                                                         : Config.G.SelectPedestrian;
+                           }
+                       }).OfType<Object>()).ToList();
             if (!list.Any()) return;
 
             int attempt = 3;
