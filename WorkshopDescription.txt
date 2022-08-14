@@ -1,8 +1,16 @@
-[h1] Cities: Skylines - First Person Camera mod v2.1 [/h1]
+[h1] Cities: Skylines - First Person Camera mod v2.2 [/h1]
 
 * Please refer to the [url=https://github.com/Asu4ni/CitiesSkylines-FPSCamera]GitHub[/url] page for change notes, source, discussions, etc.
 * Please refer to the [url=https://github.com/Asu4ni/CitiesSkylines-FPSCamera/wiki]Wiki[/url] page for more comprehensive Guide.
 * Consider submitting your issues or suggestions on the [url=https://github.com/Asu4ni/CitiesSkylines-FPSCamera/issues]Issues[/url] page.
+
+[h2] What's New [/h2]
+[list]
+[*] new Ground Clipping options: AboveRoad / SnapToRoad
+[*] new options to exclude certain targets in Walk-Through Mode:
+[*] introduce LookAhead (by kian.zarrin) (off by default)
+[/list]
+* for more details, please refer to the change notes (Steam / GitHub).
 
 [quote] This is an updated version for [url=https://steamcommunity.com/sharedfiles/filedetails/?id=650805785]First Person Camera: Updated[/url] by tony56a [/quote] 
 
