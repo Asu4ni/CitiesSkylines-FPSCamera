@@ -32,6 +32,8 @@
             return ok;
         }
 
+        public override void SimulationFrame() => _currentCam.SimulationFrame();
+        public override void RenderOverlay(RenderManager.CameraInfo cameraInfo) => _currentCam.RenderOverlay(cameraInfo);
         public override Positioning GetPositioning() => _currentCam.GetPositioning();
         public override float GetSpeed() => _currentCam.GetSpeed();
         public override void InputOffset(Offset inputOffset)
