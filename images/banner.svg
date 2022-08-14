@@ -39,8 +39,8 @@
      showguides="true"
      inkscape:guide-bbox="true"
      inkscape:zoom="0.70710678"
-     inkscape:cx="523.25902"
-     inkscape:cy="304.76302"
+     inkscape:cx="560.73568"
+     inkscape:cy="352.84628"
      inkscape:window-width="1920"
      inkscape:window-height="1177"
      inkscape:window-x="-8"
@@ -186,7 +186,8 @@
      inkscape:groupmode="layer"
      id="layer2"
      inkscape:label="Layer 2"
-     sodipodi:insensitive="true">
+     sodipodi:insensitive="true"
+     style="display:inline">
     <rect
        style="fill:#0c0a41;fill-opacity:1;stroke:#ffffff;stroke-width:1.24632;stroke-dasharray:2.49263, 1.24632;stroke-opacity:0;paint-order:stroke markers fill;stop-color:#000000"
        id="rect31201"
@@ -437,15 +438,15 @@
          id="tspan43928">First Person Camera</tspan></text>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:1.25;font-family:sans-serif;fill:#ffffff;fill-opacity:0.415584;stroke:none;stroke-width:0.264583"
+       style="font-style:normal;font-weight:normal;font-size:11.2889px;line-height:1.25;font-family:sans-serif;fill:#ffffff;fill-opacity:0.415584;stroke:none;stroke-width:0.264583"
        x="20.742922"
        y="148.00647"
        id="text94241"><tspan
-         sodipodi:role="line"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Noto Mono';-inkscape-font-specification:'Noto Mono';fill:#ffffff;fill-opacity:0.415584;stroke-width:0.264583"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.2889px;font-family:'Noto Mono';-inkscape-font-specification:'Noto Mono';fill:#ffffff;fill-opacity:0.415584;stroke-width:0.264583"
          x="20.742922"
          y="148.00647"
-         id="tspan906">v2.1</tspan></text>
+         id="tspan906"
+         sodipodi:role="line">v2.x</tspan></text>
     <g
        id="g43796"
        transform="matrix(0.91817627,0,0,0.82724358,247.67977,3.6566779)">

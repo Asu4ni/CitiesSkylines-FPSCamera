@@ -38,9 +38,9 @@
      inkscape:snap-others="false"
      showguides="true"
      inkscape:guide-bbox="true"
-     inkscape:zoom="0.640125"
-     inkscape:cx="78.890842"
-     inkscape:cy="224.17497"
+     inkscape:zoom="1.28025"
+     inkscape:cx="224.56551"
+     inkscape:cy="257.37161"
      inkscape:window-width="1920"
      inkscape:window-height="1177"
      inkscape:window-x="-8"
@@ -310,18 +310,19 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     style="display:inline">
+     style="display:inline"
+     sodipodi:insensitive="true">
     <text
        xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:6.85798px;line-height:1.25;font-family:sans-serif;display:inline;fill:#ffffff;fill-opacity:0.415584;stroke:none;stroke-width:0.171449"
+       style="font-style:normal;font-weight:normal;font-size:7.76111px;line-height:1.25;font-family:sans-serif;display:inline;fill:#ffffff;fill-opacity:0.415584;stroke:none;stroke-width:0.171449"
        x="12.95458"
        y="122.13369"
        id="text94241"><tspan
          sodipodi:role="line"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Noto Mono';-inkscape-font-specification:'Noto Mono';fill:#ffffff;fill-opacity:0.415584;stroke-width:0.171449"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.76111px;font-family:'Noto Mono';-inkscape-font-specification:'Noto Mono';fill:#ffffff;fill-opacity:0.415584;stroke-width:0.171449"
          x="12.95458"
          y="122.13369"
-         id="tspan906">v2.1</tspan></text>
+         id="tspan906">v2.x</tspan></text>
     <g
        id="g55921"
        transform="matrix(0.52559943,0.05349061,-0.05349061,0.52559943,2.7095685,56.322141)"
