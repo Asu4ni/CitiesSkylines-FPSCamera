@@ -10,6 +10,7 @@
     <RootNamespace>FPSCamera</RootNamespace>
     <AssemblyName>FPSCamera</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <LangVersion>latest</LangVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
     <AssemblySearchPaths>
@@ -49,6 +50,7 @@
     <Reference Include="System" />
     <Reference Include="System.Xml" />
     <Reference Include="UnityEngine" />
+    <Reference Include="ColossalManaged" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Mod.cs" />
@@ -61,6 +63,9 @@
     <Compile Include="Cam\VehicleCam.cs" />
     <Compile Include="Cam\WalkThruCam.cs" />
     <Compile Include="Patch\RenderOverlayPatch.cs" />
+    <Compile Include="Util\MathUtil.cs" />
+    <Compile Include="Util\NetUtil.cs" />
+    <Compile Include="Util\PathUtil.cs" />
     <Compile Include="ThreadingExtension.cs" />
     <Compile Include="UI\Style.cs" />
     <Compile Include="UI\MainPanel.cs" />

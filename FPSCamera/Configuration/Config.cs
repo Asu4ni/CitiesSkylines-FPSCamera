@@ -82,6 +82,10 @@ namespace FPSCamera.Configuration
         [Config("LookAhead", "Look ahead",
                 "Camera looks toward the position the target is going to be.")]
         public readonly CfFlag LookAhead = new CfFlag(true);
+        [Config("LookAheadSeconds", "Look seconds ahead", "seconds to look ahead by (depends on speed)")]
+        public readonly CfFloat LookAheadSeconds = new CfFloat(2,0,10);
+        [Config("LookAheadPercent", "% Look ahead", "how much to turn toward look target.")]
+        public readonly CfFloat LookAheadPercent = new CfFloat(90, 0, 100);
         [Config("InstantMoveMax", "Min distance for smooth transition",
                 "In Follow Mode, camera needs to move instantly with\n" +
                 "the target even when smooth transition is enabled.\n" +

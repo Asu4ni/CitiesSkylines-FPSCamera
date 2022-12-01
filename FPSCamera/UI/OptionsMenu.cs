@@ -107,6 +107,12 @@ namespace FPSCamera.UI
                 _settings.Add(group.Add<ToggleSetting>(props.Swap(Config.G.StickToFrontVehicle)));
                 _settings.Add(group.Add<ToggleSetting>(props.Swap(Config.G.LookAhead)));
 
+                props.stepSize = 0.1f; props.valueFormat = "R";
+                _settings.Add(group.Add<SliderSetting>(props.Swap(Config.G.LookAheadSeconds)));
+
+                props.stepSize = 10f; props.valueFormat = "F0";
+                _settings.Add(group.Add<SliderSetting>(props.Swap(Config.G.LookAheadPercent)));
+
                 props.stepSize = 1f; props.valueFormat = "F0";
                 _settings.Add(group.Add<SliderSetting>(props.Swap(Config.G.InstantMoveMax)));
 

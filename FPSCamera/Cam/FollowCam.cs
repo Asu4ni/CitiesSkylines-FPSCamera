@@ -6,6 +6,7 @@ namespace FPSCamera.Cam
     using CSkyL.Game.Object;
     using CSkyL.Transform;
     using CSkyL.UI;
+    using FPSCamera.Util;
 
     public abstract class FollowCam : Base
     {
@@ -40,8 +41,9 @@ namespace FPSCamera.Cam
             if (_target is null) _state = new Finish();
             else _inputOffset = CamOffset.G[_target.GetPrefabName()];
             _frames = new Position[4];
+            Position lookPos = _target.LookAhead();
             for (int i = 0; i < 4; ++i) {
-                _frames[i] = _target.GetTargetPos(targetPosIndex);
+                _frames[i] = lookPos;
             }
         }
 
@@ -117,8 +119,8 @@ namespace FPSCamera.Cam
         {
             // code from decompiler : GetSmoothPos()
             uint targetFrame = _target.GetTargetFrame();
-            Position pos1 = _GetFrame(targetFrame - 1 * 16U);
-            Position pos2 = _GetFrame(targetFrame - 0 * 16U);
+            Position pos1 = _GetFrame(targetFrame - 2 * 16U);
+            Position pos2 = _GetFrame(targetFrame - 1 * 16U);
             float t = ((targetFrame & 15U) + SimulationManager.instance.m_referenceTimer) * 0.0625f;
             return Position.Lerp(pos1, pos2, t);
         }
@@ -132,7 +134,7 @@ namespace FPSCamera.Cam
 
         public override void SimulationFrame()
         {
-            _frames[_target.GetLastFrame()] = _target.GetTargetPos(targetPosIndex);
+            _frames[_target.GetLastFrame()] = _target.LookAhead();
         }
 
         public override void RenderOverlay(RenderManager.CameraInfo cameraInfo)
@@ -161,8 +163,7 @@ namespace FPSCamera.Cam
 
         protected const float movementFactor = .1f;
         protected const float heightMovementFactor = .2f;
-        const int targetPosIndex = 3;
-        const float angleFactor = .9f;
+        private float angleFactor => Config.G.LookAheadPercent * 0.01f;
         const float minLookDistance = 0.1f;
 
         protected IDType _id;
