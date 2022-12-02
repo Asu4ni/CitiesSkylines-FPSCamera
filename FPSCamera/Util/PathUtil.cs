@@ -93,12 +93,21 @@ namespace FPSCamera.Util
         internal static Vector3 GetPosition(this PathUnit.Position pathPos) =>
             pathPos.GetLane().CalculatePosition(pathPos.m_offset * BYTE2FLOAT_OFFSET);
 
-
+        /// <summary>
+        /// gets look ahead position.
+        /// </summary>
         internal static Position LookAhead(this IObjectToFollow target)
         {
             return target.TravelBy(seconds: Config.G.LookAheadSeconds, minDistance: 4f);
         }
 
+        /// <summary>
+        /// returns a position <paramref name="seconds"/> ahead on <paramref name="target"/>'s path.
+        /// if not possible then returns target position instead.
+        /// </summary>
+        /// <param name="target">object to follow</param>
+        /// <param name="seconds">seconds to travel based on speed</param>
+        /// <param name="minDistance">minimum distance to travel at low speed</param>
         internal static Position TravelBy(this IObjectToFollow target, float seconds, float minDistance)
         {
             try {
@@ -112,7 +121,7 @@ namespace FPSCamera.Util
             return target.GetTargetPos(targetPosIndex);
         }
 
-        /// <param name="lastPos">pos0 if no path was found, otherwise position after distance</param>
+        /// <param name="lastPos">current position if no path was found, otherwise position that is <paramref name="seconds"/> or <paramref name="minDistance"/> ahead</param>
         /// <returns>false if no path was found</returns>
         private static bool TravelImpl(IObjectToFollow target, float seconds, float minDistance, out Vector3 lastPos)
         {

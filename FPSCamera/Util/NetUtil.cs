@@ -2,7 +2,7 @@
 {
     public static class NetUtil
     {
-        public static NetManager netMan = NetManager.instance;
+        private static NetManager netMan = NetManager.instance;
         private static NetNode[] nodeBuffer_ = netMan.m_nodes.m_buffer;
         private static NetSegment[] segmentBuffer_ = netMan.m_segments.m_buffer;
         private static NetLane[] laneBuffer_ = netMan.m_lanes.m_buffer;
