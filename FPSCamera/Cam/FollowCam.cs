@@ -5,8 +5,6 @@ namespace FPSCamera.Cam
     using CSkyL.Game.ID;
     using CSkyL.Game.Object;
     using CSkyL.Transform;
-    using CSkyL.UI;
-    using FPSCamera.Util;
 
     public abstract class FollowCam : Base
     {
@@ -41,7 +39,7 @@ namespace FPSCamera.Cam
             if (_target is null) _state = new Finish();
             else _inputOffset = CamOffset.G[_target.GetPrefabName()];
             _frames = new Position[4];
-            Position lookPos = _target.LookAhead();
+            Position lookPos = _target.LookAhead(Config.G.LookAheadSeconds);
             for (int i = 0; i < 4; ++i) {
                 _frames[i] = lookPos;
             }
@@ -134,7 +132,7 @@ namespace FPSCamera.Cam
 
         public override void SimulationFrame()
         {
-            _frames[_target.GetLastFrame()] = _target.LookAhead();
+            _frames[_target.GetLastFrame()] = _target.LookAhead(Config.G.LookAheadSeconds);
         }
 
         public override void RenderOverlay(RenderManager.CameraInfo cameraInfo)

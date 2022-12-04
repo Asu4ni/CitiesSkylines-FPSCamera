@@ -63,9 +63,6 @@
     <Compile Include="Cam\VehicleCam.cs" />
     <Compile Include="Cam\WalkThruCam.cs" />
     <Compile Include="Patch\RenderOverlayPatch.cs" />
-    <Compile Include="Util\MathUtil.cs" />
-    <Compile Include="Util\NetUtil.cs" />
-    <Compile Include="Util\PathUtil.cs" />
     <Compile Include="ThreadingExtension.cs" />
     <Compile Include="UI\Style.cs" />
     <Compile Include="UI\MainPanel.cs" />
